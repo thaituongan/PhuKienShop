@@ -1,0 +1,56 @@
+﻿﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model IEnumerable<PhuKienShop.Data.ProductSale>
+@{
+
+
+
+	<div class="products-tabs">
+		<!-- tab -->
+		<div id="tab1" class="tab-pane active">
+			<div class="products-slick" data-nav="#slick-nav-2">
+				<!-- product -->
+				@foreach (var item in Model)
+				{
+					<div class="product">
+						<div class="product-img">
+							<img height="150px" src="@item.Product.ImageUrl" alt="@item.Product.ImageUrl>">
+							<div class="product-label">
+								<span class="sale">@item.DiscountPercentage.ToString("N0")%</span>
+							</div>
+						</div>
+						<div class="product-body">
+							<p class="product-category">@item.Product.Category.CategoryName</p>
+							<h3 class="product-name"><a href="#">@item.Product.ProductName</a></h3>
+
+							<h4 class="product-price">@item.SalePrice.ToString("N0") VND</h4>
+
+							<del class="product-old-price">@item.Product.Price.ToString("N0") VND</del>
+
+							<div class="product-rating">
+								<i class="fa fa-star"></i>
+								<i class="fa fa-star"></i>
+								<i class="fa fa-star"></i>
+								<i class="fa fa-star"></i>
+								<i class="fa fa-star"></i>
+							</div>
+							<div class="product-btns">
+								<button class="add-to-wishlist"><i class="fa fa-heart-o"></i><span class="tooltipp">add to wishlist</span></button>
+								<button class="add-to-compare"><i class="fa fa-exchange"></i><span class="tooltipp">add to compare</span></button>
+								<button class="quick-view"><i class="fa fa-eye"></i><span class="tooltipp">quick view</span></button>
+							</div>
+						</div>
+						<div class="add-to-cart">
+							<button class="add-to-cart-btn"><i class="fa fa-shopping-cart"></i> add to cart</button>
+						</div>
+					</div>
+
+				}
+				<!-- /product -->
+			</div>
+			<div id="slick-nav-2" class="products-slick-nav"></div>
+		</div>
+		<!-- /tab -->
+	</div>
+}

@@ -1,0 +1,17 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model IEnumerable<PhuKienShop.Data.Category>
+@{
+
+			<div class="section-nav">
+				<ul class="section-tab-nav tab-nav">
+					<li class="active"><a data-toggle="tab" href="#tab1">Tất cả</a></li>
+					@foreach (var item in Model)
+					{
+						<li><a data-toggle="tab" href="#tab1">@item.CategoryName</a></li>
+					}
+				</ul>
+			</div>
+
+}
