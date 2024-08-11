@@ -1,5 +1,9 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using PhuKienShop.Data;
+using System.Security.Claims;
 
 namespace PhuKienShop
 {
@@ -9,6 +13,19 @@ namespace PhuKienShop
         {
             var builder = WebApplication.CreateBuilder(args);
             // Add services to the container.
+
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = "PhuKienShopAuth";
+                options.DefaultSignInScheme = "PhuKienShopAuth";
+            })
+                .AddCookie("PhuKienShopAuth")
+                .AddGoogle(options =>
+                {
+                    options.ClientId = "890059595195-nls0ig1u9ccgvlc1u4q73bmkn9ljikqg.apps.googleusercontent.com";
+                    options.ClientSecret = "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";
+                });
+
             builder.Services.AddControllersWithViews();
             builder.Services.AddDbContext<PkShopContext>(options =>
             {
@@ -28,16 +45,15 @@ namespace PhuKienShop
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-
-            app.UseRouting();
-
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllerRoute(
-                name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}");
+              name: "default",
+              pattern: "{controller=Home}/{action=Index}/{id?}");
 
             app.Run();
         }
+            
     }
 }

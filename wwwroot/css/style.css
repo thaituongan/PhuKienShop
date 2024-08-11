@@ -2188,3 +2188,12 @@ textarea.input {
     margin-top: 10px;
   }
 }
+#main {
+    min-height: 600px; /* Đảm bảo chiều cao đủ lớn để chứa nội dung */
+    display: flex;
+    justify-content: center; /* Căn giữa theo chiều ngang */
+    align-items: center; /* Căn giữa theo chiều dọc */
+    width: 100%; /* Đảm bảo chiếm toàn bộ chiều rộng */
+    padding: 20px; /* Thêm padding để không bị dính vào viền */
+}
+
