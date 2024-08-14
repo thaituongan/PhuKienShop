@@ -2188,9 +2188,12 @@ textarea.input {
     margin-top: 10px;
   }
 }
+<<<<<<< HEAD
+#main   {  min-height: 600px; /* Đảm bảo chiều cao đủ lớn để chứa nội dung */
+=======
 #main {
     min-height: 600px; /* Đảm bảo chiều cao đủ lớn để chứa nội dung */
-    display: flex;
+>>>>>>> 5697f87 (git commit - 'rm')
     justify-content: center; /* Căn giữa theo chiều ngang */
     align-items: center; /* Căn giữa theo chiều dọc */
     width: 100%; /* Đảm bảo chiếm toàn bộ chiều rộng */
