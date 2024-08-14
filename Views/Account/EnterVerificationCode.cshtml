@@ -1,0 +1,11 @@
+﻿@{
+    ViewData["Title"] = "EnterVerificationCode";
+}
+
+<form asp-action="VerifyCode" method="post">
+    <div>
+        <label for="code">Verification Code:</label>
+        <input type="text" id="code" name="code" required />
+    </div>
+    <button type="submit">Verify</button>
+</form>

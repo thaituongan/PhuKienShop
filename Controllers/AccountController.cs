@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using PhuKienShop.Data;
+using System.Net.Mail;
+using System.Net;
 using System.Security.Claims;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 
 namespace PhuKienShop.Controllers
 {
@@ -21,45 +24,85 @@ namespace PhuKienShop.Controllers
         }
 
         [HttpPost]
-        public IActionResult Register(string username, string email, string password)
-        {
-            if (_context.Users.Any(u => u.Email == email))
-            {
-                ModelState.AddModelError("", "Email is already taken.");
-                return View();
+		[HttpPost]
+		public async Task<IActionResult> Register(string username, string email, string password)
+		{
+			if (_context.Users.Any(u => u.Email == email))
+			{
+				ModelState.AddModelError("", "Email is already taken.");
+				return View();
+			}
+
+			if (ModelState.IsValid)
+			{
+                var verificationCode = new Random().Next(100000, 999999).ToString(); // Generate a 6-digit verification code
+                TempData["VerificationCode"] = verificationCode;
+                TempData["Email"] = email;
+                TempData["Username"] = username;
+                TempData["Password"] = BCrypt.Net.BCrypt.HashPassword(password); // Hash the password
+
+                // Send email verification code
+                await SendEmailAsync(email, "Verify your email", $"Your verification code is: {verificationCode}");
+                return View("EnterVerificationCode");
             }
 
-            var user = new User
-            {
-                Username = username,
-                Email = email,
-                Password = BCrypt.Net.BCrypt.HashPassword(password),
-                Role = "User",
-                CreatedAt = DateTime.Now,
-                UpdatedAt = DateTime.Now
-            };
+            return View("Register");
+		}
 
-            _context.Users.Add(user);
-            _context.SaveChanges();
+		[HttpPost]
+public IActionResult VerifyCode(string code)
+{
+    var expectedCode = TempData["VerificationCode"] as string;
+    var email = TempData["Email"] as string;
+    var username = TempData["Username"] as string;
+    var hashedPassword = TempData["Password"] as string;
 
-            // Automatically log in the user after registration
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, user.Username),
-                new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Role, user.Role)
-            };
+    if (expectedCode != null && expectedCode == code)
+    {
+        var user = new User
+        {
+            Username = username,
+            Email = email,
+            Password = hashedPassword,
+            Role = "User",
+            CreatedAt = DateTime.Now,
+            UpdatedAt = DateTime.Now
+        };
 
-            var identity = new ClaimsIdentity(claims, "PhuKienShopAuth");
-            var principal = new ClaimsPrincipal(identity);
+        _context.Users.Add(user);
+        _context.SaveChanges();
 
-            HttpContext.SignInAsync("PhuKienShopAuth", principal);
+        return RedirectToAction("Login", "Account");
+    }
 
-            return RedirectToAction("Index", "Home");
-        }
+    ModelState.AddModelError("", "Invalid verification code.");
+    return View("EnterVerificationCode");
+}
 
+		private async Task SendEmailAsync(string to, string subject, string body)
+		{
+			var fromAddress = new MailAddress("anzorobd@gmail.com", "Thái Tường An");
+			var toAddress = new MailAddress(to);
 
-        [HttpGet]
+			var message = new MailMessage
+			{
+                Subject = subject,
+				From = fromAddress,
+				Body = body,
+				IsBodyHtml = true
+			};
+			message.To.Add(toAddress);
+
+			using (var smtp = new SmtpClient())
+			{
+				smtp.Host = "smtp.gmail.com";
+				smtp.Port = 587;
+				smtp.Credentials = new NetworkCredential("anzorobd@gmail.com", "wzud casb guyv wsho");
+				smtp.EnableSsl = true;
+				await smtp.SendMailAsync(message);
+			}
+		}
+		[HttpGet]
         public IActionResult Login()
         {
             return View("Login");
