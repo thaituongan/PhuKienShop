@@ -17,6 +17,7 @@ public partial class Product
 
     public int CategoryId { get; set; }
 
+    //dâu ? biểu thị biến có thể là nullable
     public string? Branch { get; set; }
 
     public string? ImageUrl { get; set; }
@@ -34,4 +35,11 @@ public partial class Product
     public virtual ICollection<ProductSale> ProductSales { get; set; } = new List<ProductSale>();
 
     public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();
+
+    //bỏ dấu . ở trước đường dẫn để đưa ảnh lên view
+    public string RelativeImageUrl(string url)
+    {
+        string str = url.Substring(1);
+        return str;
+    }
 }
