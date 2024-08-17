@@ -56,9 +56,18 @@
 					</div>
 					<div>
 						<!--xem sản phẩm có đang giảm giá hay không-->
-						@Model.isProductSale(1)
-						@* <!--NO sẽ định dạng không có chữ số thập phân và định dạng hàng nghìn bằng dấu phẩy-->
-						<h3 class="product-price">@Model.Price.ToString("N0") VND<del class="product-old-price">  $990.00</del></h3> *@
+						@if (Model.isProductSale())
+						{
+							<!--NO sẽ định dạng không có chữ số thập phân và định dạng hàng nghìn bằng dấu phẩy-->
+							<h3 class="product-price">
+								@Model.GetPrice().ToString("N0") VND
+								<del class="product-old-price">@Model.Price.ToString("N0") VND</del>
+							</h3>
+						}
+						else
+						{
+							<h3 class="product-price">@Model.Price.ToString("N0") VND</h3>
+						}
 						<span class="product-available">Còn hàng</span>
 					</div>
 					<p>@Model.Description</p>

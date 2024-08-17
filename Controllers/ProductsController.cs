@@ -25,27 +25,30 @@ namespace PhuKienShop.Controllers
             return View(await pkShopContext.ToListAsync());
         }
 
-        // GET: Products/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
+		// GET: Products/Details/5
+		public async Task<IActionResult> Details(int? id)
+		{
+			if (id == null)
+			{
+				return NotFound();
+			}
 
-            var product = await _context.Products
-                .Include(p => p.Category)
-                .FirstOrDefaultAsync(m => m.ProductId == id);
-            if (product == null)
-            {
-                return NotFound();
-            }
+			var product = await _context.Products
+				.Include(p => p.Category)
+				.Include(p => p.ProductSales) // Thêm dòng này để nạp đầy đủ dữ liệu ProductSales
+				.FirstOrDefaultAsync(m => m.ProductId == id);
 
-            return View(product);
-        }
+			if (product == null)
+			{
+				return NotFound();
+			}
 
-        // GET: Products/Create
-        public IActionResult Create()
+			return View(product);
+		}
+
+
+		// GET: Products/Create
+		public IActionResult Create()
         {
             ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryId");
             return View();
