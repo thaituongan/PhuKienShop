@@ -1,10 +1,10 @@
 ﻿@model PhuKienShop.Data.Product
 @{
-    ViewData["Title"] = "Details";
+	ViewData["Title"] = "Details";
 }
 
 <h2>Details</h2>
-<!-- BREADCRUMB --> 
+<!-- BREADCRUMB -->
 <div id="breadcrumb" class="section">
 	<!-- container -->
 	<div class="container">
@@ -32,7 +32,7 @@
 		<!-- row -->
 		<div class="row">
 			<!-- Product main img -->
-			
+
 			<div class="col-md-5 col-md">
 				<div id="product-main-img">
 					<div class="product-preview">
@@ -52,11 +52,13 @@
 							<i class="fa fa-star"></i>
 							<i class="fa fa-star-o"></i>
 						</div>
-						<a data-toggle="tab" href="#tab2">10 Bình luận | Thêm bình luận</a>
+						<a data-toggle="tab" href="#tab2">Thêm bình luận</a>
 					</div>
 					<div>
-						<!--NO sẽ định dạng không có chữ số thập phân và định dạng hàng nghìn bằng dấu phẩy-->
-						<h3 class="product-price">@Model.Price.ToString("N0") VND<del class="product-old-price">  $990.00</del></h3>
+						<!--xem sản phẩm có đang giảm giá hay không-->
+						@Model.isProductSale(1)
+						@* <!--NO sẽ định dạng không có chữ số thập phân và định dạng hàng nghìn bằng dấu phẩy-->
+						<h3 class="product-price">@Model.Price.ToString("N0") VND<del class="product-old-price">  $990.00</del></h3> *@
 						<span class="product-available">Còn hàng</span>
 					</div>
 					<p>@Model.Description</p>
@@ -75,13 +77,13 @@
 
 					<ul class="product-btns">
 						<li><a href="#"><i class="fa fa-heart-o"></i> Thêm vào dánh sách đợi</a></li>
-						
+
 					</ul>
 
 					<ul class="product-links">
 						<li>Loại:</li>
 						<li><a href="#">@Model.Category.CategoryName</a></li>
-						
+
 					</ul>
 
 					<ul class="product-links">
@@ -471,8 +473,8 @@
 <!-- /NEWSLETTER -->
 
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.ProductId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+	<a asp-action="Edit" asp-route-id="@Model.ProductId">Edit</a> |
+	<a asp-action="Index">Back to List</a>
 </div>
 
 <!-- hiển thị phần cuộn xuống tab bình luận khi nhấn vào Bình luận -->

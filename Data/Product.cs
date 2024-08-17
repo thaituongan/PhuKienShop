@@ -36,10 +36,51 @@ public partial class Product
 
     public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();
 
-    //bỏ dấu . ở trước đường dẫn để đưa ảnh lên view
-    public string RelativeImageUrl(string url)
+	public bool isProductSale(int productId)
+	{
+		// In thông tin để kiểm tra
+		var productSales = ProductSales
+			.Where(ps => ps.ProductId == productId)
+			.ToList();
+
+		// Kiểm tra nội dung của productSales
+		foreach (var sale in productSales)
+		{
+			Console.WriteLine($"ProductId: {sale.ProductId}, StartDate: {sale.StartDate}, EndDate: {sale.EndDate}");
+		}
+
+		// Kiểm tra xem có bất kỳ chương trình giảm giá nào hiện tại áp dụng cho sản phẩm này không
+		if( productSales.Any(ps => ps.StartDate <= DateTime.Now && ps.EndDate >= DateTime.Now))
+        {
+            return true;
+        }
+        return false;
+	}
+
+
+
+	public decimal getSalePrice()
+    {
+        var ps=  ProductSales.Where(ps => ps.StartDate <= DateTime.Now && ps.EndDate >= DateTime.Now)
+                            .OrderByDescending(ps => ps.CreatedAt)
+                            .FirstOrDefault();
+        if(ps != null)
+        {
+            return ps.SalePrice;
+        }
+        else
+        {
+            return Price;
+        }
+
+	}
+	//bỏ dấu . ở trước đường dẫn để đưa ảnh lên view
+	public string RelativeImageUrl(string url)
     {
         string str = url.Substring(1);
         return str;
     }
+   
+  
 }
+
