@@ -1,0 +1,45 @@
+﻿@model AdminMessagesViewModel
+
+<div class="row">
+    <div class="col-md-4">
+        <h4>Users</h4>
+        <ul class="list-group">
+            @foreach (var user in Model.Users)
+            {
+                <li class="list-group-item">
+                    <a href="@Url.Action("Index", new { userId = user.UserId })"
+                       class="user-link @((Model.SelectedUser != null && Model.SelectedUser.UserId == user.UserId) ? "active" : "")">
+                        @user.Username
+                    </a>
+                </li>
+            }
+        </ul>
+    </div>
+
+    <div class="col-md-8">
+        @if (Model.SelectedUser != null)
+        {
+            <h2>Chat with @Model.SelectedUser.Username</h2>
+
+            <div class="chat-history" style="border: 1px solid #ccc; padding: 10px; height: 400px; overflow-y: auto;">
+                @foreach (var message in Model.Messages)
+                {
+                    <div class="message" style="margin-bottom: 10px;">
+                        <strong>@message.Sender.Username:</strong>
+                        <p>@message.Content</p>
+                        <span class="text-muted">@message.SentAt?.ToLocalTime()</span>
+                    </div>
+                }
+            </div>
+
+            <form asp-action="Reply" asp-route-userId="@Model.SelectedUser.UserId" method="post">
+                <textarea name="messageContent" placeholder="Type your message..." class="form-control" style="margin-top: 10px;"></textarea>
+                <button type="submit" class="btn btn-primary" style="margin-top: 10px;">Send</button>
+            </form>
+        }
+        else
+        {
+            <p>Select a user to start the chat.</p>
+        }
+    </div>
+</div>

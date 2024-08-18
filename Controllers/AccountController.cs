@@ -17,20 +17,46 @@ namespace PhuKienShop.Controllers
             _context = context;
         }
 
+
         [HttpGet]
         public IActionResult Register()
         {
             return View("Register");
+        }
+        [HttpPost]
+        public JsonResult CheckEmail(string email)
+        {
+            var userExists = _context.Users.Any(u => u.Email == email);
+            return Json(new { exists = userExists });
         }
 
         [HttpPost]
 		[HttpPost]
 		public async Task<IActionResult> Register(string username, string email, string password)
 		{
-			if (_context.Users.Any(u => u.Email == email))
+			/*if (_context.Users.Any(u => u.Email == email))
 			{
 				ModelState.AddModelError("", "Email is already taken.");
 				return View();
+			}*/
+			if (string.IsNullOrWhiteSpace(username))
+			{
+				ModelState.AddModelError("Username", "Username is required.");
+			}
+
+			if (string.IsNullOrWhiteSpace(email) || !_context.Users.Any(u => u.Email == email))
+			{
+				ModelState.AddModelError("Email", "Email is already taken or invalid.");
+			}
+
+			if (string.IsNullOrWhiteSpace(password) || password.Length < 6)
+			{
+				ModelState.AddModelError("Password", "Password must be at least 6 characters long.");
+			}
+
+			if (!ModelState.IsValid)
+			{
+				return View("Register");
 			}
 
 			if (ModelState.IsValid)
@@ -50,7 +76,7 @@ namespace PhuKienShop.Controllers
 		}
 
 		[HttpPost]
-public IActionResult VerifyCode(string code)
+    public IActionResult VerifyCode(string code)
 {
     var expectedCode = TempData["VerificationCode"] as string;
     var email = TempData["Email"] as string;
@@ -82,8 +108,7 @@ public IActionResult VerifyCode(string code)
 		private async Task SendEmailAsync(string to, string subject, string body)
 		{
 			var fromAddress = new MailAddress("anzorobd@gmail.com", "Thái Tường An");
-			var toAddress = new MailAddress(to);
-
+            var toAddress = new MailAddress(to);
 			var message = new MailMessage
 			{
                 Subject = subject,
@@ -118,7 +143,8 @@ public IActionResult VerifyCode(string code)
                 {
                     new Claim(ClaimTypes.Name, user.Username),
                     new Claim(ClaimTypes.Email, user.Email),
-                    new Claim(ClaimTypes.Role, user.Role)
+                    new Claim(ClaimTypes.Role, user.Role),
+                    new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString())
                 };
 
                 var identity = new ClaimsIdentity(claims, "PhuKienShopAuth");

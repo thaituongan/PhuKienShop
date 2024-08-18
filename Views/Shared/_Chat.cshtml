@@ -1,0 +1,63 @@
+﻿<!-- Chat Widget -->
+<div id="chat-widget" style="z-index: 1000;position: fixed; bottom: 0; right: 0; width: 300px; background-color: white; border: 1px solid #ccc; padding: 10px; display: none;">
+    <h5>Live Chat <span id="toggleChat" style="cursor: pointer;">[Hide]</span></h5>
+    <div id="messages" style="height: 200px; overflow-y: auto; border: 1px solid #ccc; padding: 5px;"></div>
+    <input type="text" id="messageInput" placeholder="Enter your message..." class="form-control" />
+    <button id="sendButton" class="btn btn-primary">Send</button>
+</div>
+
+<button id="toggleChatButton" style="position: fixed; bottom: 10px; right: 10px;" class="btn btn-info">Chat</button>
+
+<!-- Hidden field to store the current user's name -->
+<input type="hidden" id="userName" value="@User.Identity.Name" />
+
+<!-- SignalR Script and Chat Widget Logic -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/chathub")
+            .configureLogging(signalR.LogLevel.Information)
+            .build();
+
+        connection.on("ReceiveMessage", (user, message) => {
+            const msg = document.createElement("div");
+            msg.textContent = `${user}: ${message}`;
+            document.getElementById("messages").appendChild(msg);
+        });
+
+        connection.start()
+            .then(() => {
+                console.log("SignalR connected.");
+                document.getElementById("sendButton").disabled = false;
+
+                // Load chat history when connected
+                connection.invoke("GetChatHistory")
+                    .catch(err => console.error("Error loading chat history: " + err.toString()));
+            })
+            .catch(err => console.error("SignalR connection failed: " + err.toString()));
+
+        document.getElementById("sendButton").addEventListener("click", () => {
+            const user = document.getElementById("userName").value;
+            const message = document.getElementById("messageInput").value;
+            if (message.trim()) {
+                connection.invoke("SendMessageToAdmin", user, message)
+                    .catch(err => console.error("Error sending message: " + err.toString()));
+                document.getElementById("messageInput").value = "";
+            }
+        });
+
+        // Toggle chat widget visibility
+        let chatWidgetVisible = false;
+        document.getElementById("toggleChatButton").addEventListener("click", () => {
+            chatWidgetVisible = !chatWidgetVisible;
+            document.getElementById("chat-widget").style.display = chatWidgetVisible ? "block" : "none";
+        });
+
+        document.getElementById("toggleChat").addEventListener("click", () => {
+            chatWidgetVisible = !chatWidgetVisible;
+            document.getElementById("chat-widget").style.display = chatWidgetVisible ? "block" : "none";
+        });
+    });
+
+</script>

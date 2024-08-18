@@ -1,83 +1,189 @@
-﻿@model IEnumerable<PhuKienShop.Data.User>
+﻿<style>
+
+    /* Add some padding to the container */
+
+    .container {
+        padding: 20px;
+    }
+
+
+    /* Make the table header darker and more prominent */
+
+    .thead-dark {
+        background-color: #333;
+        color: #fff;
+    }
+
+
+    /* Add some margin to the table rows */
+
+    .table-hover > tbody > tr:hover {
+        background-color: #f5f5f5;
+    }
+
+
+    /* Make the action buttons smaller and more compact */
+
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+    }
+
+
+    /* Add some margin to the action buttons */
+
+    .mx-1 {
+        margin: 0 0.25rem;
+    }
+
+
+    /* Make the DataTables pagination and search box more compact */
+
+    .dataTables_wrapper .dataTables_paginate {
+        margin-top: 10px;
+    }
+
+
+    .dataTables_wrapper .dataTables_filter {
+        margin-bottom: 10px;
+    }
+
+
+    /* Add some padding to the DataTables info and pagination elements */
+
+    .dataTables_info, .dataTables_paginate {
+        padding: 10px;
+    }
+
+</style>
+
+
+@model IEnumerable<PhuKienShop.Data.User>
+
 
 @{
-    ViewData["Title"] = "Index";
+
+    ViewData["Title"] = "Quản Lý Tài Khoản";
+
 }
 
-<h2>Index</h2>
+<div class="container mt-4">
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Username)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Password)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Email)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.FullName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.PhoneNumber)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Address)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Role)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CreatedAt)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.UpdatedAt)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Username)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Password)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Email)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.FullName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.PhoneNumber)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Address)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Role)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreatedAt)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.UpdatedAt)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.UserId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.UserId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.UserId">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+    <h2 class="mb-0 text-center d-flex justify-content-between">
+        @ViewData["Title"]
+        <button class="right">
+            <a asp-action="Create" class="btn"><i class="fas fa-user-plus"></i> </a>
+        </button>
+        
+    </h2>
+
+    <table id="userTable" class="table table-hover table-bordered display nowrap" style="width:100%">
+
+        <thead class="thead-dark">
+
+            <tr class="text-center align-self-xl-center">
+
+                <th class="text-center">Username</th>
+
+                <th class="text-center" style="width:30px">Email</th>
+
+                <th class="text-center">Họ Tên</th>
+
+                <th class="text-center">Số Điện Thoại</th>
+
+                <th class="text-center" style="width:100%">Địa Chỉ</th>
+
+                <th class="text-center">Quyền</th>
+
+                <th class="text-center">Ngày Tạo</th>
+
+                <th class="text-center">Ngày cập nhật</th>
+
+                <th class="text-center">Cập Nhật</th>
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            @foreach (var item in Model)
+
+            {
+
+                <tr class="text-center">
+
+                    <td>@Html.DisplayFor(modelItem => item.Username)</td>
+
+                    <td>@Html.DisplayFor(modelItem => item.Email)</td>
+
+                    <td>@Html.DisplayFor(modelItem => item.FullName)</td>
+
+                    <td>@Html.DisplayFor(modelItem => item.PhoneNumber)</td>
+
+                    <td>@Html.DisplayFor(modelItem => item.Address)</td>
+
+                    <td>@Html.DisplayFor(modelItem => item.Role)</td>
+
+                    <td>@Html.DisplayFor(modelItem => item.CreatedAt)</td>
+
+                    <td>@Html.DisplayFor(modelItem => item.UpdatedAt)</td>
+
+                    <td class="d-flex justify-content-center">
+
+                        <a asp-action="Edit" asp-route-id="@item.UserId" class="btn btn-warning btn-sm mx-1">
+
+                            <i class="fas fa-edit"></i>
+
+                        </a>
+
+                        <a asp-action="Details" asp-route-id="@item.UserId" class="btn btn-info btn-sm mx-1">
+
+                            <i class="fas fa-info-circle"></i>
+
+                        </a>
+
+                        <a asp-action="Delete" asp-route-id="@item.UserId" class="btn btn-danger btn-sm mx-1">
+
+                            <i class="fas fa-trash"></i>
+
+                        </a>
+
+                    </td>
+
+                </tr>
+
+            }
+
+        </tbody>
+
+    </table>
+
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
+
+<script src="https://cdn.datatables.net/1.13.1/js/dataTables.bootstrap5.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $('#userTable').DataTable({
+            responsive: true,
+            "language": {
+                "paginate": {
+                    "previous": "Trước",
+                    "next": "Tiếp"
+                },
+                "search": "Tìm kiếm:",
+                "lengthMenu": "Hiển thị _MENU_ người dùng",
+                "info": "Hiển thị _START_ đến _END_ trong số _TOTAL_ người dùng",
+                "infoEmpty": "Không có dữ liệu",
+                "zeroRecords": "Không tìm thấy kết quả",
+                "infoFiltered": "(lọc từ _MAX_ tổng số bản ghi)"
+            }
+        });
+    });
+</script>

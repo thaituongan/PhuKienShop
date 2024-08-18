@@ -1,40 +1,53 @@
 ﻿@{
     ViewData["Title"] = "Login";
 }
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
 <div class="container d-flex justify-content-center align-items-center min-vh-100">
-    <div class="card p-4 shadow-lg" border-radius: 15px,margin: auto;">
+    <div class="card p-4 shadow-lg" style="border-radius: 15px; margin: auto;">
         <div class="text-center mb-4">
-            <h3>Login</h3>
+            <h3>Đăng Nhập</h3>
         </div>
         <form asp-action="Login" method="post">
             <div class="form-group mb-3">
-                <label for="Email" class="form-label">Email</label>
-                <input type="email" name="email" class="form-control" placeholder="Enter your email" required />
+                <div class="input-group-append">
+                    <label for="Email" class="form-label">Email</label> <span id="emailExists" class="input-group-text"></span>
+                </div>
+                <div class="input-group">
+                    <input type="email" id="emailInput" name="email" class="form-control" placeholder="Nhập email..." required />
+                    
+                </div>
             </div>
+
             <div class="form-group mb-3">
                 <label for="Password" class="form-label">Password</label>
-                <input type="password" name="password" class="form-control" placeholder="Enter your password" required />
+                <div class="input-group">
+                    <input type="password" id="password" name="password" class="form-control" placeholder="Nhập password..." required />
+                    <div class="input-group-append">
+                        <span id="pwValid" class="input-group-text text-danger"></span>
+                    </div>
+                </div>
             </div>
+
             <div class="form-check mb-3">
                 <input type="checkbox" class="form-check-input" id="showPassword" />
                 <label class="form-check-label" for="showPassword">Show Password</label>
             </div>
-            <button type="submit" class="btn btn-primary btn-block">Sign In</button>
-        
-            <a asp-action="GoogleLogin" class="btn btn-danger btn-block">Sign in with Google</a>
+
+            <button type="submit" class="btn btn-primary btn-block">Đăng Nhập</button>
+            <a asp-action="GoogleLogin" class="btn btn-danger btn-block">Đăng Nhập bằng tài khoản Google</a>
         </form>
         <hr>
         <div class="text-center mt-3">
-            <a href="#" class="text-muted">Forgot Username / Password?</a>
+            <a href="#" class="text-muted">Quên Mật Khẩu?</a>
         </div>
         <div class="text-center mt-2">
-            <span>Don't have an account? </span><a asp-action="Register" class="text-primary">Sign up</a>
+            <span>Bạn chưa có tài khoản? </span><a asp-action="Register" class="text-primary">Đăng Kí</a>
         </div>
     </div>
 </div>
+
 <style>
-  
     .card {
         background-color: #ffffff;
         border-radius: 15px;
@@ -42,22 +55,27 @@
         box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
     }
 
+    .form-label{
+        padding-right: 5px;
+    }
     h3 {
         color: #333;
         font-weight: 600;
     }
 
-
+    .form-group {
+        display: grid;
+    }
     .btn-primary {
         background-color: #166cb2;
         border-color: aliceblue;
         font-weight: 600;
     }
 
-        .btn-primary:hover {
-            background-color: #166cb2;
-            border-color: #166cb2;
-        }
+    .btn-primary:hover {
+        background-color: #166cb2;
+        border-color: #166cb2;
+    }
 
     .text-muted {
         color: #6c757d !important;
@@ -67,12 +85,71 @@
         color: #1e88e5 !important;
     }
 
-        .text-primary:hover {
-            text-decoration: underline;
-        }
+    .text-primary:hover {
+        text-decoration: underline;
+    }
 
     .form-check-label {
         color: #333;
     }
 
+    .input-group-text {
+        background-color: transparent;
+        border: none;
+    }
 </style>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            function isValidEmail(email) {
+                var emailPattern = /^[^\s@@]+@@[^\s@@]+\.[^\s@@]+$/;
+                return emailPattern.test(email);
+            }
+
+            $('#emailInput').on('input', function () {
+                var email = $(this).val();
+                var emailExists = $('#emailExists');
+
+                if (email.length > 0) {
+                    if (isValidEmail(email)) {
+                        $.ajax({
+                            type: 'POST',
+                            url: '@Url.Action("CheckEmail", "Account")',
+                            data: { email: email },
+                            success: function (response) {
+                                if (response.exists) {
+                                    emailExists.html('<i class="fas fa-check-circle" style="color: green;"></i>');
+                                } else {
+                                    emailExists.html('<i class="fas fa-times-circle" style="color: red;"></i>');
+                                }
+                            },
+                            error: function () {
+                                emailExists.html('<i class="fas fa-exclamation-triangle" style="color: red;"></i>');
+                            }
+                        });
+                    } else {
+                        emailExists.html('<i class="fas fa-exclamation-triangle" style="color: red;"></i>');
+                    }
+                } else {
+                    emailExists.html('');
+                }
+            });
+
+            $('#password').on('input', function () {
+                var password = $(this).val();
+                var pwValid = $('#pwValid');
+
+                var hasLetter = /[a-zA-Z]/.test(password);
+                var hasNumber = /\d/.test(password);
+                var isValidLength = password.length >= 8;
+
+                if (!isValidLength || !hasLetter || !hasNumber) {
+                    pwValid.html('<i class="fas fa-exclamation-triangle" style="color: red;"></i> Mật khẩu phải dài ít nhất 8 ký tự và chứa cả chữ và số');
+                } else {
+                    pwValid.html('');
+                }
+            });
+        });
+    </script>
+}
