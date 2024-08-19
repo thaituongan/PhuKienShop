@@ -1,12 +1,5 @@
-﻿using CoreWCF;
-using CoreWCF.Configuration;
-using CoreWCF.Description;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using PhuKienShop.Data;
-using System.Security.Claims;
-using System.ServiceModel;
-using NuGet.Protocol;
-using PhuKienShop.Models;
 namespace PhuKienShop
 {
     public class Program
