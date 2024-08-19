@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using PhuKienShop.Data;
 namespace PhuKienShop.Controllers
 {
@@ -58,17 +59,30 @@ namespace PhuKienShop.Controllers
         }
 
         //trả về các kết quả khi người dùng nhấn Tìm kiếm từ name searchTerm
-        public IActionResult Search(string searchTerm)
+        public IActionResult Search(string searchTerm, int category)
         {
-            var results = _context.Products
-               .Include(p => p.ProductSales) 
-               .Include(p => p.Category)
-               .Where(pd => pd.ProductName.Contains(searchTerm))
-               .ToList(); //lấy ra các sản phẩm có chứa searchTerm từ người dùng
-            return View("Search",results);
+            var query = _context.Products
+                      .Include(p => p.ProductSales)
+                      .Include (p => p.Category).AsQueryable();
+            //loc theo tim kiem
+            if (!searchTerm.IsNullOrEmpty())
+            {
+                query = query.Where(p => p.ProductName.Contains(searchTerm)); 
+            }
+            //loc theo select danh muc
+            if (category > 0)
+            {
+                query = query.Where(p => p.CategoryId == category);
+            }
+           /* if (category == 0)
+            {
+                query = query.Select(p => p);
+            }*/
+            var result = query.ToList();
+			return View(result);
         }
 
-        // GET: Products/Create
+        // GET: Products/Create                
         public IActionResult Create()
         {
             ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryId");
