@@ -4,7 +4,8 @@ using PhuKienShop.Data;
 using System.Net.Mail;
 using System.Net;
 using System.Security.Claims;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
+using Microsoft.EntityFrameworkCore;
+using System.Text.RegularExpressions;
 
 namespace PhuKienShop.Controllers
 {
@@ -32,9 +33,13 @@ namespace PhuKienShop.Controllers
                 ViewData["Email"] = email;
                 ViewData["Role"] = role;
                 ViewData["Username"] = username;
-            
 
-			if (role != null)
+/*                int id = int.Parse(userId);
+                var user = _context.Users.FirstOrDefault(u => u.UserId == id);*/
+
+
+
+                if (role != null)
 			{
 				if (role == "Admin") // Kiểm tra nếu người dùng là Admin
 				{
@@ -66,33 +71,42 @@ namespace PhuKienShop.Controllers
             var userExists = _context.Users.Any(u => u.Email == email);
             return Json(new { exists = userExists });
         }
+        [HttpPost]
+        public JsonResult CheckUsername(string username)
+        {
+            var userExists = _context.Users.Any(u => u.Username == username);
+            return Json(new { exists = userExists });
+        }
+
 
         [HttpPost]
-		[HttpPost]
-		public async Task<IActionResult> Register(string username, string email, string password)
-		{
-			if (string.IsNullOrWhiteSpace(username))
-			{
-				ModelState.AddModelError("Username", "Username is required.");
-			}
+        [HttpPost]
+        public async Task<IActionResult> Register(string username, string email, string password)
+        {
+            // Check fomart email
+            // Validate email format
+            var emailPattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
+            if (!Regex.IsMatch(email, emailPattern))
+            {
+                ModelState.AddModelError("Email", "Email không hợp lệ.");
+            }
 
-			if (string.IsNullOrWhiteSpace(email) || !_context.Users.Any(u => u.Email == email))
-			{
-				ModelState.AddModelError("Email", "Email is already taken or invalid.");
-			}
+            // Check if the email already exists
+            if (_context.Users.Any(u => u.Email == email))
+                {
+                    ModelState.AddModelError("Email", "Email đã được sử dụng!");
+                    return View();
+                }
 
-			if (string.IsNullOrWhiteSpace(password) || password.Length < 6)
-			{
-				ModelState.AddModelError("Password", "Password must be at least 6 characters long.");
-			}
-
-			if (!ModelState.IsValid)
-			{
-				return View("Register");
-			}
-
-			if (ModelState.IsValid)
-			{
+                // Check if the username already exists
+                if (_context.Users.Any(u => u.Username == username))
+                {
+                    ModelState.AddModelError("Username", "Username đã được sử dụng!");
+                    return View();
+                }
+            if (ModelState.IsValid)
+            {
+                // Proceed with the registration
                 var verificationCode = new Random().Next(100000, 999999).ToString(); // Generate a 6-digit verification code
                 TempData["VerificationCode"] = verificationCode;
                 TempData["Email"] = email;
@@ -101,13 +115,16 @@ namespace PhuKienShop.Controllers
 
                 // Send email verification code
                 await SendEmailAsync(email, "Verify your email", $"Your verification code is: {verificationCode}");
+
                 return View("EnterVerificationCode");
             }
 
+            // If we got this far, something failed; redisplay the form with errors
             return View("Register");
-		}
+        }
 
-		[HttpPost]
+
+        [HttpPost]
     public IActionResult VerifyCode(string code)
 {
     var expectedCode = TempData["VerificationCode"] as string;
@@ -133,7 +150,7 @@ namespace PhuKienShop.Controllers
         return RedirectToAction("Login", "Account");
     }
 
-    ModelState.AddModelError("", "Invalid verification code.");
+    ModelState.AddModelError("", "Mã xác thực không hợp lệ!.");
     return View("EnterVerificationCode");
 }
 
@@ -172,37 +189,31 @@ namespace PhuKienShop.Controllers
             if (user == null)
             {
                 _logger.LogWarning("User with email {Email} not found.", email);
-                ModelState.AddModelError("", "User not found.");
+                ModelState.AddModelError("", "Tài khoản không tồn tại.");
                 return View();
             }
 
             if (BCrypt.Net.BCrypt.Verify(password, user.Password))
             {
                 var claims = new List<Claim>
-    {
-        new Claim(ClaimTypes.Name, user.Username ?? string.Empty),
-        new Claim(ClaimTypes.Email, user.Email ?? string.Empty),
-        new Claim(ClaimTypes.Role, user.Role ?? string.Empty),
-        new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString() ?? string.Empty)
-    };
-
-
-
-
+        {
+            new Claim(ClaimTypes.Name, user.Username ?? string.Empty),
+            new Claim(ClaimTypes.Email, user.Email ?? string.Empty),
+            new Claim(ClaimTypes.Role, user.Role ?? string.Empty),
+            new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString() ?? string.Empty)
+        };
                 var claimsIdentity = new ClaimsIdentity(claims, "PhuKienShopAuth");
                 var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
 
                 await HttpContext.SignInAsync("PhuKienShopAuth", claimsPrincipal);
                 return RedirectToAction("Index", "Home");
-
             }
             else
             {
                 _logger.LogWarning("Password verification failed for user {Email}.", email);
-                ModelState.AddModelError("", "Invalid login attempt.");
+                ModelState.AddModelError("", "Đăng nhập không thành công. Vui lòng kiểm tra lại email và mật khẩu.");
                 return View();
             }
-
         }
 
 
@@ -272,10 +283,7 @@ namespace PhuKienShop.Controllers
 
             var newIdentity = new ClaimsIdentity(newClaims, "PhuKienShopAuth");
             var newPrincipal = new ClaimsPrincipal(newIdentity);
-            
-
             await HttpContext.SignInAsync("PhuKienShopAuth", newPrincipal);
-
             return RedirectToAction("Index", "Home");
         }
 

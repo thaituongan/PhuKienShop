@@ -97,6 +97,21 @@ namespace PhuKienShop.Controllers
             {
                 try
                 {
+                    // Check if the password has changed
+                    var existingUser = await _context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.UserId == id);
+                    if (existingUser == null)
+                    {
+                        return NotFound();
+                    }
+
+                    if (existingUser.Password != user.Password)
+                    {
+                        // Hash the new password if it has been changed
+                        user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
+                    }
+
+                    user.UpdatedAt = DateTime.Now; // Update the timestamp
+
                     _context.Update(user);
                     await _context.SaveChangesAsync();
                 }
@@ -115,6 +130,8 @@ namespace PhuKienShop.Controllers
             }
             return View(user);
         }
+
+
 
         // GET: ManageUsers/Delete/5
         public async Task<IActionResult> Delete(int? id)
