@@ -1,0 +1,14 @@
+﻿@model IEnumerable<PhuKienShop.Data.Message>
+
+<div>
+    @foreach (var message in Model)
+    {
+        <div class="message @((message.SenderId == 1) ? "admin-message" : "user-message")" style="margin-bottom: 10px;">
+            <div class="message-content" style="padding: 10px; border-radius: 10px;">
+                @* <strong>@message.Sender.Username:</strong> *@
+                <p>@message.Content</p>
+                <span class="text-muted" style="font-size: 0.85em;">@message.SentAt?.ToLocalTime()</span>
+            </div>
+        </div>
+    }
+</div>

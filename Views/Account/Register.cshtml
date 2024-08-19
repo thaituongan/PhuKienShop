@@ -1,0 +1,150 @@
+﻿@{
+    ViewData["Title"] = "Register";
+}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<div class="container d-flex justify-content-center align-items-center min-vh-100">
+    <div class="card p-4 shadow-lg" style="border-radius: 15px; margin: auto;">
+        <div class="text-center mb-4">
+            <h3>Tạo Tài Khoản</h3>
+        </div>
+        <form asp-action="Register" method="post">
+            <div class="form-group mb-3">
+                <label for="Username" class="form-label">Họ Tên</label>
+                <input type="text" id="username" name="username" class="form-control" placeholder="Enter your full name" required />
+                <span id="username-error" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <div class="input-group-append">
+                    <label for="Email" class="form-label">Email</label><span id="emailExists" class="input-group-text"></span>
+                </div>
+                
+                <div class="input-group">
+                    <input type="email" id="email" name="email" class="form-control" placeholder="Enter your email" required />
+                </div>
+                <span id="emailExists1" class="input-group-text"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label for="Password" class="form-label">Password</label>
+                <div class="input-group">
+                    <input type="password" id="password" name="password" class="form-control" placeholder="Enter your password" required />
+                    <div class="input-group-append">
+                        <span id="pwValid" class="input-group-text"></span>
+                    </div>
+                </div>
+                <span id="password-error" class="text-danger"></span>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Đăng Kí</button>
+        </form>
+        <hr>
+        <div class="text-center mt-3">
+            <span>Bạn đã có tài khoản? </span><a asp-action="Login" class="text-primary">Đăng Nhập tại đây</a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        background-color: #ffffff;
+        border-radius: 15px;
+        padding: 20px;
+        box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    h3 {
+        color: #333;
+        font-weight: 600;
+    }
+
+    .form-label {
+        padding-right: 5px;
+    }
+
+    .form-group {
+        display: grid;
+    }
+    .btn-primary {
+        background-color: #166cb2;
+        border-color: aliceblue;
+        font-weight: 600;
+    }
+
+    .btn-primary:hover {
+        background-color: #166cb2;
+        border-color: #166cb2;
+    }
+
+    .text-muted {
+        color: #6c757d !important;
+    }
+
+    .text-primary {
+        color: #1e88e5 !important;
+    }
+
+    .text-primary:hover {
+        text-decoration: underline;
+    }
+
+    .input-group-text {
+        background-color: transparent;
+        border: none;
+    }
+</style>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Hàm kiểm tra định dạng email hợp lệ
+            function isValidEmail(email) {
+                var emailPattern = /^[^\s@@]+@@[^\s@@]+\.[^\s@@]+$/;
+                return emailPattern.test(email);
+            }
+
+            // Check email
+            $('#email').on('input', function () {
+                var email = $(this).val();
+                var emailExists = $('#emailExists');
+                var emailExists1 = $('#emailExists1');
+                if (email.length > 0) {
+                    if (isValidEmail(email)) {
+                        $.ajax({
+                            type: 'POST',
+                            url: '@Url.Action("CheckEmail", "Account")',
+                            data: { email: email },
+                            success: function (response) {
+                                if (response.exists) {
+                                    emailExists1.html('<i class="fas fa-times-circle" style="color: red;"></i><span class="text-danger" > Email đã được sử dụng!</span>');
+                                } else {
+                                    emailExists.html('<i class="fas fa-check-circle" style="color: green;"></i>');
+                                }
+                            },
+                            error: function () {
+                                emailExists.html('<i class="fas fa-exclamation-triangle" style="color: red;"></i>');
+                            }
+                        });
+                    } else {
+                        emailExists.html('<i class="fas fa-exclamation-triangle" style="color: red;"></i>');
+                    }
+                } else {
+                    emailExists.html('');
+                }
+            });
+
+            $('#password').on('input', function () {
+                var password = $(this).val();
+                var pwValid = $('#pwValid');
+
+                var hasLetter = /[a-zA-Z]/.test(password);
+                var hasNumber = /\d/.test(password);
+                var isValidLength = password.length >= 8;
+
+                if (!isValidLength || !hasLetter || !hasNumber) {
+                    pwValid.html('<i class="fas fa-exclamation-triangle" style="color: red;"></i><span class="text-danger" > Mật khẩu phải dài ít nhất 8 ký tự và chứa cả chữ và số</span>')
+                } else {
+                    pwValid.html('');
+                }
+            });
+        });
+    </script>
+}

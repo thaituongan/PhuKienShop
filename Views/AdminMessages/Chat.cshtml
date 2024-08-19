@@ -1,0 +1,48 @@
+﻿@model IEnumerable<PhuKienShop.Data.Message>
+@{
+    var user = ViewBag.User as PhuKienShop.Data.User;
+    ViewData["Title"] = "Chat with " + user?.Username;
+}
+
+<h2>@user.Username</h2>
+
+@* <div class="chat-history" style="border: 1px solid #ccc; padding: 10px; height: 400px; overflow-y: auto;">
+    @foreach (var message in Model)
+    {
+        <div class="message" style="margin-bottom: 10px;">
+            <strong>@message.Sender.Username:</strong>
+            <p>@message.Content</p>
+            <span class="text-muted">@message.SentAt?.ToLocalTime()</span>
+        </div>
+    }
+</div> *@
+<div class="chat-history" style="border: 1px solid #ccc; padding: 10px; height: 400px; overflow-y: auto;">
+    @await Html.PartialAsync("_MessagesPartial", Model)
+</div>
+
+
+<form asp-action="Reply" asp-route-userId="@user.UserId" method="post" id="chat-form">
+    <textarea name="messageContent" placeholder="Type your message..." class="form-control" style="margin-top: 10px;"></textarea>
+    <button type="submit" class="btn btn-primary" style="margin-top: 10px;">Send</button>
+</form>
+
+<script>
+    $(document).ready(function () {
+        $("#chat-form").submit(function (e) {
+            e.preventDefault();
+
+            $.ajax({
+                url: $(this).attr('action'),
+                type: 'POST',
+                data: $(this).serialize(),
+                success: function () {
+                    // Reload the chat after sending a message
+                    $(".user-link[data-userid='@user.UserId']").click();
+                },
+                error: function () {
+                    alert('Failed to send message. Please try again.');
+                }
+            });
+        });
+    });
+</script>

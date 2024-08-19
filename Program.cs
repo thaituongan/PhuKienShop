@@ -1,6 +1,5 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using PhuKienShop.Data;
-
 namespace PhuKienShop
 {
     public class Program
@@ -9,11 +8,33 @@ namespace PhuKienShop
         {
             var builder = WebApplication.CreateBuilder(args);
             // Add services to the container.
+            builder.Services.ConfigureApplicationCookie(options =>
+            {
+                options.Cookie.Name = "PhuKienShopAuthCookie";
+                options.Cookie.HttpOnly = true;
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+                options.SlidingExpiration = true;
+            });
+
+            builder.Services.AddAuthentication("PhuKienShopAuth")
+                 .AddCookie("PhuKienShopAuth", options =>
+                 {
+                     options.LoginPath = "/Account/Login"; // Redirect here if not authenticated
+                     options.AccessDeniedPath = "/Account/AccessDenied"; // Redirect here if access denied
+                 })
+                 .AddGoogle(options =>
+                 {
+                     options.ClientId = "890059595195-nls0ig1u9ccgvlc1u4q73bmkn9ljikqg.apps.googleusercontent.com";
+                     options.ClientSecret = "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";
+                 });
+            builder.Services.AddSignalR();
+
             builder.Services.AddControllersWithViews();
             builder.Services.AddDbContext<PkShopContext>(options =>
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
             });
+
 
             var app = builder.Build();
 
@@ -25,20 +46,25 @@ namespace PhuKienShop
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+            app.MapControllerRoute(
+    name: "admin",
+    pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-
-            app.UseRouting();
-
+            app.UseAuthentication();
             app.UseAuthorization();
 
+            app.MapHub<ChatHub>("/chathub");
+
             app.MapControllerRoute(
-                name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}");
+              name: "default",
+              pattern: "{controller=Home}/{action=Index}/{id?}");
 
             app.Run();
 
         }
+
     }
 }
