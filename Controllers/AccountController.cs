@@ -11,14 +11,51 @@ namespace PhuKienShop.Controllers
     public class AccountController : Controller
     {
         private readonly PkShopContext _context;
-
-        public AccountController(PkShopContext context)
+        private readonly ILogger<AccountController> _logger;
+        public AccountController(PkShopContext context, ILogger<AccountController> logger)
         {
             _context = context;
+            _logger = logger;
+        }
+		public IActionResult MyAccount()
+		{
+            
+			if (User.Identity.IsAuthenticated) // Kiểm tra nếu người dùng chưa đăng nhập
+			{
+
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var email = User.FindFirst(ClaimTypes.Email)?.Value;
+                var role = User.FindFirst(ClaimTypes.Role)?.Value;
+                var username = User.FindFirst(ClaimTypes.Name)?.Value;
+
+                ViewData["UserId"] = userId;
+                ViewData["Email"] = email;
+                ViewData["Role"] = role;
+                ViewData["Username"] = username;
+            
+
+			if (role != null)
+			{
+				if (role == "Admin") // Kiểm tra nếu người dùng là Admin
+				{
+					return RedirectToAction("Index", "AdminMessages"); // Chuyển hướng đến trang quản lý của admin
+				}
+				else
+				{
+                    return View("MyAccount"); // Chuyển hướng đến trang thông tin tài khoản của user
+				}
+			}
+            }
+            else
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            return View("MyAccount"); // Chuyển hướng đến trang thông tin tài khoản của user
         }
 
 
-        [HttpGet]
+		[HttpGet]
         public IActionResult Register()
         {
             return View("Register");
@@ -34,11 +71,6 @@ namespace PhuKienShop.Controllers
 		[HttpPost]
 		public async Task<IActionResult> Register(string username, string email, string password)
 		{
-			/*if (_context.Users.Any(u => u.Email == email))
-			{
-				ModelState.AddModelError("", "Email is already taken.");
-				return View();
-			}*/
 			if (string.IsNullOrWhiteSpace(username))
 			{
 				ModelState.AddModelError("Username", "Username is required.");
@@ -134,30 +166,46 @@ namespace PhuKienShop.Controllers
         }
 
         [HttpPost]
-        public IActionResult Login(string email, string password)
+        public async Task<IActionResult> Login(string email, string password)
         {
             var user = _context.Users.SingleOrDefault(u => u.Email == email);
-            if (user != null && BCrypt.Net.BCrypt.Verify(password, user.Password))
+            if (user == null)
             {
-                var claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Name, user.Username),
-                    new Claim(ClaimTypes.Email, user.Email),
-                    new Claim(ClaimTypes.Role, user.Role),
-                    new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString())
-                };
-
-                var identity = new ClaimsIdentity(claims, "PhuKienShopAuth");
-                var principal = new ClaimsPrincipal(identity);
-
-                HttpContext.SignInAsync("PhuKienShopAuth", principal);
-
-                return RedirectToAction("Index", "Home");
+                _logger.LogWarning("User with email {Email} not found.", email);
+                ModelState.AddModelError("", "User not found.");
+                return View();
             }
 
-            ModelState.AddModelError("", "Invalid login attempt.");
-            return View();
+            if (BCrypt.Net.BCrypt.Verify(password, user.Password))
+            {
+                var claims = new List<Claim>
+    {
+        new Claim(ClaimTypes.Name, user.Username ?? string.Empty),
+        new Claim(ClaimTypes.Email, user.Email ?? string.Empty),
+        new Claim(ClaimTypes.Role, user.Role ?? string.Empty),
+        new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString() ?? string.Empty)
+    };
+
+
+
+
+                var claimsIdentity = new ClaimsIdentity(claims, "PhuKienShopAuth");
+                var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+
+                await HttpContext.SignInAsync("PhuKienShopAuth", claimsPrincipal);
+                return RedirectToAction("Index", "Home");
+
+            }
+            else
+            {
+                _logger.LogWarning("Password verification failed for user {Email}.", email);
+                ModelState.AddModelError("", "Invalid login attempt.");
+                return View();
+            }
+
         }
+
+
 
         [HttpGet]
         public IActionResult Logout()
@@ -224,6 +272,7 @@ namespace PhuKienShop.Controllers
 
             var newIdentity = new ClaimsIdentity(newClaims, "PhuKienShopAuth");
             var newPrincipal = new ClaimsPrincipal(newIdentity);
+            
 
             await HttpContext.SignInAsync("PhuKienShopAuth", newPrincipal);
 

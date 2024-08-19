@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using PhuKienShop.Data;
-
+using System.Security.Claims;
 [ApiController]
 [Route("api/[controller]")]
 public class MessagesController : ControllerBase
@@ -40,16 +40,18 @@ public class MessagesController : ControllerBase
         // Create the message and save it to the database
         var msg = new PhuKienShop.Data.Message
         {
-            SenderId = sender.UserId,
+            SenderId = 1,
+            ReceiverId = sender.UserId,
             Content = message.Content,
             SentAt = DateTime.UtcNow
+
         };
 
         _context.Messages.Add(msg);
         await _context.SaveChangesAsync();
 
         // Find all admin users
-        var admins = await _context.Users.Where(u => u.Role == "admin").ToListAsync();
+        var admins = await _context.Users.Where(u => u.Role == "Admin").ToListAsync();
 
         // Broadcast the message to all admin users
         foreach (var admin in admins)

@@ -2,13 +2,13 @@
 
 <div class="row">
     <div class="col-md-4">
-        <h4>Users</h4>
+        <h4> Tin Nhắn</h4>
         <ul class="list-group">
             @foreach (var user in Model.Users)
             {
-                <li class="list-group-item">
+                <li class="list-group-item @((Model.SelectedUser != null && Model.SelectedUser.UserId == user.UserId) ? "active-user" : "")">
                     <a href="@Url.Action("Index", new { userId = user.UserId })"
-                       class="user-link @((Model.SelectedUser != null && Model.SelectedUser.UserId == user.UserId) ? "active" : "")">
+                       class="user-link">
                         @user.Username
                     </a>
                 </li>
@@ -22,18 +22,11 @@
             <h2>Chat with @Model.SelectedUser.Username</h2>
 
             <div class="chat-history" style="border: 1px solid #ccc; padding: 10px; height: 400px; overflow-y: auto;">
-                @foreach (var message in Model.Messages)
-                {
-                    <div class="message" style="margin-bottom: 10px;">
-                        <strong>@message.Sender.Username:</strong>
-                        <p>@message.Content</p>
-                        <span class="text-muted">@message.SentAt?.ToLocalTime()</span>
-                    </div>
-                }
+                @await Html.PartialAsync("_MessagesPartial", Model.Messages)
             </div>
 
-            <form asp-action="Reply" asp-route-userId="@Model.SelectedUser.UserId" method="post">
-                <textarea name="messageContent" placeholder="Type your message..." class="form-control" style="margin-top: 10px;"></textarea>
+            <form asp-action="Reply" asp-route-userId="@Model.SelectedUser.UserId" method="post" id="chat-form">
+                <textarea id="messageContent" name="messageContent" placeholder="Type your message..." class="form-control" style="margin-top: 10px;"></textarea>
                 <button type="submit" class="btn btn-primary" style="margin-top: 10px;">Send</button>
             </form>
         }
@@ -43,3 +36,84 @@
         }
     </div>
 </div>
+<style>
+    .admin-message .message-content {
+        background-color: #d1e7dd;
+        text-align: right;
+    }
+
+    .user-message .message-content {
+        background-color: #f8d7da;
+        text-align: left;
+    }
+
+    .active-user {
+        background-color: #0d6efd;
+        color: white;
+    }
+
+    .message {
+        margin-bottom: 10px;
+        display: flex;
+    }
+
+    .admin-message {
+        justify-content: flex-end;
+    }
+
+    .user-message {
+        justify-content: flex-start;
+    }
+
+    .chat-history {
+        padding: 10px;
+        height: 400px;
+        overflow-y: auto;
+        border: 1px solid #ccc;
+    }
+</style>
+    <script>
+        $(document).ready(function () {
+            // Function to fetch messages
+            function fetchMessages() {
+            console.log("load ne")
+                var userId = '@Model.SelectedUser?.UserId';
+                if (userId) {
+                    console.log("load ne")
+                    $.ajax({
+                        url: '@Url.Action("GetMessages", "AdminMessages", new { userId = "__USER_ID__" })'.replace('__USER_ID__', userId),
+                        type: 'GET',
+                        success: function (data) {
+                            $('.chat-history').html(data);
+                            $('.chat-history').scroll($('.chat-history')[fetchMessages.length.scrollHeight);
+                        },
+                        error: function () {
+                            console.error('Failed to load messages');
+                        }
+                    });
+                }
+            }
+
+            // Set an interval to fetch messages every second
+            setInterval(fetchMessages, 100);
+
+
+            // Submit the message form via AJAX
+            $("#chat-form").submit(function (e) {
+                e.preventDefault();
+
+                $.ajax({
+                    url: $(this).attr('action'),
+                    type: 'POST',
+                    data: $(this).serialize(),
+                    success: function () {
+                        fetchMessages(); // Reload messages after sending a new one
+                        $('#messageContent').val(''); // Clear the input field
+                    },
+                    error: function () {
+                        alert('Failed to send message. Please try again.');
+                    }
+                });
+            });
+        });
+</script>

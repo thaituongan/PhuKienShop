@@ -3,22 +3,36 @@ using PhuKienShop.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using System.Linq;
+using Microsoft.AspNetCore.SignalR;
 [Route("admin/messages")]
 public class AdminMessagesController : Controller
 {
     private readonly PkShopContext _context;
-
-    public AdminMessagesController(PkShopContext context)
+    private readonly IHubContext<ChatHub> _hubContext;
+    public AdminMessagesController(PkShopContext context, IHubContext<ChatHub> hubContext)
     {
         _context = context;
+        _hubContext = hubContext;
     }
+    [HttpGet("Chat/GetMessages/{userId}")]
+    public async Task<IActionResult> GetMessages(int userId)
+    {
+        var messages = await _context.Messages
+                                     .Include(m => m.Sender)
+                                     .Where(m => m.SenderId == userId || m.ReceiverId == userId)
+                                     .OrderBy(m => m.SentAt)
+                                     .ToListAsync();
+
+        return PartialView("_MessagesPartial", messages);
+    }
+
 
     // Get the list of users who have messaged the admin and the chat history of a specific user (if selected)
     [HttpGet("{userId?}")]
     public async Task<IActionResult> Index(int? userId)
     {
         var users = await _context.Messages
-                                  .Where(m => m.ReceiverId == null) // Messages to admin
+                                  .Where(m => m.ReceiverId == 1) // Messages to admin
                                   .Select(m => m.Sender)
                                   .Distinct()
                                   .ToListAsync();
@@ -51,11 +65,11 @@ public class AdminMessagesController : Controller
     [HttpPost("Chat/{userId}")]
     public async Task<IActionResult> Reply(int userId, string messageContent)
     {
-        var adminUser = await _context.Users.SingleOrDefaultAsync(u => u.Username == User.Identity.Name);
+        //var adminUser = await _context.Users.SingleOrDefaultAsync(u => u.Username == User.Identity.Name);
 
-        var message = new Message
+        var message = new PhuKienShop.Data.Message
         {
-            SenderId = adminUser.UserId,
+            SenderId = 1,
             ReceiverId = userId,
             Content = messageContent,
             SentAt = DateTime.UtcNow
@@ -63,7 +77,8 @@ public class AdminMessagesController : Controller
 
         _context.Messages.Add(message);
         await _context.SaveChangesAsync();
-
+        await _hubContext.Clients.User(userId.ToString()).SendAsync("ReceiveMessage", "Admin", message.Content);
+        //await _hubContext.Clients.All.SendAsync("ReceiveMessage", "Admin", message.Content);
         return RedirectToAction("Index", new { userId });
     }
 }

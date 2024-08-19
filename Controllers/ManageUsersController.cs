@@ -32,6 +32,7 @@ namespace PhuKienShop.Controllers
                 return NotFound();
             }
 
+
             var user = await _context.Users
                 .FirstOrDefaultAsync(m => m.UserId == id);
             if (user == null)

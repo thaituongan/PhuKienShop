@@ -4,9 +4,9 @@
     ViewData["Title"] = "Chat with " + user?.Username;
 }
 
-<h2>Chat with @user.Username</h2>
+<h2>@user.Username</h2>
 
-<div class="chat-history" style="border: 1px solid #ccc; padding: 10px; height: 400px; overflow-y: auto;">
+@* <div class="chat-history" style="border: 1px solid #ccc; padding: 10px; height: 400px; overflow-y: auto;">
     @foreach (var message in Model)
     {
         <div class="message" style="margin-bottom: 10px;">
@@ -15,7 +15,11 @@
             <span class="text-muted">@message.SentAt?.ToLocalTime()</span>
         </div>
     }
+</div> *@
+<div class="chat-history" style="border: 1px solid #ccc; padding: 10px; height: 400px; overflow-y: auto;">
+    @await Html.PartialAsync("_MessagesPartial", Model)
 </div>
+
 
 <form asp-action="Reply" asp-route-userId="@user.UserId" method="post" id="chat-form">
     <textarea name="messageContent" placeholder="Type your message..." class="form-control" style="margin-top: 10px;"></textarea>
