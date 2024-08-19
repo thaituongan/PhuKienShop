@@ -34,9 +34,6 @@ namespace PhuKienShop.Controllers
                 ViewData["Role"] = role;
                 ViewData["Username"] = username;
 
-/*                int id = int.Parse(userId);
-                var user = _context.Users.FirstOrDefault(u => u.UserId == id);*/
-
 
 
                 if (role != null)
