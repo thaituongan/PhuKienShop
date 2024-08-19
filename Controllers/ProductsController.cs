@@ -6,10 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using PhuKienShop.Data;
-
 namespace PhuKienShop.Controllers
 {
-    public class ProductsController : Controller
+	public class ProductsController : Controller
     {
         private readonly PkShopContext _context;
 
@@ -46,9 +45,31 @@ namespace PhuKienShop.Controllers
 			return View(product);
 		}
 
+        // SEARCH:   
+        //trả về phần gợi ý sản phẩm dưới dạng PartialView
+        public IActionResult SearchPartial(string searchTerm)
+        {
+            var results = _context.Products
+                .Include(p => p.ProductSales) //nạp thêm ProductSales để lấy được giá giảm
+                .Where(pd => pd.ProductName.Contains(searchTerm))
+                .Take(4) //lấy ra chỉ 4 sản phẩm đầu tiên
+                .ToList(); //lấy ra các sản phẩm có chứa searchTerm từ người dùng
+            return PartialView("SearchPartial", results);// đưa results truyền tới SearchPartial.cshtml
+        }
 
-		// GET: Products/Create
-		public IActionResult Create()
+        //trả về các kết quả khi người dùng nhấn Tìm kiếm từ name searchTerm
+        public IActionResult Search(string searchTerm)
+        {
+            var results = _context.Products
+               .Include(p => p.ProductSales) 
+               .Include(p => p.Category)
+               .Where(pd => pd.ProductName.Contains(searchTerm))
+               .ToList(); //lấy ra các sản phẩm có chứa searchTerm từ người dùng
+            return View("Search",results);
+        }
+
+        // GET: Products/Create
+        public IActionResult Create()
         {
             ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryId");
             return View();
@@ -162,5 +183,7 @@ namespace PhuKienShop.Controllers
         {
             return _context.Products.Any(e => e.ProductId == id);
         }
+
+        
     }
 }

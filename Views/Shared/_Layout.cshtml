@@ -27,7 +27,9 @@
 
 	<!-- Custom stlylesheet -->
 	<link type="text/css" rel="stylesheet" href="~/css/style.css" />
-
+	<script src="~/js/search.js" defer></script>
+	<script src="~/js/searchpartial.js" defer></script>
+	
 	<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
 	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
 	<!--[if lt IE 9]>
@@ -72,7 +74,7 @@
 					<!-- SEARCH BAR -->
 					<div class="col-md-6">
 						<div class="header-search">
-							<form>
+							<form action="/Products/Search" method="get">
 								<select class="input-select">
 									<option value="0">Tất Cả</option>
 									<option value="1">Cáp Sạc</option>
@@ -80,7 +82,7 @@
 									<option value="1">Tai Nghe</option>
 									<option value="1">Loa</option>
 								</select>
-								<input class="input" placeholder="Tìm kiếm sản phẩm">
+								<input id="searchInput" name="searchTerm" class="input" placeholder="Tìm kiếm sản phẩm">
 								<button class="search-btn">Search</button>
 							</form>
 						</div>
@@ -181,6 +183,10 @@
 		<!-- /container -->
 	</nav>
 	<!-- /NAVIGATION -->
+
+	<!-- hiển thị cho phần tìm kiếm-->
+	<div id="searchResults"></div>
+
 	</header>
 
 	<div id="main" style="min-height: 600px">

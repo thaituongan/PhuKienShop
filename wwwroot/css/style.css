@@ -86,6 +86,14 @@ ul, ol {
   list-style: none
 }
 
+/*-- Cover main layout--*/
+/*.suggestions {
+    border: 1px solid #ccc;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    max-height: 400px;
+    overflow-y: auto;
+}*/
+
 /*----------------------------*\
 	Buttons
 \*----------------------------*/

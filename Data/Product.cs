@@ -42,15 +42,6 @@ public partial class Product
         string str = url.Substring(1);
         return str;
     }
-    //lấy giá sale nếu là sản phẩm đang sale
-	/*public decimal GetPrice()
-	{
-		var currentSale = ProductSales
-			.Where(ps => ps.StartDate <= DateTime.Now && ps.EndDate >= DateTime.Now)
-			.FirstOrDefault();
-
-		return currentSale != null ? currentSale.SalePrice : Price;
-	}*/
 
     public bool isProductSale()
     {

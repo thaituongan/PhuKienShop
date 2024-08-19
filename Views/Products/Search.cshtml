@@ -1,0 +1,57 @@
+﻿@model IEnumerable<PhuKienShop.Data.Product>
+
+<h2>Kết quả tìm kiếm</h2>
+@if (!Model.Any())
+{
+    <p>Không có sản phẩm nào khớp với từ khóa tìm kiếm.</p>
+}
+else
+{
+    <div class="products-tabs">
+        <div id="tab1" class="tab-pane active">
+            <div class="products-slick" data-nav="#slick-nav-1">
+                @foreach (var item in Model)
+                {
+                    <div class="product">
+                        <a asp-controller="Products" asp-action="Details" asp-route-id="@item.ProductId">
+                            <div class="product-img">
+                                <img height="150px" src="@item.RelativeImageUrl(item.ImageUrl)" alt="@item.Description">
+                            </div>
+                            <div class="product-body">
+                                <p class="product-category">@item.Category.CategoryName</p>
+                                <h3 class="product-name"><a asp-controller="Products" asp-action="Details" asp-route-id="@item.ProductId">@item.ProductName</a></h3>
+                                @if (item.isProductSale())
+                                {
+                                    <h4 class="product-price">@item.GetPrice().ToString("N0") VND</h4>
+                                    <del class="product-old-price">@item.Price.ToString("N0") VND</del>
+                                }
+                                else
+                                {
+                                    <h4 class="product-price">@item.Price.ToString("N0") VND</h4>
+                                }
+                                <div class="product-rating">
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                </div>
+                                <div class="product-btns">
+                                    <button class="add-to-wishlist"><i class="fa fa-heart-o"></i><span class="tooltipp">add to wishlist</span></button>
+                                    <button class="add-to-compare"><i class="fa fa-exchange"></i><span class="tooltipp">add to compare</span></button>
+                                    <button class="quick-view"><i class="fa fa-eye"></i><span class="tooltipp">quick view</span></button>
+                                </div>
+                            </div>
+
+                            <div class="add-to-cart">
+                                <button class="add-to-cart-btn"><i class="fa fa-shopping-cart"></i> add to cart</button>
+                            </div>
+                        </a>
+                    </div>
+
+                }
+            </div>
+            <div id="slick-nav-1" class="products-slick-nav"></div>
+        </div>
+    </div>
+}
