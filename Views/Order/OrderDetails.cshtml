@@ -1,0 +1,99 @@
+﻿@model PhuKienShop.Data.Order
+
+@{
+    ViewData["Title"] = "Chi Tiết Đơn Hàng";
+}
+
+<style>
+    .order-details-container {
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        max-width: 800px;
+        margin: auto;
+    }
+
+    .order-info, .order-items {
+        margin-bottom: 20px;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+    }
+
+    .order-info {
+        background-color: #f9f9f9;
+    }
+
+    .order-items {
+        background-color: #fff;
+    }
+
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .table th, .table td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .table th {
+            background-color: #f4f4f4;
+        }
+
+    .btn-primary {
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        border-radius: 5px;
+    }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+</style>
+
+<div class="order-details-container">
+    <h2>Chi Tiết Đơn Hàng</h2>
+
+    <div class="order-info">
+        <h3>Thông Tin Đơn Hàng</h3>
+        <p><strong>Ngày Đặt:</strong> @Model.OrderDate?.ToString("dd/MM/yyyy")</p>
+        <p><strong>Tổng Tiền:</strong> @Model.TotalAmount.ToString("C")</p>
+        <p><strong>Trạng Thái:</strong> @Model.Status</p>
+    </div>
+
+    <div class="order-items">
+        <h3>Chi Tiết Sản Phẩm</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Sản Phẩm</th>
+                    <th>Số Lượng</th>
+                    <th>Giá Đơn Vị</th>
+                    <th>Tổng Giá</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var detail in Model.OrderDetails)
+                {
+                    <tr>
+                        <td>@detail.Product?.ProductName</td>
+                        <td>@detail.Quantity</td>
+                        <td>@detail.UnitPrice.ToString("C")</td>
+                        <td>@detail.TotalPrice.ToString("C")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <a href="@Url.Action("MyAccount", "Account")" class="btn btn-primary">Trở Lại</a>
+</div>
+
