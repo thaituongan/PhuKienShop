@@ -1,10 +1,8 @@
 ﻿@model PhuKienShop.Data.User
 
 @{
-    ViewData["Title"] = "Quản lý Tài Khoản";
-    <!-- Layout = "~/Views/Shared/_LayoutAdmin.cshtml"; -->
-    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
-
+    ViewData["Title"] = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <h2>Create</h2>
@@ -61,6 +59,3 @@
     <a asp-action="Index">Back to List</a>
 </div>
 
-@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}

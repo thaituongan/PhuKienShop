@@ -21,7 +21,7 @@ namespace PhuKienShop.Controllers
 		public IActionResult MyAccount()
 		{
             
-			if (User.Identity.IsAuthenticated) // Kiểm tra nếu người dùng chưa đăng nhập
+			if (User.Identity.IsAuthenticated)
 			{
 
                 var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -34,13 +34,12 @@ namespace PhuKienShop.Controllers
                 ViewData["Role"] = role;
                 ViewData["Username"] = username;
 
-
-
                 if (role != null)
 			{
 				if (role == "Admin") // Kiểm tra nếu người dùng là Admin
 				{
-					return RedirectToAction("Index", "AdminMessages"); // Chuyển hướng đến trang quản lý của admin
+					
+					return RedirectToAction("Index", "ManageUsers"); // Chuyển hướng đến trang quản lý của admin
 				}
 				else
 				{

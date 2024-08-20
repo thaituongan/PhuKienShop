@@ -9,31 +9,22 @@ using PhuKienShop.Data;
 
 namespace PhuKienShop.Controllers
 {
-    public class ProductsController : Controller
+    public class UsersController : Controller
     {
         private readonly PkShopContext _context;
 
-        public ProductsController(PkShopContext context)
+        public UsersController(PkShopContext context)
         {
             _context = context;
         }
 
-        // GET: Products
+        // GET: Users
         public async Task<IActionResult> Index()
         {
-            var pkShopContext = _context.Products.Include(p => p.Category);
-            return View(await pkShopContext.ToListAsync());
+            return View(await _context.Users.ToListAsync());
         }
 
-        public async Task<List<Product>> SelectByIDsAsync(List<int> ids)
-        {
-            return await _context.Products
-                                 .Include(o => o.OrderDetails)
-                                 .Where(od => ids.Contains(od.ProductId))
-                                 .ToListAsync();
-        }
-
-        // GET: Products/Details/5
+        // GET: Users/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -41,42 +32,39 @@ namespace PhuKienShop.Controllers
                 return NotFound();
             }
 
-            var product = await _context.Products
-                .Include(p => p.Category)
-                .FirstOrDefaultAsync(m => m.ProductId == id);
-            if (product == null)
+            var user = await _context.Users
+                .FirstOrDefaultAsync(m => m.UserId == id);
+            if (user == null)
             {
                 return NotFound();
             }
 
-            return View(product);
+            return View(user);
         }
 
-        // GET: Products/Create
+        // GET: Users/Create
         public IActionResult Create()
         {
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryId");
             return View();
         }
 
-        // POST: Products/Create
+        // POST: Users/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ProductId,ProductName,Description,Price,StockQuantity,CategoryId,Branch,ImageUrl,CreatedAt,UpdatedAt")] Product product)
+        public async Task<IActionResult> Create([Bind("UserId,Username,Password,Email,FullName,PhoneNumber,Address,Role,CreatedAt,UpdatedAt")] User user)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(product);
+                _context.Add(user);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryId", product.CategoryId);
-            return View(product);
+            return View(user);
         }
 
-        // GET: Products/Edit/5
+        // GET: Users/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -84,23 +72,22 @@ namespace PhuKienShop.Controllers
                 return NotFound();
             }
 
-            var product = await _context.Products.FindAsync(id);
-            if (product == null)
+            var user = await _context.Users.FindAsync(id);
+            if (user == null)
             {
                 return NotFound();
             }
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryId", product.CategoryId);
-            return View(product);
+            return View(user);
         }
 
-        // POST: Products/Edit/5
+        // POST: Users/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ProductId,ProductName,Description,Price,StockQuantity,CategoryId,Branch,ImageUrl,CreatedAt,UpdatedAt")] Product product)
+        public async Task<IActionResult> Edit(int id, [Bind("UserId,Username,Password,Email,FullName,PhoneNumber,Address,Role,CreatedAt,UpdatedAt")] User user)
         {
-            if (id != product.ProductId)
+            if (id != user.UserId)
             {
                 return NotFound();
             }
@@ -109,12 +96,12 @@ namespace PhuKienShop.Controllers
             {
                 try
                 {
-                    _context.Update(product);
+                    _context.Update(user);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ProductExists(product.ProductId))
+                    if (!UserExists(user.UserId))
                     {
                         return NotFound();
                     }
@@ -125,11 +112,10 @@ namespace PhuKienShop.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryId", product.CategoryId);
-            return View(product);
+            return View(user);
         }
 
-        // GET: Products/Delete/5
+        // GET: Users/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -137,35 +123,34 @@ namespace PhuKienShop.Controllers
                 return NotFound();
             }
 
-            var product = await _context.Products
-                .Include(p => p.Category)
-                .FirstOrDefaultAsync(m => m.ProductId == id);
-            if (product == null)
+            var user = await _context.Users
+                .FirstOrDefaultAsync(m => m.UserId == id);
+            if (user == null)
             {
                 return NotFound();
             }
 
-            return View(product);
+            return View(user);
         }
 
-        // POST: Products/Delete/5
+        // POST: Users/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var product = await _context.Products.FindAsync(id);
-            if (product != null)
+            var user = await _context.Users.FindAsync(id);
+            if (user != null)
             {
-                _context.Products.Remove(product);
+                _context.Users.Remove(user);
             }
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool ProductExists(int id)
+        private bool UserExists(int id)
         {
-            return _context.Products.Any(e => e.ProductId == id);
+            return _context.Users.Any(e => e.UserId == id);
         }
     }
 }
