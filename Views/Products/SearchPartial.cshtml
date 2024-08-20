@@ -5,7 +5,7 @@
     {
         <div class="col-md-3 col-sm-6">
             <div class="product">
-                <a asp-controller="Products" asp-action="Details" asp-route-id="@product.ProductId">
+                <a asp-controller="Products" asp-action="Details" asp-route-id="@product.ProductId" asp-route-categoryId="@product.CategoryId">
                     <div class="product-img">
                         <img height="180px" src="@product.RelativeImageUrl(product.ImageUrl)" alt="@product.Description" class="img-fluid">
                     </div>

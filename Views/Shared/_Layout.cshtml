@@ -17,8 +17,7 @@
 
 	<!-- Slick -->
 	<link type="text/css" rel="stylesheet" href="~/css/slick.css" />
-	<link type="text/css" rel="stylesheet" href="css/slick-theme.css" />
-
+	<link type="text/css" rel="stylesheet" href="~/css/slick-theme.css" />
 	<!-- nouislider -->
 	<link type="text/css" rel="stylesheet" href="~/css/nouislider.min.css" />
 
@@ -30,7 +29,6 @@
 	<!-- js-->
 	
 	<script src="~/js/searchpartial.js" defer></script>
-	<script src="~/js/searchbycat.js" defer></script>
 
 	<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
 	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -77,14 +75,8 @@
 					<div class="col-md-6">
 						<div class="header-search">
 							<form action="/Products/Search" method="get" id="searchForm">
-								<select class="input-select" name="category" id="categorySelect">
-									<option value="0">Tất Cả</option>
-									<option value="1">Cáp Sạc</option>
-									<option value="2">Tai Nghe</option>
-									<option value="3">Loa</option>
-									<option value="4">Ốp lưng</option>
-								</select>
-								<input id="searchInput" name="searchTerm" class="input" placeholder="Tìm kiếm sản phẩm">
+								
+								<input id="searchInput" name="searchTerm" class="input-select" placeholder="Tìm kiếm sản phẩm">
 								<button class="search-btn">Search</button>
 							</form>
 						</div>

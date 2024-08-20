@@ -1,4 +1,5 @@
 ﻿@model IEnumerable<PhuKienShop.Data.Product>
+<script src="~/js/searchbycat.js" defer></script>
 <h2>Kết quả tìm kiếm</h2>
 @if (!Model.Any())
 {
@@ -12,7 +13,7 @@ else
                 @foreach (var item in Model)
                 {
                     <div class="product">
-                        <a asp-controller="Products" asp-action="Details" asp-route-id="@item.ProductId">
+                        <a asp-controller="Products" asp-action="Details" asp-route-id="@item.ProductId" asp-route-categoryId="@item.CategoryId">
                             <div class="product-img">
                                 <img height="150px" src="@item.RelativeImageUrl(item.ImageUrl)" alt="@item.Description">
                             </div>

@@ -3,9 +3,6 @@
 *@
 @model IEnumerable<PhuKienShop.Data.ProductSale>
 @{
-
-
-
 	<div class="products-tabs">
 		<!-- tab -->
 		<div id="tab1" class="tab-pane active">
@@ -14,7 +11,7 @@
 				@foreach (var item in Model)
 				{
 					<div class="product" >
-					<a asp-controller="Products" asp-action="Details" asp-route-id="@item.Product.ProductId">
+						<a asp-controller="Products" asp-action="Details" asp-route-id="@item.Product.ProductId" asp-route-categoryId="@item.Product.CategoryId">
 						<div class="product-img">
 							<img height="150px" src="@item.Product.ImageUrl" alt="@item.Product.ImageUrl>">
 							<div class="product-label">
@@ -55,5 +52,11 @@
 			<div id="slick-nav-2" class="products-slick-nav"></div>
 		</div>
 		<!-- /tab -->
+
+		<!-- tab2 -->
+		<div id="tab-2" class="tab-pane">
+		San pham
+		</div>
 	</div>
+	
 }

@@ -74,23 +74,14 @@ namespace PhuKienShop.Controllers
 		}
 
 		//trả về các kết quả khi người dùng nhấn Tìm kiếm từ name searchTerm
-		public IActionResult Search(string searchTerm, int category)
+		public IActionResult Search(string searchTerm)
 		{
-			var query = _context.Products
-					  .Include(p => p.ProductSales)
-					  .Include(p => p.Category).AsQueryable();
-			//loc theo tim kiem
-			if (!string.IsNullOrEmpty(searchTerm))
-			{
-				query = query.Where(p => p.ProductName.Contains(searchTerm));
-			}
-			//loc theo select danh muc
-			if (category > 0)
-			{
-				query = query.Where(p => p.CategoryId == category);
-			}
-			var result = query.ToList();
-			return View(result);
+			var product = _context.Products
+                      .Include(p => p.ProductSales)
+                      .Include(p => p.Category)
+					  .Where(p=> p.ProductName.Contains(searchTerm))
+					  .ToList();
+			return View(product);
 		}
 
 		// GET: Products/Create                

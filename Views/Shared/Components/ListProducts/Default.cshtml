@@ -6,7 +6,7 @@
             @foreach (var item in Model)
             {
                 <div class="product">
-                    <a asp-controller="Products" asp-action="Details" asp-route-id="@item.Product.ProductId">
+                    <a asp-controller="Products" asp-action="Details" asp-route-id="@item.Product.ProductId" asp-route-categoryId="@item.Product.CategoryId">
                     <div class="product-img">
                         <img height="150px" src="@item.Product.ImageUrl" alt="@item.Product.Description">
                         <div class="product-label">
@@ -57,5 +57,241 @@
             }
         </div>
         <div id="slick-nav-1" class="products-slick-nav"></div>
+    </div>
+    <div id="tab-2" class="tab-pane">
+        <div class="products-slick" data-nav="#slick-nav-1">
+        @foreach(var item in Model)
+        {
+            if(item.Product.CategoryId == 1)
+            {
+                <div class="product">
+                    <a asp-controller="Products" asp-action="Details" asp-route-id="@item.Product.ProductId" asp-route-categoryId="@item.Product.CategoryId">
+                        <div class="product-img">
+                            <img height="150px" src="@item.Product.ImageUrl" alt="@item.Product.Description">
+                            <div class="product-label">
+                                @if (item.IsOnSale)
+                                {
+                                    <span class="new">NEW</span>
+                                    <span class="sale">@item.Sale.DiscountPercentage.ToString("N0")%</span>
+                                }
+                                else
+                                {
+                                    <span class="new">NEW</span>
+                                }
+                            </div>
+                        </div>
+                        <div class="product-body">
+
+                            <p class="product-category">@item.Product.Category.CategoryName</p>
+                            <h3 class="product-name"><a asp-controller="Products" asp-action="Details" asp-route-id="@item.Product.ProductId">@item.Product.ProductName</a></h3>
+                            @if (item.IsOnSale)
+                            {
+                                <h4 class="product-price">@item.Sale.SalePrice.ToString("N0") VND</h4>
+                                <del class="product-old-price">@item.Product.Price.ToString("N0") VND</del>
+                            }
+                            else
+                            {
+                                <h4 class="product-price">@item.Product.Price.ToString("N0") VND</h4>
+                            }
+                            <div class="product-rating">
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                            </div>
+                            <div class="product-btns">
+                                <button class="add-to-wishlist"><i class="fa fa-heart-o"></i><span class="tooltipp">add to wishlist</span></button>
+                                <button class="add-to-compare"><i class="fa fa-exchange"></i><span class="tooltipp">add to compare</span></button>
+                                <button class="quick-view"><i class="fa fa-eye"></i><span class="tooltipp">quick view</span></button>
+                            </div>
+                        </div>
+
+                        <div class="add-to-cart">
+                            <button class="add-to-cart-btn"><i class="fa fa-shopping-cart"></i> add to cart</button>
+                        </div>
+                    </a>
+                </div>
+                
+            }
+        }
+        </div>
+    </div>
+    <div id="tab-3" class="tab-pane">
+        <div class="products-slick" data-nav="#slick-nav-1">
+            @foreach (var item in Model)
+            {
+                if (item.Product.CategoryId == 2)
+                {
+                    <div class="product">
+                        <a asp-controller="Products" asp-action="Details" asp-route-id="@item.Product.ProductId" asp-route-categoryId="@item.Product.CategoryId">
+                            <div class="product-img">
+                                <img height="150px" src="@item.Product.ImageUrl" alt="@item.Product.Description">
+                                <div class="product-label">
+                                    @if (item.IsOnSale)
+                                    {
+                                        <span class="new">NEW</span>
+                                        <span class="sale">@item.Sale.DiscountPercentage.ToString("N0")%</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="new">NEW</span>
+                                    }
+                                </div>
+                            </div>
+                            <div class="product-body">
+
+                                <p class="product-category">@item.Product.Category.CategoryName</p>
+                                <h3 class="product-name"><a asp-controller="Products" asp-action="Details" asp-route-id="@item.Product.ProductId">@item.Product.ProductName</a></h3>
+                                @if (item.IsOnSale)
+                                {
+                                    <h4 class="product-price">@item.Sale.SalePrice.ToString("N0") VND</h4>
+                                    <del class="product-old-price">@item.Product.Price.ToString("N0") VND</del>
+                                }
+                                else
+                                {
+                                    <h4 class="product-price">@item.Product.Price.ToString("N0") VND</h4>
+                                }
+                                <div class="product-rating">
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                </div>
+                                <div class="product-btns">
+                                    <button class="add-to-wishlist"><i class="fa fa-heart-o"></i><span class="tooltipp">add to wishlist</span></button>
+                                    <button class="add-to-compare"><i class="fa fa-exchange"></i><span class="tooltipp">add to compare</span></button>
+                                    <button class="quick-view"><i class="fa fa-eye"></i><span class="tooltipp">quick view</span></button>
+                                </div>
+                            </div>
+
+                            <div class="add-to-cart">
+                                <button class="add-to-cart-btn"><i class="fa fa-shopping-cart"></i> add to cart</button>
+                            </div>
+                        </a>
+                    </div>
+
+                }
+            }
+        </div>
+    </div>
+    <div id="tab-4" class="tab-pane">
+        <div class="products-slick" data-nav="#slick-nav-1">
+            @foreach (var item in Model)
+            {
+                if (item.Product.CategoryId == 3)
+                {
+                    <div class="product">
+                        <a asp-controller="Products" asp-action="Details" asp-route-id="@item.Product.ProductId" asp-route-categoryId="@item.Product.CategoryId">
+                            <div class="product-img">
+                                <img height="150px" src="@item.Product.ImageUrl" alt="@item.Product.Description">
+                                <div class="product-label">
+                                    @if (item.IsOnSale)
+                                    {
+                                        <span class="new">NEW</span>
+                                        <span class="sale">@item.Sale.DiscountPercentage.ToString("N0")%</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="new">NEW</span>
+                                    }
+                                </div>
+                            </div>
+                            <div class="product-body">
+
+                                <p class="product-category">@item.Product.Category.CategoryName</p>
+                                <h3 class="product-name"><a asp-controller="Products" asp-action="Details" asp-route-id="@item.Product.ProductId">@item.Product.ProductName</a></h3>
+                                @if (item.IsOnSale)
+                                {
+                                    <h4 class="product-price">@item.Sale.SalePrice.ToString("N0") VND</h4>
+                                    <del class="product-old-price">@item.Product.Price.ToString("N0") VND</del>
+                                }
+                                else
+                                {
+                                    <h4 class="product-price">@item.Product.Price.ToString("N0") VND</h4>
+                                }
+                                <div class="product-rating">
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                </div>
+                                <div class="product-btns">
+                                    <button class="add-to-wishlist"><i class="fa fa-heart-o"></i><span class="tooltipp">add to wishlist</span></button>
+                                    <button class="add-to-compare"><i class="fa fa-exchange"></i><span class="tooltipp">add to compare</span></button>
+                                    <button class="quick-view"><i class="fa fa-eye"></i><span class="tooltipp">quick view</span></button>
+                                </div>
+                            </div>
+
+                            <div class="add-to-cart">
+                                <button class="add-to-cart-btn"><i class="fa fa-shopping-cart"></i> add to cart</button>
+                            </div>
+                        </a>
+                    </div>
+
+                }
+            }
+        </div>
+    </div>
+    <div id="tab-5" class="tab-pane">
+        <div class="products-slick" data-nav="#slick-nav-1">
+            @foreach (var item in Model)
+            {
+                if (item.Product.CategoryId == 4)
+                {
+                    <div class="product">
+                        <a asp-controller="Products" asp-action="Details" asp-route-id="@item.Product.ProductId" asp-route-categoryId="@item.Product.CategoryId">
+                            <div class="product-img">
+                                <img height="150px" src="@item.Product.ImageUrl" alt="@item.Product.Description">
+                                <div class="product-label">
+                                    @if (item.IsOnSale)
+                                    {
+                                        <span class="new">NEW</span>
+                                        <span class="sale">@item.Sale.DiscountPercentage.ToString("N0")%</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="new">NEW</span>
+                                    }
+                                </div>
+                            </div>
+                            <div class="product-body">
+
+                                <p class="product-category">@item.Product.Category.CategoryName</p>
+                                <h3 class="product-name"><a asp-controller="Products" asp-action="Details" asp-route-id="@item.Product.ProductId">@item.Product.ProductName</a></h3>
+                                @if (item.IsOnSale)
+                                {
+                                    <h4 class="product-price">@item.Sale.SalePrice.ToString("N0") VND</h4>
+                                    <del class="product-old-price">@item.Product.Price.ToString("N0") VND</del>
+                                }
+                                else
+                                {
+                                    <h4 class="product-price">@item.Product.Price.ToString("N0") VND</h4>
+                                }
+                                <div class="product-rating">
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                </div>
+                                <div class="product-btns">
+                                    <button class="add-to-wishlist"><i class="fa fa-heart-o"></i><span class="tooltipp">add to wishlist</span></button>
+                                    <button class="add-to-compare"><i class="fa fa-exchange"></i><span class="tooltipp">add to compare</span></button>
+                                    <button class="quick-view"><i class="fa fa-eye"></i><span class="tooltipp">quick view</span></button>
+                                </div>
+                            </div>
+
+                            <div class="add-to-cart">
+                                <button class="add-to-cart-btn"><i class="fa fa-shopping-cart"></i> add to cart</button>
+                            </div>
+                        </a>
+                    </div>
+
+                }
+            }
+        </div>
     </div>
 </div>
