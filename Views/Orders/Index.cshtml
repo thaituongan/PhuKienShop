@@ -1,0 +1,332 @@
+﻿@model IEnumerable<PhuKienShop.Models.OrderViewModel>
+<!-- model IEnumerable<PhuKienShop.Data.Order> -->
+
+@{
+    ViewData["Title"] = "Quản lý đơn hàng";
+    <!-- Layout = "~/Views/Shared/_LayoutAdmin.cshtml"; -->
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+
+}
+   
+@{
+<!-- main content -->
+
+
+
+<div class="wrapper" style="">
+        <script src="~/js/toast.js"></script>
+    <div class="row">
+        <div class="col-8 col-m-12 col-sm-12" style="padding: 40px 20px;">
+            <div class="card">
+                <div class="card-header" style="display: flex">
+                    <h3>
+                        Quản lý đơn hàng
+                    </h3>
+                  
+                </div>
+                <div class="card-content" style="display: flex; justify-content:space-between;align-items: center;">
+                    <a href="#confirmOrder" class="btn btn-white-green" data-toggle="modal" style="margin-left: auto">
+                        <span>Xác nhận</span>
+                    </a>
+                    <a href="#packageOrder" class="btn btn-yellow" data-toggle="modal" style="margin-left: auto">
+                        <span>Đóng gói</span>
+                    </a>
+                    <a href="#deliveryOrder" class="btn btn-blue" data-toggle="modal" style="margin-left: auto">
+                        <span>Giao hàng</span>
+                    </a>
+                    <a href="#completeOrder" class="btn btn-green" data-toggle="modal" style="margin-left: auto">
+                        <span>Thành công</span>
+                    </a>
+                    <a href="#cancelOrder" class="btn btn-white-orange" data-toggle="modal" style="margin-left: auto">
+                        <span>Hủy</span>
+                    </a>
+                </div>
+                <div class="card-content">
+                    <table class="customerTable">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Ngày đặt hàng</th>
+                                <th>Danh sách sản phẩm</th>
+                                <th>Tổng tiền (VND)</th>
+                                <th>Trạng thái đơn hàng</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- main content
+                            OrderDAO orderDAO = new OrderDAO();
+                            List<Order> list = orderDAO.selectAll();
+                            for (Order order : list) {
+                                    -->
+                            @foreach (var orderViewModel in Model)
+                            {
+                                <tr>
+                                        <!-- background-color: aliceblue; -->
+                                    <td>@orderViewModel.Order.OrderId</td>
+                                    <td>@orderViewModel.Order.OrderDate</td>
+                                   
+                                    <td>@Html.Raw(orderViewModel.Details)</td>
+                                    <td>@orderViewModel.Order.TotalAmount</td>
+                                    <td>@orderViewModel.Order.Status</td>
+                                </tr>
+                            }
+                           
+                            <!--<%}%> -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Edit-->
+    <div id="editEmployeeModal" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="oderedit" method="post">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Thay đổi thông tin</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>#</label>
+                            <input type="text" name="id" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Mã khách hàng</label>
+                            <select name="userId" class="form-control" required>
+                                <option value="" disabled selected>Chọn mã khách hàng</option>
+                                <!--<% List<User> u1 = new UserDAO().selectAll();
+                                    for (User user : u1) {%>
+                                <option value="<%= user.getId() %>"><%= user.getId() %></option>
+                                <%
+                                    }
+                                %> -->
+                                <option value="<%= user.getId() %>"><%= user.getId() %></option>
+                                <option value="<%= user.getId() %>"><%= user.getId() %></option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Địa chỉ giao hàng</label>
+                            <input type="text" name="address" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Trạng thái đơn hàng</label>
+                            <select name="status" class="form-control" required>
+                                <option value="" disabled selected>Trạng thái</option>
+                                <option value="Xác nhận đơn hàng">Xác nhận đơn hàng</option>
+                                <option value="Chuẩn bị đơn hàng">Chuẩn bị đơn hàng</option>
+                                <option value="Đang giao">Đang giao</option>
+                                <option value="Hoàn tất">Hoàn tất</option>
+                                <option value="Hủy đơn hàng">Hủy đơn hàng</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Phương thức thanh toán</label>
+                            <select name="payment" class="form-control" required>
+                                <option value="" disabled selected>Phương thức thanh toán</option>
+                                <option value="Chuyển khoản trực tiếp">Chuyển khoản trực tiếp</option>
+                                <option value="Thanh toán khi nhận hàng">Thanh toán khi nhận hàng</option>
+                            </select>
+
+                        </div>
+                        <div class="form-group">
+                            <label>Ngày đặt hàng</label>
+                            <input type="date" name="dateOder" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Ngày nhận hàng</label>
+                            <input type="date" name="doneDate" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <input type="button" class="btn btn-default" data-dismiss="modal" value="Hủy">
+                        <input type="submit" class="btn btn-info" value="Lưu">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--/ Edit-->
+    <!--/ xac nhan-->
+    <div id="confirmOrder" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="oderadmin" method="post">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Xác nhận đơn hàng</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    </div>
+                        <div id="toast">
+                            toast
+                        </div>
+                        <script>showSuccessToast2("xac nhan don hang thanh cong");</script>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Mã đơn hàng</label>
+                            <input type="text" name="orderID" class="form-control" required>
+                        </div>
+                       
+                 
+                    </div>
+                    <div class="modal-footer">
+                        <!-- <input type="button" class="btn btn-default" data-dismiss="modal" value="Hủy"> -->
+                            <input type="button" class="btn btn-info" onclick="showSuccessToast2('xac nhan don hang thanh cong')" value="Xác nhận">
+                    </div>
+                </form>
+
+                kg
+            </div>
+        </div>
+    </div>
+    <!--/ xac nhan -->
+
+
+     <!--/ dong goi-->
+    <div id="packageOrder" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="oderadmin" method="post">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Đóng gói đơn hàng</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    </div>
+                        <div id="toast">
+                            toast
+                        </div>
+                        <script>showSuccessToast2("dong goi don hang thanh cong");</script>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Mã đơn hàng</label>
+                            <input type="text" name="orderID" class="form-control" required>
+                        </div>
+                       
+                 
+                    </div>
+                    <div class="modal-footer">
+                        <!-- <input type="button" class="btn btn-default" data-dismiss="modal" value="Hủy"> -->
+                            <input type="button" class="btn btn-info" onclick="showSuccessToast2('xac nhan don hang thanh cong')" value="Đóng gói">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--/ dong goi -->
+
+    <!--/vận chuyển-->
+    <div id="deliveryOrder" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="oderadmin" method="post">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Vận chuyển đơn hàng</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    </div>
+                    <div id="toast">
+                        toast
+                    </div>
+                    <script>showSuccessToast2("dong goi don hang thanh cong");</script>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Mã đơn hàng</label>
+                            <input type="text" name="orderID" class="form-control" required>
+                        </div>
+
+
+                    </div>
+                    <div class="modal-footer">
+                        <!-- <input type="button" class="btn btn-default" data-dismiss="modal" value="Hủy"> -->
+                        <input type="button" class="btn btn-info" onclick="showSuccessToast2('xac nhan don hang thanh cong')" value="Vận chuyển">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--/van chuyen -->
+
+    <!--/Hoan thanh-->
+    <div id="completeOrder" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="oderadmin" method="post">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Hoàn thành đơn hàng</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    </div>
+                    <div id="toast">
+                        toast
+                    </div>
+                    <script>showSuccessToast2("dong goi don hang thanh cong");</script>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Mã đơn hàng</label>
+                            <input type="text" name="orderID" class="form-control" required>
+                        </div>
+
+
+                    </div>
+                    <div class="modal-footer">
+                        <!-- <input type="button" class="btn btn-default" data-dismiss="modal" value="Hủy"> -->
+                        <input type="button" class="btn btn-info" onclick="showSuccessToast2('xac nhan don hang thanh cong')" value="Hoàn thành">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--/Hoan thanh -->
+
+    <!--/Huy-cancelOrder" class="modal fade"> -->
+    <div id="cancelOrder" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="oderadmin" method="post">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Hủy đơn hàng</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    </div>
+                    <div id="toast">
+                        toast
+                    </div>
+                    <script>showSuccessToast2("dong goi don hang thanh cong");</script>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Mã đơn hàng</label>
+                            <input type="text" name="orderID" class="form-control" required>
+                        </div>
+
+
+                    </div>
+                    <div class="modal-footer">
+                        <!-- <input type="button" class="btn btn-default" data-dismiss="modal" value="Hủy"> -->
+                            <input type="button" class="btn btn-info" onclick="showSuccessToast2('xac nhan don hang thanh cong')" value="Hủy">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+        <!--/Huy -->
+
+
+    <!-- <p>
+        <a asp-action="Create">Create New</a>
+    </p>
+    -->
+    <table class="table">
+        <thead>
+            <tr>
+               
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                 
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<!-- end main content -->
+}
+

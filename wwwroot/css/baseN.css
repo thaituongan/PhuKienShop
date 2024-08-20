@@ -1,0 +1,40 @@
+﻿.btn:hover {
+    cursor: pointer;
+    opacity: 0.3;
+}
+
+.btn-white-green {
+    background-color: white;
+    border: 1px solid #47D864;
+    color: #47D864;
+}
+
+.btn-white-yellow {
+    background-color: white;
+    border: 1px solid #FFC021;
+    color: #FFC021;
+}
+
+.btn-yellow {
+    background-color: #FFC021;
+    border: 1px solid #FFC021;
+    color: white;
+}
+
+.btn-blue {
+    background-color: #4154F1;
+    border: 1px solid #4154F1;
+    color: white;
+}
+
+.btn-green {
+    background-color: #47D864;
+    border: 1px solid #47D864;
+    color: white;
+}
+
+.btn-white-orange {
+    background-color: white;
+    border: 1px solid #FF623D;
+    color: #FF623D;
+}

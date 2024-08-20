@@ -1,6 +1,8 @@
 ﻿@model PhuKienShop.Data.Product
+
 @{
-	ViewData["Title"] = "Details";
+    ViewData["Title"] = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <h2>Details</h2>
@@ -44,7 +46,7 @@
 			<div class="col-md-5 align-content-md-center">
 				<div class="product-details">
 					<h2 class="product-name">@Model.ProductName</h2>
-					<div>
+<div>
 						<div class="product-rating">
 							<i class="fa fa-star"></i>
 							<i class="fa fa-star"></i>
@@ -473,8 +475,8 @@
 <!-- /NEWSLETTER -->
 
 <div>
-	<a asp-action="Edit" asp-route-id="@Model.ProductId">Edit</a> |
-	<a asp-action="Index">Back to List</a>
+    <a asp-action="Edit" asp-route-id="@Model.ProductId">Edit</a> |
+    <a asp-action="Index">Back to List</a>
 </div>
 
 <!-- hiển thị phần cuộn xuống tab bình luận khi nhấn vào Bình luận -->
