@@ -67,6 +67,7 @@
 
   <ItemGroup>
     <Folder Include="Data\" />
+    <Folder Include="Views\Orders\NewFolder\" />
   </ItemGroup>
 
 </Project>

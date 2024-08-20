@@ -20,4 +20,27 @@ public partial class Order
     public virtual ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
 
     public virtual User? User { get; set; }
+
+    public override bool Equals(object obj)
+    {
+        if (obj is Order other)
+        {
+            return OrderId == other.OrderId;
+        }
+        return false;
+    }
+
+    public override int GetHashCode()
+    {
+        return OrderId.GetHashCode();
+    }
+
+    public Order()
+    {
+    }
+
+    public Order(int id)
+    {
+        OrderId = id;
+    }
 }
