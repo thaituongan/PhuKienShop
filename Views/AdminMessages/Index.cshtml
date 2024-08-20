@@ -3,16 +3,25 @@
 <div class="row">
     <div class="col-md-4">
         <h4> Tin Nhắn</h4>
+
         <ul class="list-group">
-            @* @foreach (var user in Model.Users)
+            @if (Model.UserList != null && Model.UserList.Any())
             {
-                <li class="list-group-item @((Model.SelectedUser != null && Model.SelectedUser.UserId == user.UserId) ? "active-user" : "")">
-                    <a href="@Url.Action("Index", new { userId = user.UserId })"
-                       class="user-link">
-                        @user.Username
-                    </a>
-                </li>
-            } *@
+                <ul class="list-group">
+                    @foreach (var user in Model.UserList)
+                    {
+                        <li class="list-group-item @((Model.SelectedUser != null && Model.SelectedUser.UserId == user.UserId) ? "active-user" : "")">
+                            <a href="@Url.Action("Index", new { userId = user.UserId })" class="user-link">
+                                @user.Username
+                            </a>
+                        </li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <p>Không có user nào để hiển thị.</p>
+            }
         </ul>
     </div>
 
@@ -36,6 +45,7 @@
         }
     </div>
 </div>
+
 <style>
     .admin-message .message-content {
         background-color: #d1e7dd;
@@ -72,20 +82,20 @@
         border: 1px solid #ccc;
     }
 </style>
+@section Scripts {
 <script>
     $(document).ready(function () {
         // Function to fetch messages
         function fetchMessages() {
-            console.log("load ne")
             var userId = '@Model.SelectedUser?.UserId';
+            console.log("load message...")
             if (userId) {
-                console.log("load ne")
                 $.ajax({
                     url: '@Url.Action("GetMessages", "AdminMessages", new { userId = "__USER_ID__" })'.replace('__USER_ID__', userId),
                     type: 'GET',
                     success: function (data) {
                         $('.chat-history').html(data);
-                        $('.chat-history').scroll($('.chat-history')[fetchMessages.length.scrollHeight);
+                        $('.chat-history').scrollTop($('.chat-history')[0].scrollHeight);
                     },
                     error: function () {
                         console.error('Failed to load messages');
@@ -95,8 +105,7 @@
         }
 
         // Set an interval to fetch messages every second
-        setInterval(fetchMessages, 100);
-
+        setInterval(fetchMessages, 1000);
 
         // Submit the message form via AJAX
         $("#chat-form").submit(function (e) {
@@ -117,3 +126,4 @@
         });
     });
 </script>
+}
