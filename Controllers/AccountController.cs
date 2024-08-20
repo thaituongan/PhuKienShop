@@ -23,31 +23,24 @@ namespace PhuKienShop.Controllers
             if (User.Identity.IsAuthenticated)
             {
                 var email = User.FindFirst(ClaimTypes.Email)?.Value;
-                var role = User.FindFirst(ClaimTypes.Role)?.Value;
+                var user = _context.Users.FirstOrDefault(u => u.Email == email);
 
-                if (role != null)
+                if (user != null)
                 {
-                    if (role == "Admin")
-                    {
-                        return RedirectToAction("Index", "AdminMessages");
-                    }
-                    else
-                    {
-                        var userDetails = _context.Users.FirstOrDefault(u => u.Email == email);
+                    var orders = _context.Orders
+                        .Where(o => o.UserId == user.UserId) // Hoặc `o.UserId == user.Id` nếu bạn có thuộc tính `UserId`
+                        .ToList();
 
-                        if (userDetails != null)
-                        {
-                            return View("MyAccount", userDetails);
-                        }
-                        else
-                        {
-                            return RedirectToAction("Error", "Home");
-                        }
-                    }
+                    var viewModel = new MyAccountViewModel
+                    {
+                        User = user,
+                        Orders = orders
+                    };
+
+                    return View(viewModel);
                 }
                 else
                 {
-                    // Handle case where role is null or unrecognized
                     return RedirectToAction("Error", "Home");
                 }
             }

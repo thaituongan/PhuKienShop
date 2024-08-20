@@ -1,18 +1,133 @@
-﻿@model PhuKienShop.Data.User
+﻿@model MyAccountViewModel
 
 @{
     ViewData["Title"] = "User Profile";
 }
 
-<h2 style="margin-left: 50px;">User Profile</h2>
+<style>
+    /* Container chứa hai phần thông tin người dùng và danh sách đơn hàng */
+    .profile-container {
+        display: flex;
+        justify-content: space-between;
+        padding: 20px;
+        gap: 20px; /* Khoảng cách giữa các phần */
+    }
 
-<div style="border: 1px solid red; border-radius: 20px; padding: 10px; display: inline-block;">
-    <p><strong>FullName:</strong> @Model.FullName</p>
-    <p><strong>Email:</strong> @Model.Email</p>
-    <p><strong>Username:</strong> @Model.Username</p>
-    <p><strong>Phone Number:</strong> @Model.PhoneNumber</p>
-    <p><strong>Address:</strong> @Model.Address</p>
-    <p><strong>Created At:</strong> @Model.CreatedAt.ToString()</p>
-    <p><strong>Updated At:</strong> @Model.UpdatedAt.ToString()</p>
-    <a href="@Url.Action("UpdateAccount", "Account")" class="btn btn-primary" style="display: inline-block; margin-left: 65px;">Update Account</a>
+    /* Phần thông tin người dùng */
+    .user-info-section {
+        flex: 0 1 auto; /* Không gian linh hoạt theo nội dung */
+        border: 1px solid #d9534f; /* Màu đỏ nhạt */
+        border-radius: 10px;
+        padding: 15px;
+        max-width: 300px; /* Đặt kích thước tối đa */
+        background-color: #f9f9f9; /* Màu nền nhẹ */
+    }
+
+    /* Phần danh sách đơn hàng */
+    .order-list-section {
+        flex: 1 1 auto; /* Chiếm không gian còn lại */
+        border: 1px solid #0275d8; /* Màu xanh nhạt */
+        border-radius: 10px;
+        padding: 15px;
+        background-color: #fff; /* Màu nền trắng */
+    }
+
+    /* Các kiểu cho bảng */
+    .order-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+
+        .order-table th, .order-table td {
+            text-align: center;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .order-table th {
+            background-color: #f4f4f4;
+            font-weight: bold;
+        }
+
+    /* Nút cập nhật tài khoản */
+    .update-btn {
+        background-color: #0275d8; /* Màu xanh dương */
+        color: #fff;
+        border: none;
+        padding: 5px 10px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        border-radius: 5px;
+        margin-left: 50px;
+    }
+
+        .update-btn:hover {
+            background-color: #025aa5; /* Màu xanh dương đậm khi hover */
+        }
+
+    .details-btn {
+        background-color: #5bc0de; /* Màu xanh dương nhạt */
+        color: #fff;
+        border: none;
+        padding: 5px 10px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        border-radius: 5px;
+    }
+
+        .details-btn:hover {
+            background-color: #31b0d5; /* Màu xanh dương đậm khi hover */
+        }
+</style>
+
+
+<div class="profile-container">
+    <!-- Thông Tin Người Dùng -->
+    <div class="user-info-section">
+        <h4>Thông Tin Người Dùng</h4>
+        <div>
+            <p><strong>Họ và tên:</strong> @Model.User.FullName</p>
+            <p><strong>Email:</strong> @Model.User.Email</p>
+            <p><strong>Tên đăng nhập:</strong> @Model.User.Username</p>
+            <p><strong>Số điện thoại:</strong> @Model.User.PhoneNumber</p>
+            <p><strong>Địa chỉ:</strong> @Model.User.Address</p>
+            <p><strong>Ngày tạo:</strong> @Model.User.CreatedAt?.ToString()</p>
+            <p><strong>Ngày cập nhật:</strong> @Model.User.UpdatedAt?.ToString()</p>
+            <a href="@Url.Action("UpdateAccount", "Account")" class="update-btn">Cập Nhật Tài Khoản</a>
+        </div>
+    </div>
+
+    <!-- Danh Sách Đơn Hàng -->
+    <div class="order-list-section">
+        <h2>Danh Sách Đơn Hàng Của Tôi</h2>
+        <table class="order-table">
+            <thead>
+                <tr>
+                    <th>Mã Đơn Hàng</th>
+                    <th>Ngày Đặt</th>
+                    <th>Tổng Tiền</th>
+                    <th>Trạng Thái</th>
+                    <th>Hành Động</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var order in Model.Orders)
+                {
+                    <tr>
+                        <td>@order.OrderId</td>
+                        <td>@order.OrderDate?.ToString("dd/MM/yyyy")</td>
+                        <td>@order.TotalAmount.ToString("C")</td>
+                        <td>@order.Status</td>
+                        <td>
+                            <a href="@Url.Action("OrderDetails", "Order", new { id = order.OrderId })" class="details-btn">Xem Chi Tiết</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 </div>
+
