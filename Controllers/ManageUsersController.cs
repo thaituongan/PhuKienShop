@@ -170,5 +170,31 @@ namespace PhuKienShop.Controllers
         {
             return _context.Users.Any(e => e.UserId == id);
         }
-    }
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> EditRoleAndDelete(int UserId, string Role, string action)
+		{
+			var user = await _context.Users.FindAsync(UserId);
+			if (user == null)
+			{
+				return NotFound();
+			}
+
+			if (action == "update")
+			{
+				user.Role = Role;
+				user.UpdatedAt = DateTime.Now;
+				_context.Update(user);
+				await _context.SaveChangesAsync();
+			}
+			else if (action == "delete")
+			{
+				_context.Users.Remove(user);
+				await _context.SaveChangesAsync();
+			}
+
+			return RedirectToAction(nameof(Index));
+		}
+
+	}
 }

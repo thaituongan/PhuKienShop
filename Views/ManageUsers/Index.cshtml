@@ -1,110 +1,70 @@
-﻿
-@model IEnumerable<PhuKienShop.Data.User>
+﻿@model IEnumerable<PhuKienShop.Data.User>
 @{
     ViewData["Title"] = "Quản lý Tài Khoản";
     Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
-
 }
 
 <div class="container mt-4" style="padding-top: 100px;">
-
-@*     <h2 class="mb-0 text-center d-flex justify-content-between">
-        <button class="right">
-            <a asp-action="Create" class="btn"><i class="fas fa-user-plus"></i> </a>
-        </button>
-    </h2> *@
-
     <table id="userTable" class="table table-hover table-bordered display nowrap" style="width:100%">
-
         <thead class="thead-dark">
-
             <tr class="text-center align-self-xl-center">
-
                 <th class="text-center">Username</th>
-
-                <th class="text-center" style="width:30px">Email</th>
-
+                <th class="text-center">Email</th>
                 <th class="text-center">Họ Tên</th>
-
                 <th class="text-center">Số Điện Thoại</th>
-
-                <th class="text-center" style="width:100%">Địa Chỉ</th>
-
+                <th class="text-center">Địa Chỉ</th>
                 <th class="text-center">Quyền</th>
-
                 <th class="text-center">Ngày Tạo</th>
-
                 <th class="text-center">Ngày cập nhật</th>
-
-                <th class="text-center">Cập Nhật</th>
-
+                <th class="text-center">Hành Động</th>
             </tr>
-
         </thead>
-
         <tbody>
-
             @foreach (var item in Model)
-
             {
-
                 <tr class="text-center">
-
-                    <td>@Html.DisplayFor(modelItem => item.Username)</td>
-
-                    <td>@Html.DisplayFor(modelItem => item.Email)</td>
-
-                    <td>@Html.DisplayFor(modelItem => item.FullName)</td>
-
-                    <td>@Html.DisplayFor(modelItem => item.PhoneNumber)</td>
-
-                    <td>@Html.DisplayFor(modelItem => item.Address)</td>
-
-                    <td>@Html.DisplayFor(modelItem => item.Role)</td>
-
-                    <td>@Html.DisplayFor(modelItem => item.CreatedAt)</td>
-
-                    <td>@Html.DisplayFor(modelItem => item.UpdatedAt)</td>
-
-                    <td class="d-flex justify-content-center">
-
-                        <a asp-action="Edit" asp-route-id="@item.UserId" class="btn btn-warning btn-sm mx-1">
-
-                            <i class="fas fa-edit"></i>
-
-                        </a>
-
-                        <a asp-action="Details" asp-route-id="@item.UserId" class="btn btn-info btn-sm mx-1">
-
-                            <i class="fas fa-info-circle"></i>
-
-                        </a>
-
-                        <a asp-action="Delete" asp-route-id="@item.UserId" class="btn btn-danger btn-sm mx-1">
-
-                            <i class="fas fa-trash"></i>
-
-                        </a>
-
+                    <form asp-action="EditRoleAndDelete" method="post">
+                        <td>@Html.DisplayFor(modelItem => item.Username)</td>
+                        <td>@Html.DisplayFor(modelItem => item.Email)</td>
+                        <td>@Html.DisplayFor(modelItem => item.FullName)</td>
+                        <td>@Html.DisplayFor(modelItem => item.PhoneNumber)</td>
+                        <td>@Html.DisplayFor(modelItem => item.Address)</td>
+                    <td>
+                        <select name="Role" class="form-control">
+                                @if (item.Role == "User")
+                                {
+                                <option value="User" selected="selected">User</option>
+                                <option value="Admin">Admin</option>
+                                }
+                                else
+                                {
+                                <option value="User">User</option>
+                                <option value="Admin" selected="selected">Admin</option>
+                                }
+                        </select>
                     </td>
 
+                        <td>@Html.DisplayFor(modelItem => item.CreatedAt)</td>
+                        <td>@Html.DisplayFor(modelItem => item.UpdatedAt)</td>
+                        <td class="d-flex justify-content-center">
+                            <input type="hidden" name="UserId" value="@item.UserId" />
+                            <button type="submit" name="action" value="update" class="btn btn-warning btn-sm mx-1">
+                                <i class="fas fa-save"></i>
+                            </button>
+                            <button type="submit" name="action" value="delete" class="btn btn-danger btn-sm mx-1">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </form>
                 </tr>
-
             }
-
         </tbody>
-
     </table>
-
 </div>
 
-
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
 <script src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
-
 <script src="https://cdn.datatables.net/1.13.1/js/dataTables.bootstrap5.min.js"></script>
-
 <script>
     $(document).ready(function () {
         $('#userTable').DataTable({
