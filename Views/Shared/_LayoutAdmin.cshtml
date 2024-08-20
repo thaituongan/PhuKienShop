@@ -1,0 +1,146 @@
+﻿<!DOCTYPE html>
+
+<html>
+<head>
+    <title>@ViewBag.Title</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport"
+          content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+    <link rel="icon" type="image/png" href="~/img/logo.png" />
+
+    <!-- Import lib -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto|Varela+Round">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.css">
+    <link rel="stylesheet" type="text/css" href="~/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+    <link type="text/css" rel="stylesheet" href="~/css/style.css" />
+    <!-- End import lib -->
+
+    <link rel="stylesheet" type="text/css" href="~/css/styleAdmin.css">
+    <link rel="stylesheet" type="text/css" href="~/css/baseN.css">
+    <link rel="stylesheet" type="text/css" href="~/css/toast.css">
+
+    <!-- @RenderSection("Styles", required: false) -->
+</head>
+<body class="overlay-scrollbar">
+    <!-- navbar -->
+<div class="navbar">
+    <!-- nav left -->
+    <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link">
+                <i class="fa-solid fa-bars" onclick="collapseSidebar()"></i>
+            </a>
+        </li>
+        <li class="nav-item">
+            <img src="~/img/mylogo.png" alt="logo" class="logo logo-light">
+        </li>
+    </ul>
+    <!-- end nav left -->
+
+    <!-- nav right -->
+        <ul class="navbar-nav nav-right" style="align-items: center;">
+        <li class="nav-item">
+            <div class="avt dropdown">
+                <c:if test="${sessionScope.user != null}">
+                    <a><i class="fa fa-user-o"></i> To Nhat </a>
+                </c:if>
+              <!--  <ul id="user-menu" class="dropdown-menu">
+                    <li class="dropdown-menu-item">
+                        <a href="logout" class="dropdown-menu-link">
+                            <div>
+                                <i class="fas fa-sign-out-alt"></i>
+                            </div>
+                            <span>Đăng xuất</span>
+                        </a>
+                    </li>
+                </ul> -->
+            </div>
+        </li>
+        <li class="nav-item">
+            <div class="avt dropdown">
+                <img src="~/img/admin1.jpg" alt="User image" class="dropdown-toggle" data-toggle="user-menu">
+                    <ul id="user-menu" class="dropdown-menu" style="position:absolute;left:-140px; max-width:200px;">
+                        <li class="dropdown-menu-item">
+                            <a href="logout" class="dropdown-menu-link">
+                                <div>
+                                    <i class="fas fa-sign-out-alt"></i>
+                                </div>
+                                <span>Đăng xuất</span>
+                            </a>
+                        </li>
+                    </ul>
+            </div>
+        </li>
+    </ul>
+
+    <!-- end nav right -->
+</div>
+<!-- end navbar -->
+<!-- sidebar -->
+<div class="sidebar">
+    <ul class="sidebar-nav">
+        <li class="sidebar-nav-item">
+            <a href="thongso.jsp" class="sidebar-nav-link" style="margin-top: 20px;">
+                <div>
+                    <i class="fa-solid fa-signal"></i>
+                </div>
+                <span>
+						Thông số bán hàng
+					</span>
+            </a>
+        </li>
+        <li class="sidebar-nav-item">
+            <a href="admin.jsp" class="sidebar-nav-link">
+                <div>
+                    <i class="fa fa-user"></i>
+                </div>
+                <span>Quản lý nhân viên</span>
+            </a>
+        </li>
+        <li class="sidebar-nav-item">
+            <a href="quanlysanpham.jsp" class="sidebar-nav-link">
+                <div>
+                    <i class="fa fa-mobile"></i>
+                </div>
+                <span>Quản lý sản phẩm</span>
+            </a>
+        </li>
+        <li class="sidebar-nav-item">
+            <a href="quanlyhoadon.jsp" class="sidebar-nav-link">
+                <div>
+                    <i class="fa-solid fa-layer-group"></i>
+                </div>
+                <span>Quản lý hóa đơn</span>
+            </a>
+        </li>
+        <li class="sidebar-nav-item">
+            <a href="quanlytaikhoan" class="sidebar-nav-link">
+                <div>
+                    <i class="fa-solid fa-circle-user"></i>
+                </div>
+                <span>Quản lý tài khoản</span>
+            </a>
+        </li>
+    </ul>
+</div>
+<!-- end sidebar -->
+
+    <div style="">
+        @RenderBody()
+    </div>
+
+    <!-- import script -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
+    <script src="~/js/admin.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    <!-- end import script -->
+</body>
+</html>
