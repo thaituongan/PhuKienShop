@@ -18,49 +18,48 @@ namespace PhuKienShop.Controllers
             _context = context;
             _logger = logger;
         }
-		public IActionResult MyAccount()
-		{
-            
-			if (User.Identity.IsAuthenticated) // Kiểm tra nếu người dùng chưa đăng nhập
-			{
-
-                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        public IActionResult MyAccount()
+        {
+            if (User.Identity.IsAuthenticated)
+            {
                 var email = User.FindFirst(ClaimTypes.Email)?.Value;
                 var role = User.FindFirst(ClaimTypes.Role)?.Value;
-                var username = User.FindFirst(ClaimTypes.Name)?.Value;
-
-                ViewData["UserId"] = userId;
-                ViewData["Email"] = email;
-                ViewData["Role"] = role;
-                ViewData["Username"] = username;
-
-/*                int id = int.Parse(userId);
-                var user = _context.Users.FirstOrDefault(u => u.UserId == id);*/
-
-
 
                 if (role != null)
-			{
-				if (role == "Admin") // Kiểm tra nếu người dùng là Admin
-				{
-					return RedirectToAction("Index", "AdminMessages"); // Chuyển hướng đến trang quản lý của admin
-				}
-				else
-				{
-                    return View("MyAccount"); // Chuyển hướng đến trang thông tin tài khoản của user
-				}
-			}
+                {
+                    if (role == "Admin")
+                    {
+                        return RedirectToAction("Index", "AdminMessages");
+                    }
+                    else
+                    {
+                        var userDetails = _context.Users.FirstOrDefault(u => u.Email == email);
+
+                        if (userDetails != null)
+                        {
+                            return View("MyAccount", userDetails);
+                        }
+                        else
+                        {
+                            return RedirectToAction("Error", "Home");
+                        }
+                    }
+                }
+                else
+                {
+                    // Handle case where role is null or unrecognized
+                    return RedirectToAction("Error", "Home");
+                }
             }
             else
             {
                 return RedirectToAction("Login", "Account");
             }
-
-            return View("MyAccount"); // Chuyển hướng đến trang thông tin tài khoản của user
         }
 
 
-		[HttpGet]
+
+        [HttpGet]
         public IActionResult Register()
         {
             return View("Register");
