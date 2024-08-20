@@ -22,22 +22,32 @@ namespace PhuKienShop.Controllers
         {
             if (User.Identity.IsAuthenticated)
             {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var role = User.FindFirst(ClaimTypes.Role)?.Value;
                 var email = User.FindFirst(ClaimTypes.Email)?.Value;
                 var user = _context.Users.FirstOrDefault(u => u.Email == email);
 
-                if (user != null)
+                if (role != null && user != null)
                 {
-                    var orders = _context.Orders
-                        .Where(o => o.UserId == user.UserId) // Hoặc `o.UserId == user.Id` nếu bạn có thuộc tính `UserId`
-                        .ToList();
-
-                    var viewModel = new MyAccountViewModel
+                    if (role == "Admin") // Kiểm tra nếu người dùng là Admin
                     {
-                        User = user,
-                        Orders = orders
-                    };
+                        return RedirectToAction("Index", "ManageUsers"); // Chuyển hướng đến trang quản lý của admin
+                    }
+                    else
+                    {
+                        var orders = _context.Orders
+                     .Where(o => o.UserId == user.UserId) // Hoặc `o.UserId == user.Id` nếu bạn có thuộc tính `UserId`
+                     .ToList();
 
-                    return View(viewModel);
+                        var viewModel = new MyAccountViewModel
+                        {
+                            User = user,
+                            Orders = orders
+                        };
+
+                        return View(viewModel);
+                    }
+
                 }
                 else
                 {
@@ -49,7 +59,6 @@ namespace PhuKienShop.Controllers
                 return RedirectToAction("Login", "Account");
             }
         }
-
 
 
         [HttpGet]
@@ -85,17 +94,17 @@ namespace PhuKienShop.Controllers
 
             // Check if the email already exists
             if (_context.Users.Any(u => u.Email == email))
-                {
-                    ModelState.AddModelError("Email", "Email đã được sử dụng!");
-                    return View();
-                }
+            {
+                ModelState.AddModelError("Email", "Email đã được sử dụng!");
+                return View();
+            }
 
-                // Check if the username already exists
-                if (_context.Users.Any(u => u.Username == username))
-                {
-                    ModelState.AddModelError("Username", "Username đã được sử dụng!");
-                    return View();
-                }
+            // Check if the username already exists
+            if (_context.Users.Any(u => u.Username == username))
+            {
+                ModelState.AddModelError("Username", "Username đã được sử dụng!");
+                return View();
+            }
             if (ModelState.IsValid)
             {
                 // Proceed with the registration
@@ -117,58 +126,58 @@ namespace PhuKienShop.Controllers
 
 
         [HttpPost]
-    public IActionResult VerifyCode(string code)
-{
-    var expectedCode = TempData["VerificationCode"] as string;
-    var email = TempData["Email"] as string;
-    var username = TempData["Username"] as string;
-    var hashedPassword = TempData["Password"] as string;
-
-    if (expectedCode != null && expectedCode == code)
-    {
-        var user = new User
+        public IActionResult VerifyCode(string code)
         {
-            Username = username,
-            Email = email,
-            Password = hashedPassword,
-            Role = "User",
-            CreatedAt = DateTime.Now,
-            UpdatedAt = DateTime.Now
-        };
+            var expectedCode = TempData["VerificationCode"] as string;
+            var email = TempData["Email"] as string;
+            var username = TempData["Username"] as string;
+            var hashedPassword = TempData["Password"] as string;
 
-        _context.Users.Add(user);
-        _context.SaveChanges();
+            if (expectedCode != null && expectedCode == code)
+            {
+                var user = new User
+                {
+                    Username = username,
+                    Email = email,
+                    Password = hashedPassword,
+                    Role = "User",
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now
+                };
 
-        return RedirectToAction("Login", "Account");
-    }
+                _context.Users.Add(user);
+                _context.SaveChanges();
 
-    ModelState.AddModelError("", "Mã xác thực không hợp lệ!.");
-    return View("EnterVerificationCode");
-}
+                return RedirectToAction("Login", "Account");
+            }
 
-		private async Task SendEmailAsync(string to, string subject, string body)
-		{
-			var fromAddress = new MailAddress("anzorobd@gmail.com", "Thái Tường An");
+            ModelState.AddModelError("", "Mã xác thực không hợp lệ!.");
+            return View("EnterVerificationCode");
+        }
+
+        private async Task SendEmailAsync(string to, string subject, string body)
+        {
+            var fromAddress = new MailAddress("anzorobd@gmail.com", "Thái Tường An");
             var toAddress = new MailAddress(to);
-			var message = new MailMessage
-			{
+            var message = new MailMessage
+            {
                 Subject = subject,
-				From = fromAddress,
-				Body = body,
-				IsBodyHtml = true
-			};
-			message.To.Add(toAddress);
+                From = fromAddress,
+                Body = body,
+                IsBodyHtml = true
+            };
+            message.To.Add(toAddress);
 
-			using (var smtp = new SmtpClient())
-			{
-				smtp.Host = "smtp.gmail.com";
-				smtp.Port = 587;
-				smtp.Credentials = new NetworkCredential("anzorobd@gmail.com", "wzud casb guyv wsho");
-				smtp.EnableSsl = true;
-				await smtp.SendMailAsync(message);
-			}
-		}
-		[HttpGet]
+            using (var smtp = new SmtpClient())
+            {
+                smtp.Host = "smtp.gmail.com";
+                smtp.Port = 587;
+                smtp.Credentials = new NetworkCredential("anzorobd@gmail.com", "wzud casb guyv wsho");
+                smtp.EnableSsl = true;
+                await smtp.SendMailAsync(message);
+            }
+        }
+        [HttpGet]
         public IActionResult Login()
         {
             return View("Login");

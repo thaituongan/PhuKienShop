@@ -1,81 +1,18 @@
-﻿<style>
-
-    /* Add some padding to the container */
-
-    .container {
-        padding: 20px;
-    }
-
-
-    /* Make the table header darker and more prominent */
-
-    .thead-dark {
-        background-color: #333;
-        color: #fff;
-    }
-
-
-    /* Add some margin to the table rows */
-
-    .table-hover > tbody > tr:hover {
-        background-color: #f5f5f5;
-    }
-
-
-    /* Make the action buttons smaller and more compact */
-
-    .btn-sm {
-        padding: 0.25rem 0.5rem;
-        font-size: 0.875rem;
-    }
-
-
-    /* Add some margin to the action buttons */
-
-    .mx-1 {
-        margin: 0 0.25rem;
-    }
-
-
-    /* Make the DataTables pagination and search box more compact */
-
-    .dataTables_wrapper .dataTables_paginate {
-        margin-top: 10px;
-    }
-
-
-    .dataTables_wrapper .dataTables_filter {
-        margin-bottom: 10px;
-    }
-
-
-    /* Add some padding to the DataTables info and pagination elements */
-
-    .dataTables_info, .dataTables_paginate {
-        padding: 10px;
-    }
-
-</style>
-
-
+﻿
 @model IEnumerable<PhuKienShop.Data.User>
-
-
 @{
-
-    ViewData["Title"] = "Quản Lý Tài Khoản";
+    ViewData["Title"] = "Quản lý Tài Khoản";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
 
 }
 
-<div class="container mt-4">
+<div class="container mt-4" style="padding-top: 100px;">
 
-    <h2 class="mb-0 text-center d-flex justify-content-between">
-        @ViewData["Title"]
+@*     <h2 class="mb-0 text-center d-flex justify-content-between">
         <button class="right">
             <a asp-action="Create" class="btn"><i class="fas fa-user-plus"></i> </a>
         </button>
-        
-    </h2>
+    </h2> *@
 
     <table id="userTable" class="table table-hover table-bordered display nowrap" style="width:100%">
 

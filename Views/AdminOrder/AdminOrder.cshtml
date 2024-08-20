@@ -1,0 +1,207 @@
+﻿﻿@{
+	ViewData["Title"] = "Home Page";
+	Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@{
+	<!-- main content -->
+<div class="wrapper">
+    <div class="row">
+        <div class="col-8 col-m-12 col-sm-12">
+            <div class="card">
+                <div class="card-header" style="display: flex">
+                    <h3>
+                        Quản lý đơn hàng
+                    </h3>
+                    <a href="#addEmployeeModal" class="btn btn-success" data-toggle="modal" style="margin-left: auto">
+                        <span>Thêm đơn hàng mới</span></a>
+                </div>
+                <div class="card-content">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Mã khách hàng</th>
+                            <th>Địa chỉ giao hàng</th>
+                            <th>Trạng thái đơn hàng</th>
+                            <th>Phương thức thanh toán</th>
+                            <th>Ngày đặt hàng</th>
+                            <th>Ngày nhận hàng</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                                <!-- main content 
+                            OrderDAO orderDAO = new OrderDAO();
+                            List<Order> list = orderDAO.selectAll();
+                            for (Order order : list) {
+                                    -->
+                        <tr>
+                            <td><%=order.getId()%>
+                            </td>
+                            <td><%=order.getUser().getId()%>
+                            </td>
+                            <td><%=order.getAddress()%>
+                            </td>
+                            <td><%=order.getStatus()%>
+                            </td>
+                            <td><%=order.getPayMent()%>
+                            </td>
+                            <td><%=order.getOrderDate()%>
+                            </td>
+                            <td><%=order.getDeliveryDate()%>
+                            </td>
+                            <td>
+                                <a href="#editEmployeeModal" class="edit" data-toggle="modal"><i class="material-icons"
+                                                                                                 data-toggle="tooltip"
+                                                                                                 title="Edit">&#xE254;</i></a>
+                            </td>
+                        </tr>
+                                <!--<%}%> -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Edit-->
+    <div id="editEmployeeModal" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="oderedit" method="post">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Thay đổi thông tin</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>#</label>
+                            <input type="text" name="id" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Mã khách hàng</label>
+                            <select name="userId" class="form-control" required>
+                                <option value="" disabled selected>Chọn mã khách hàng</option>
+                                    <!--<% List<User> u1 = new UserDAO().selectAll();
+                                    for (User user : u1) {%>
+                                <option value="<%= user.getId() %>"><%= user.getId() %></option>
+                                <%
+                                    }
+                                %> -->
+                                    <option value="<%= user.getId() %>"><%= user.getId() %></option>
+                                    <option value="<%= user.getId() %>"><%= user.getId() %></option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Địa chỉ giao hàng</label>
+                            <input type="text" name="address" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Trạng thái đơn hàng</label>
+                            <select name="status" class="form-control" required>
+                                <option value="" disabled selected>Trạng thái</option>
+                                <option value="Xác nhận đơn hàng">Xác nhận đơn hàng</option>
+                                <option value="Chuẩn bị đơn hàng">Chuẩn bị đơn hàng</option>
+                                <option value="Đang giao">Đang giao</option>
+                                <option value="Hoàn tất">Hoàn tất</option>
+                                <option value="Hủy đơn hàng">Hủy đơn hàng</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Phương thức thanh toán</label>
+                            <select name="payment" class="form-control" required>
+                                <option value="" disabled selected>Phương thức thanh toán</option>
+                                <option value="Chuyển khoản trực tiếp">Chuyển khoản trực tiếp</option>
+                                <option value="Thanh toán khi nhận hàng">Thanh toán khi nhận hàng</option>
+                            </select>
+
+                        </div>
+                        <div class="form-group">
+                            <label>Ngày đặt hàng</label>
+                            <input type="date" name="dateOder" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Ngày nhận hàng</label>
+                            <input type="date" name="doneDate" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <input type="button" class="btn btn-default" data-dismiss="modal" value="Hủy">
+                        <input type="submit" class="btn btn-info" value="Lưu">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--/ Edit-->
+
+    <!--/ Add-->
+    <div id="addEmployeeModal" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="oderadmin" method="post">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Thêm hóa đơn</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Mã khách hàng</label>
+                                <select name="userId" class="form-control" required>
+                                    <option value="" disabled selected>Chọn mã khách hàng</option>
+                                    <!--<% List<User> u = new UserDAO().selectAll();
+                                    for (User user : u) {%>
+                                    <option value="<%= user.getId() %>"><%= user.getId() %></option>
+                                <%
+                                    }
+                                %> -->
+                                    <option value="<%= user.getId() %>">Ma khach hang 1</option>
+                                    <option value="<%= user.getId() %>">Ma khach hang 2</option>
+
+                                </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Địa chỉ giao hàng</label>
+                                <input type="text" name="address" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Trạng thái đơn hàng</label>
+                            <select name="status" class="form-control" required>
+                                <option value="" disabled selected>Trạng thái</option>
+                                <option value="Xác nhận đơn hàng">Xác nhận đơn hàng</option>
+                                <option value="Chuẩn bị đơn hàng">Chuẩn bị đơn hàng</option>
+                                <option value="Đang giao">Đang giao</option>
+                                <option value="Hoàn tất">Hoàn tất</option>
+                                <option value="Hủy đơn hàng">Hủy đơn hàng</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Phương thức thanh toán</label>
+                            <select name="payment" class="form-control" required>
+                                <option value="" disabled selected>Phương thức thanh toán</option>
+                                <option value="Chuyển khoản trực tiếp">Chuyển khoản trực tiếp</option>
+                                <option value="Thanh toán khi nhận hàng">Thanh toán khi nhận hàng</option>
+                            </select>
+
+                        </div>
+                        <div class="form-group">
+                            <label>Ngày đặt hàng</label>
+                                <input type="date" name="dateOder" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Ngày nhận hàng</label>
+                                <input type="date" name="doneDate" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <input type="button" class="btn btn-default" data-dismiss="modal" value="Hủy">
+                        <input type="submit" class="btn btn-info" value="Thêm">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--/ Add -->
+</div>
+<!-- end main content -->
+
+}

@@ -1,7 +1,7 @@
-﻿<!-- Chat Widget -->
+﻿﻿<!-- Chat Widget -->
 <div id="chat-widget" class="chat-widget">
     <div class="chat-header">
-        <h5>Live Chat @User.Identity.Name <span id="toggleChat" class="toggle-chat">[Hide]</span></h5>
+        <h5>Chat với admin<span id="toggleChat" class="toggle-chat">[Hide]</span></h5>
     </div>
     <div id="messages" class="chat-messages"></div>
     <div class="chat-input-container">
@@ -38,7 +38,8 @@
             })
             .catch(err => console.error("SignalR connection failed: " + err.toString()));
 
-        document.getElementById("sendButton").addEventListener("click", () => {
+        // Function to send a message
+        function sendMessage() {
             const user = document.getElementById("userName").value;
             const message = document.getElementById("messageInput").value;
             if (message.trim()) {
@@ -46,7 +47,23 @@
                     .catch(err => console.error("Error sending message: " + err.toString()));
                 document.getElementById("messageInput").value = "";
             }
+        }
+
+        // Event listener for the Send button
+        document.getElementById("sendButton").addEventListener("click", () => {
+            sendMessage();
         });
+
+        // Event listener for pressing Enter in the message input
+        document.getElementById("messageInput").addEventListener("keydown", (event) => {
+            if (event.key === "Enter") {
+                event.preventDefault(); // Prevent the default action, like submitting a form
+                sendMessage();
+            }
+        });
+
+
+        
 
         let chatWidgetVisible = false;
         document.getElementById("toggleChatButton").addEventListener("click", () => {
@@ -125,10 +142,10 @@
         background-color: #f1f1f1;
     }
 
-    .chat-input-container input {
-        flex: 1;
-        margin-right: 5px;
-    }
+        .chat-input-container input {
+            flex: 1;
+            margin-right: 5px;
+        }
 
     .chat-toggle-button {
         position: fixed;

@@ -25,6 +25,14 @@ namespace PhuKienShop.Controllers
             return View(await pkShopContext.ToListAsync());
         }
 
+        public async Task<List<Product>> SelectByIDsAsync(List<int> ids)
+        {
+            return await _context.Products
+                                 .Include(o => o.OrderDetails)
+                                 .Where(od => ids.Contains(od.ProductId))
+                                 .ToListAsync();
+        }
+
         // GET: Products/Details/5
         public async Task<IActionResult> Details(int? id)
         {

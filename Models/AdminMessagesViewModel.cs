@@ -1,9 +1,8 @@
 ﻿using PhuKienShop.Data;
-using System.Collections.Generic;
 
 public class AdminMessagesViewModel
 {
-    public IEnumerable<User> Users { get; set; }
-    public IEnumerable<Message> Messages { get; set; }
+    public IEnumerable<User> UserList { get; set; } = new List<User>(); // Khởi tạo danh sách trống
+    public IEnumerable<Message> Messages { get; set; } = new List<Message>(); // Khởi tạo danh sách trống
     public User SelectedUser { get; set; }
 }

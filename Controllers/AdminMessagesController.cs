@@ -50,10 +50,11 @@ public class AdminMessagesController : Controller
 
             selectedUser = await _context.Users.FindAsync(userId.Value);
         }
-
+        // Loại bỏ các phần tử null (nếu có) trong danh sách
+        users = users.Where(u => u != null).ToList();
         var model = new AdminMessagesViewModel
         {
-            Users = users,
+            UserList = users ?? new List<User>(),
             Messages = userMessages,
             SelectedUser = selectedUser
         };

@@ -1,0 +1,172 @@
+﻿@{
+    ViewData["Title"] = "Thống kê";
+    Layout = "~/Views/Shared/LayoutAdmin.cshtml";
+}
+
+<!-- main content -->
+<div class="wrapper">
+    <div class="row">
+        <div class="col-3 col-m-6 col-sm-6">
+            <div class="counter bg-primary">
+                <p>
+                    <i class="fas fa-tasks"></i>
+                </p>
+                <h3 id="countOrd">@Model.TotalOrdersThisMonth</h3>
+                <p>Đơn hàng tháng này</p>
+            </div>
+        </div>
+        <div class="col-3 col-m-6 col-sm-6">
+            <div class="counter bg-warning">
+                <p>
+                    <i class="fas fa-user"></i>
+                </p>
+                <h3 id="countCus">@Model.TotalCustomersThisMonth</h3>
+                <p>Khách mua hàng tháng này</p>
+            </div>
+        </div>
+        <div class="col-3 col-m-6 col-sm-6">
+            <div class="counter bg-success">
+                <p>
+                    <i class="fas fa-phone"></i>
+                </p>
+                <h3 id="calculateRev">@Model.TotalProductThisMonth</h3>
+                <p>Sản phấm bán tháng này</p>
+            </div>
+        </div>
+        <div class="col-3 col-m-6 col-sm-6">
+            <div class="counter bg-success">
+                <p>
+                    <i>$</i>
+                </p>
+                <h3 id="calculateRev">@Model.TotalRevenueThisMonth VND</h3>
+                <p>Doanh thu tháng này</p>
+            </div>
+        </div>
+        </div>
+    <div class="row">
+        <div class="col-4 col-m-12 col-sm-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Biến động</h3>
+                    <i class="fas fa-ellipsis-h"></i>
+                </div>
+                <div class="card-content">
+                    <div class="progress-wrapper">
+                        <p>
+                            Số đơn hàng so với tháng trước
+                            <span class="float-right">
+                                @if (Model.OrderChangePercentage > 0)
+                                {
+                                    <text>Tăng @Model.OrderChangePercentage.ToString("0.##")%</text>
+                                }
+                                else
+                                {
+                                    <text>Giảm @(-Model.OrderChangePercentage).ToString("0.##")%</text>
+                                }
+                            </span>
+                        </p>
+                        <div class="progress">
+                            <div class="bg-primary" style="width: @(Model.OrderChangePercentage > 100 ? 100 : Model.OrderChangePercentage)%"></div>
+                        </div>
+                    </div>
+                    <div class="progress-wrapper">
+                        <p>
+                            Số khách mua hàng so với tháng trước
+                            <span class="float-right">
+                                @if (Model.CustomerChangePercentage > 0)
+                                {
+                                    <text>Tăng @Model.CustomerChangePercentage.ToString("0.##")%</text>
+                                }
+                                else
+                                {
+                                    <text>Giảm @(-Model.CustomerChangePercentage).ToString("0.##")%</text>
+                                }
+                            </span>
+                        </p>
+                        <div class="progress">
+                            <div class="bg-warning" style="width: @(Model.CustomerChangePercentage > 100 ? 100 : Model.CustomerChangePercentage)%"></div>
+                        </div>
+                    </div>
+                    <div class="progress-wrapper">
+                        <p>
+                            Doanh thu so với tháng trước
+                            <span class="float-right">
+                                @if (Model.RevenueChangePercentage > 0)
+                                {
+                                    <text>Tăng @Model.RevenueChangePercentage.ToString("0.##")%</text>
+                                }
+                                else
+                                {
+                                    <text>Giảm @(-Model.RevenueChangePercentage).ToString("0.##")%</text>
+                                }
+                            </span>
+                        </p>
+                        <div class="progress">
+                            <div class="bg-danger" style="width: @(Model.RevenueChangePercentage > 100 ? 100 : Model.RevenueChangePercentage)%"></div>
+                        </div>
+                    </div>
+                    <div class="progress-wrapper">
+                        <p>
+                            Lượng sản phẩm bán ra so với tháng trước
+                            <span class="float-right">
+                                @if (Model.ProductSoldChangePercentage > 0)
+                                {
+                                    <text>Tăng @Model.ProductSoldChangePercentage.ToString("0.##")%</text>
+                                }
+                                else
+                                {
+                                    <text>Giảm @(-Model.ProductSoldChangePercentage).ToString("0.##")%</text>
+                                }
+                            </span>
+                        </p>
+                        <div class="progress">
+                            <div class="bg-dark" style="width: @(Model.ProductSoldChangePercentage > 100 ? 100 : Model.ProductSoldChangePercentage)%"></div>
+                        </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+    </div>
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-3">
+                <div class="bg-primary text-white p-3 rounded">
+                    <p>
+                        <i class="fas fa-tasks fa-2x"></i>
+                    </p>
+                    <h3>@Model.TotalOrders</h3>
+                    <p>Tổng số đơn hàng</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="bg-warning text-dark p-3 rounded">
+                    <p>
+                        <i class="fas fa-user fa-2x"></i>
+                    </p>
+                    <h3>@Model.TotalCustomers</h3>
+                    <p>Tổng khách mua hàng</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="bg-success text-white p-3 rounded">
+                    <p>
+                        <i class="fas fa-phone fa-2x"></i>
+                    </p>
+                    <h3>@Model.TotalProduct</h3>
+                    <p>Tổng sản phẩm bán ra</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="bg-success text-white p-3 rounded">
+                    <p>
+                        <i class="fas fa-dollar-sign fa-2x"></i>
+                    </p>
+                    <h3>@Model.TotalRevenue VND</h3>
+                    <p>Tổng doanh thu </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+    <!-- end main content -->
