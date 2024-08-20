@@ -43,7 +43,7 @@ namespace PhuKienShop.Controllers
 			{
 				if (role == "Admin") // Kiểm tra nếu người dùng là Admin
 				{
-					return RedirectToAction("Index", "AdminMessages"); // Chuyển hướng đến trang quản lý của admin
+					return RedirectToAction("Index", "Statistics"); // Chuyển hướng đến trang quản lý của admin
 				}
 				else
 				{

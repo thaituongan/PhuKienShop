@@ -35,6 +35,13 @@ namespace PhuKienShop
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
             });
 
+            // Add session
+            builder.Services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromMinutes(30);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
 
             var app = builder.Build();
 
@@ -55,6 +62,8 @@ namespace PhuKienShop
             app.UseStaticFiles();
             app.UseAuthentication();
             app.UseAuthorization();
+            app.UseSession();
+
 
             app.MapHub<ChatHub>("/chathub");
 
