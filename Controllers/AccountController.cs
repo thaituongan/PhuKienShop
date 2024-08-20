@@ -285,6 +285,61 @@ namespace PhuKienShop.Controllers
             await HttpContext.SignInAsync("PhuKienShopAuth", newPrincipal);
             return RedirectToAction("Index", "Home");
         }
+        // GET: Account/UpdateAccount
+        [HttpGet]
+        public IActionResult UpdateAccount()
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                var email = User.FindFirst(ClaimTypes.Email)?.Value;
+                var userDetails = _context.Users.FirstOrDefault(u => u.Email == email);
+
+                if (userDetails != null)
+                {
+                    return View(userDetails);
+                }
+                else
+                {
+                    return RedirectToAction("Error", "Home");
+                }
+            }
+            else
+            {
+                return RedirectToAction("Login", "Account");
+            }
+        }
+
+        // POST: Account/UpdateAccount
+        [HttpPost]
+        public IActionResult UpdateAccount(User updatedUser)
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                var email = User.FindFirst(ClaimTypes.Email)?.Value;
+                var user = _context.Users.FirstOrDefault(u => u.Email == email);
+
+                if (user != null)
+                {
+                    // Update user details
+                    user.FullName = updatedUser.FullName;
+                    user.PhoneNumber = updatedUser.PhoneNumber;
+                    user.Address = updatedUser.Address;
+                    user.UpdatedAt = DateTime.Now;
+                    _context.Users.Update(user);
+                    _context.SaveChanges();
+
+                    return RedirectToAction("MyAccount");
+                }
+                else
+                {
+                    return RedirectToAction("Error", "Home");
+                }
+            }
+            else
+            {
+                return RedirectToAction("Login", "Account");
+            }
+        }
 
     }
 }
