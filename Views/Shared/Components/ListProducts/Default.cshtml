@@ -48,9 +48,27 @@
                         </div>
                     </div>
                    
-                    <div class="add-to-cart">
-                        <button class="add-to-cart-btn"><i class="fa fa-shopping-cart"></i> add to cart</button>
-                    </div>
+                        <div class="add-to-cart">
+                            @if (User.Identity.IsAuthenticated)
+                            {
+                                <form asp-controller="ShoppingCart" asp-action="AddToCart" method="post">
+                                    <input type="hidden" name="productId" value="@item.Product.ProductId" />
+                                    <input type="hidden" name="quantity" value="1" />
+                                    <button type="submit" class="add-to-cart-btn">
+                                        <i class="fa fa-shopping-cart"></i> add to cart
+                                    </button>
+                                </form>
+                            }
+                            else
+                            {
+                                <form asp-controller="Account" asp-action="Login" method="get">
+                                    <button type="submit" class="add-to-cart-btn">
+                                        <i class="fa fa-shopping-cart"></i> add to cart
+                                    </button>
+                                </form>
+                            }
+                        </div>
+
                   </a>  
                 </div>
                 
