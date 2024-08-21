@@ -34,6 +34,17 @@ namespace PhuKienShop.Controllers
                                  .ToListAsync();
         }
 
+        public async Task<List<OrderDetail>> SelectByOrderIDAsync(int? OrderId)
+        {
+            return await _context.OrderDetails
+                                 .Include(o => o.Order)
+                                 .Include(o => o.Product)
+                                 .Where(od => od.OrderId.HasValue && od.OrderId.Value == OrderId)
+                                 .ToListAsync();
+        }
+
+
+
         // GET: OrderDetails/Details/5
         public async Task<IActionResult> Details(int? id)
         {
