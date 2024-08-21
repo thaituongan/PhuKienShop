@@ -1,7 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PhuKienShop.Data;
-using PhuKienShop.Services;
-
 namespace PhuKienShop
 {
     public class Program
@@ -37,11 +35,17 @@ namespace PhuKienShop
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
             });
 
-            // Đăng ký các dịch vụ
-            builder.Services.AddScoped<IOrderDetailService, OrderDetailService>();
-            builder.Services.AddScoped<IProductService, ProductService>();
+			// Add session
+			builder.Services.AddHttpContextAccessor();
+			builder.Services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromMinutes(30);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
+			
 
-            var app = builder.Build();
+			var app = builder.Build();
 
 
             // Configure the HTTP request pipeline.
@@ -60,6 +64,8 @@ namespace PhuKienShop
             app.UseStaticFiles();
             app.UseAuthentication();
             app.UseAuthorization();
+            app.UseSession();
+
 
             app.MapHub<ChatHub>("/chathub");
 

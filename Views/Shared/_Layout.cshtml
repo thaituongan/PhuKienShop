@@ -1,4 +1,5 @@
-﻿﻿<!DOCTYPE html>
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor﻿
+<!DOCTYPE html>
 <html lang="en">
 <head>
 	<meta charset="utf-8" />
@@ -21,8 +22,7 @@
 
 	<!-- Slick -->
 	<link type="text/css" rel="stylesheet" href="~/css/slick.css" />
-	<link type="text/css" rel="stylesheet" href="css/slick-theme.css" />
-
+	<link type="text/css" rel="stylesheet" href="~/css/slick-theme.css" />
 	<!-- nouislider -->
 	<link type="text/css" rel="stylesheet" href="~/css/nouislider.min.css" />
 
@@ -31,6 +31,9 @@
 
 	<!-- Custom stlylesheet -->
 	<link type="text/css" rel="stylesheet" href="~/css/style.css" />
+	<!-- js-->
+	
+	<script src="~/js/searchpartial.js" defer></script>
 
 	<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
 	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -47,14 +50,23 @@
 		<div id="top-header">
 			<div class="container">
 				<ul class="header-links pull-left">
-					<li><a href="#"><i class="fa fa-phone"></i> +021-95-51-84</a></li>
-					<li><a href="#"><i class="fa fa-envelope-o"></i> email@email.com</a></li>
-					<li><a href="#"><i class="fa fa-map-marker"></i> 1734 Stonecoal Road</a></li>
+					<li><a href="#"><i class="fa fa-phone"></i> 0949497383</a></li>
+					<li><a href="#"><i class="fa fa-envelope-o"></i> dhnl@email.com</a></li>
+					<li><a href="#"><i class="fa fa-map-marker"></i> Đại Học Nông Lâm</a></li>
 				</ul>
 				<ul class="header-links pull-right">
-					<li><a href="#"><i class="fa fa-dollar"></i> VND</a></li>
-					<li><a href="@Url.Action("MyAccount", "Account")"><i class="fa fa-user-o"></i> My Account</a></li>
-					<li><a href="@Url.Action("Logout", "Account")"><i class="fa fa-user-o"></i> Logout</a></li>
+					<li><a href="#"><i></i> VND</a></li>
+					<li><a href="@Url.Action("MyAccount", "Account")"><i class="fa fa-user-o"></i>
+							@{if(User.Identity.Name != null)
+								{
+									@User.Identity.Name
+								}else
+									{
+										<span>Login</span>
+									}
+								
+							}</a></li>
+					<li><a href="@Url.Action("Logout", "Account")"> <i class="fas fa-sign-out-alt"></i></i> Logout</a></li>
 
 				</ul>
 
@@ -71,7 +83,7 @@
 					<div class="col-md-3">
 						<div class="header-logo">
 							<a href="#" class="logo">
-								<img height="100px", width="180px" src="~/img/mylogo.png" alt="">
+								<img height="100px" , width="180px" src="~/img/mylogo.png" alt="">
 							</a>
 						</div>
 					</div>
@@ -79,15 +91,9 @@
 					<!-- SEARCH BAR -->
 					<div class="col-md-6">
 						<div class="header-search">
-							<form>
-								<select class="input-select">
-									<option value="0">Tất Cả</option>
-									<option value="1">Cáp Sạc</option>
-									<option value="1">Ốp lưng</option>
-									<option value="1">Tai Nghe</option>
-									<option value="1">Loa</option>
-								</select>
-								<input class="input" placeholder="Tìm kiếm sản phẩm">
+							<form action="/Products/Search" method="get" id="searchForm">
+								
+								<input id="searchInput" name="searchTerm" class="input-select" placeholder="Tìm kiếm sản phẩm">
 								<button class="search-btn">Search</button>
 							</form>
 						</div>
@@ -96,57 +102,28 @@
 					<!-- ACCOUNT -->
 					<div class="col-md-3 clearfix">
 						<div class="header-ctn">
-							<!-- Wishlist -->
-							<div>
-								<a href="#">
-									<i class="fa fa-heart-o"></i>
-									<span>Your Wishlist</span>
-									<div class="qty">2</div>
-								</a>
-							</div>
-							<!-- /Wishlist -->
-							<!-- Cart -->
-							<div class="dropdown">
-								<a class="dropdown-toggle" data-toggle="dropdown" aria-expanded="true">
-									<i class="fa fa-shopping-cart"></i>
-									<span>Your Cart</span>
-									<div class="qty">3</div>
-								</a>
-								<div class="cart-dropdown">
-									<div class="cart-list">
-										<div class="product-widget">
-											<div class="product-img">
-												<img src="./img/product01.png" alt="">
-											</div>
-											<div class="product-body">
-												<h3 class="product-name"><a href="#">product name goes here</a></h3>
-												<h4 class="product-price"><span class="qty">1x</span>$980.00</h4>
-											</div>
-											<button class="delete"><i class="fa fa-close"></i></button>
+								<div class="dropdown">
+									<a class="dropdown-toggle" asp-controller="ShoppingCart" asp-action="Index">
+										<i class="fa fa-shopping-cart"></i>
+										<span>Giỏ Hàng</span>
+									<div class="qty">
+										<div class="qty">
+											@{
+												var totalItems = 0;
+												var cartJson = HttpContextAccessor.HttpContext.Session.GetString("Cart");
+												if (!string.IsNullOrEmpty(cartJson))
+												{
+													var cart = System.Text.Json.JsonSerializer.Deserialize<CartModel>(cartJson);
+													totalItems = cart.GetTotal();
+												}
+											}
+											@totalItems
 										</div>
 
-										<div class="product-widget">
-											<div class="product-img">
-												<img src="./img/product02.png" alt="">
-											</div>
-											<div class="product-body">
-												<h3 class="product-name"><a href="#">product name goes here</a></h3>
-												<h4 class="product-price"><span class="qty">3x</span>$980.00</h4>
-											</div>
-											<button class="delete"><i class="fa fa-close"></i></button>
-										</div>
-									</div>
-									<div class="cart-summary">
-										<small>3 Item(s) selected</small>
-										<h5>SUBTOTAL: $2940.00</h5>
-									</div>
-									<div class="cart-btns">
-										<a href="#">View Cart</a>
-										<a href="#">Checkout  <i class="fa fa-arrow-circle-right"></i></a>
-									</div>
+									</div>  <!-- Hiển thị số lượng sản phẩm trong giỏ hàng -->
+									</a>
 								</div>
-							</div>
-							<!-- /Cart -->
+						
 							<!-- Menu Toogle -->
 							<div class="menu-toggle">
 								<a href="#">
@@ -177,9 +154,9 @@
 					<li class="active"><a href="#">Trang Chủ</a></li>
 					<li><a href="#">Danh Mục</a></li>
 					<li><a href="#">Khuyến mãi</a></li>
-					<li><a href="#">Giới Thiệu</a></li>
+					<li><a href="@Url.Action("Introduction", "Home")">Giới Thiệu</a></li>
 					<li><a href="#">Liên Hệ</a></li>
-					<li><a href="#">Chính Sách Bảo Mật</a></li>
+					<li><a href="@Url.Action("Privacy", "Home")">Chính Sách Bảo Mật</a></li>
 				</ul>
 				<!-- /NAV -->
 			</div>
@@ -188,6 +165,9 @@
 		<!-- /container -->
 	</nav>
 	<!-- /NAVIGATION -->
+	<!-- hiển thị cho phần tìm kiếm-->
+	<div id="searchResults"></div>
+
 	</header>
 
 	<div id="main" style="min-height: 600px" >

@@ -21,8 +21,7 @@ namespace PhuKienShop.Controllers
 			DateTime dealEndTime = DateTime.Now.AddDays(2);
 			String deal = dealEndTime.ToString("yyyy-MM-ddTHH:mm:ss");
 			ViewBag.DealEndTime = deal;
-
-			return View();
+            return View();
             //_context.Products.ToList()
         }
 
@@ -32,7 +31,12 @@ namespace PhuKienShop.Controllers
             return View();
         }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+		public IActionResult Introduction()
+		{
+			return View();
+		}
+
+		[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });

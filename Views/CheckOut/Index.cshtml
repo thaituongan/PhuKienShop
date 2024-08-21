@@ -1,0 +1,128 @@
+﻿@model PhuKienShop.Models.CheckoutViewModel
+
+@{
+    ViewData["Title"] = "Đặt hàng";
+}
+
+
+<!-- BREADCRUMB -->
+<div id="breadcrumb" class="section">
+    <!-- container -->
+    <div class="container">
+        <!-- row -->
+        <div class="row">
+            <div class="col-md-12">
+                <ul class="breadcrumb-tree">
+                    <li><a href="@Url.Action("Index", "Home")">Trang chủ</a></li>
+                    <li><a href="@Url.Action("Index", "ShoppingCart")">Giỏ hàng</a></li>
+                    <li class="active">Thanh toán</li>
+                </ul>
+            </div>
+        </div>
+        <!-- /row -->
+    </div>
+    <!-- /container -->
+</div>
+<!-- /BREADCRUMB -->
+
+<div class="section">
+    <div class="container">
+        <form asp-action="Index" method="post">
+            <div class="row">
+                <div class="col-md-7">
+                    <div class="billing-details">
+                        <div class="section-title">
+                            <h3 class="title">Thông tin Khách hàng</h3>
+                        </div>
+                        <div class="form-group">
+                            <input class="input" type="text" name="Name" placeholder="Họ và tên" value="@Model.Name" required>
+                        </div>
+                        <div class="form-group">
+                            <input class="input" type="email" name="Email" placeholder="Email" value="@Model.Email" required>
+                        </div>
+                        <div class="form-group">
+                            <input class="input" type="text" name="Address" placeholder="Địa chỉ nhận hàng" value="@Model.Address" required>
+                        </div>
+                        <div class="form-group">
+                            <input class="input" type="tel" name="Phone" placeholder="Số điện thoại" value="@Model.Phone" required>
+                        </div>
+                    </div>
+                    <div class="order-notes">
+                        <textarea class="input" name="OrderNotes" placeholder="Ghi chú">@Model.OrderNotes</textarea>
+                    </div>
+                </div>
+                @if (Model != null && Model.CartProducts.Any())
+                {
+                    <div class="col-md-5 order-details">
+                        <div class="section-title text-center">
+                            <h3 class="title">Đơn hàng của tôi</h3>
+                        </div>
+                        <div class="order-summary">
+                            <div class="order-col">
+                                <div><strong>SẢN PHẨM</strong></div>
+                                <div><strong>TỔNG</strong></div>
+                            </div>
+                            <div class="order-products">
+                                @foreach (var product in Model.CartProducts)
+                                {
+                                    <div class="order-col">
+                                        <div>@product.Quantity x @product.Product.ProductName</div>
+                                        <div>@string.Format("{0:N0}", Model.TotalAmount) VND</div>
+                                    </div>
+                                }
+                            </div>
+                            <div class="order-col">
+                                <div>Phí vận chuyển</div>
+                                <div><strong>Miễn phí</strong></div>
+                            </div>
+                            <div class="order-col">
+                                <div><strong>TỔNG</strong></div>
+                                <div><strong class="order-total">@string.Format("{0:N0}", Model.TotalAmount) VND</strong></div>
+                            </div>
+                        </div>
+                        <div class="payment-method">
+                            <div class="input-radio">
+                                <input type="radio" name="PaymentMethod" id="payment-1" value="Chuyển khoản trực tiếp" required>
+                                <label for="payment-1">
+                                    <span></span>
+                                    Chuyển khoản trực tiếp
+                                </label>
+                                <div class="caption">
+                                    <p>
+                                        Quý khách vui lòng chuyển khoản qua số tài khoản: 0973206403 với nội dung là : Số điện thoại + Họ và tên
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="input-radio">
+                                <input type="radio" name="PaymentMethod" id="payment-2" value="Thanh toán khi nhận hàng" required>
+                                <label for="payment-2">
+                                    <span></span>
+                                    Thanh toán khi nhận hàng
+                                </label>
+                                <div class="caption">
+                                    <p>
+                                        Sản phẩm sẽ được gửi tới cho quý khách theo địa chỉ nhận hàng. Quý khách nhận sản phẩm và thanh toán cho người giao hàng
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="input-checkbox">
+                            <input type="checkbox" id="terms" name="TermsAccepted" required>
+                            <label for="terms">
+                                <span></span>
+                                Tôi đã đọc và chấp nhận <a href="/chinhsachbaomat">các điều khoản trên</a>
+                            </label>
+                            <button type="submit" class="primary-btn order-submit">Đặt hàng</button>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <p>Không có sản phẩm nào trong giỏ hàng</p>
+                }
+            </div>
+        </form>
+    </div>
+</div>
+
+

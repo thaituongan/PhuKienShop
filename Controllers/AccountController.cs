@@ -18,49 +18,50 @@ namespace PhuKienShop.Controllers
             _context = context;
             _logger = logger;
         }
-		public IActionResult MyAccount()
-		{
-            
-			if (User.Identity.IsAuthenticated) // Kiểm tra nếu người dùng chưa đăng nhập
-			{
-
+        public IActionResult MyAccount()
+        {
+            if (User.Identity.IsAuthenticated)
+            {
                 var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                var email = User.FindFirst(ClaimTypes.Email)?.Value;
                 var role = User.FindFirst(ClaimTypes.Role)?.Value;
-                var username = User.FindFirst(ClaimTypes.Name)?.Value;
+                var email = User.FindFirst(ClaimTypes.Email)?.Value;
+                var user = _context.Users.FirstOrDefault(u => u.Email == email);
 
-                ViewData["UserId"] = userId;
-                ViewData["Email"] = email;
-                ViewData["Role"] = role;
-                ViewData["Username"] = username;
+                if (role != null && user != null)
+                {
+                    if (role == "Admin") // Kiểm tra nếu người dùng là Admin
+                    {
+                        return RedirectToAction("Index", "ManageUsers"); // Chuyển hướng đến trang quản lý của admin
+                    }
+                    else
+                    {
+                        var orders = _context.Orders
+                     .Where(o => o.UserId == user.UserId) // Hoặc `o.UserId == user.Id` nếu bạn có thuộc tính `UserId`
+                     .ToList();
 
-/*                int id = int.Parse(userId);
-                var user = _context.Users.FirstOrDefault(u => u.UserId == id);*/
+                        var viewModel = new MyAccountViewModel
+                        {
+                            User = user,
+                            Orders = orders
+                        };
 
+                        return View(viewModel);
+                    }
 
-
-                if (role != null)
-			{
-				if (role == "Admin") // Kiểm tra nếu người dùng là Admin
-				{
-					return RedirectToAction("Index", "AdminMessages"); // Chuyển hướng đến trang quản lý của admin
-				}
-				else
-				{
-                    return View("MyAccount"); // Chuyển hướng đến trang thông tin tài khoản của user
-				}
-			}
+                }
+                else
+                {
+                    return RedirectToAction("Error", "Home");
+                }
             }
             else
             {
                 return RedirectToAction("Login", "Account");
             }
-
-            return View("MyAccount"); // Chuyển hướng đến trang thông tin tài khoản của user
         }
 
 
-		[HttpGet]
+        [HttpGet]
         public IActionResult Register()
         {
             return View("Register");
@@ -93,17 +94,17 @@ namespace PhuKienShop.Controllers
 
             // Check if the email already exists
             if (_context.Users.Any(u => u.Email == email))
-                {
-                    ModelState.AddModelError("Email", "Email đã được sử dụng!");
-                    return View();
-                }
+            {
+                ModelState.AddModelError("Email", "Email đã được sử dụng!");
+                return View();
+            }
 
-                // Check if the username already exists
-                if (_context.Users.Any(u => u.Username == username))
-                {
-                    ModelState.AddModelError("Username", "Username đã được sử dụng!");
-                    return View();
-                }
+            // Check if the username already exists
+            if (_context.Users.Any(u => u.Username == username))
+            {
+                ModelState.AddModelError("Username", "Username đã được sử dụng!");
+                return View();
+            }
             if (ModelState.IsValid)
             {
                 // Proceed with the registration
@@ -125,58 +126,58 @@ namespace PhuKienShop.Controllers
 
 
         [HttpPost]
-    public IActionResult VerifyCode(string code)
-{
-    var expectedCode = TempData["VerificationCode"] as string;
-    var email = TempData["Email"] as string;
-    var username = TempData["Username"] as string;
-    var hashedPassword = TempData["Password"] as string;
-
-    if (expectedCode != null && expectedCode == code)
-    {
-        var user = new User
+        public IActionResult VerifyCode(string code)
         {
-            Username = username,
-            Email = email,
-            Password = hashedPassword,
-            Role = "User",
-            CreatedAt = DateTime.Now,
-            UpdatedAt = DateTime.Now
-        };
+            var expectedCode = TempData["VerificationCode"] as string;
+            var email = TempData["Email"] as string;
+            var username = TempData["Username"] as string;
+            var hashedPassword = TempData["Password"] as string;
 
-        _context.Users.Add(user);
-        _context.SaveChanges();
+            if (expectedCode != null && expectedCode == code)
+            {
+                var user = new User
+                {
+                    Username = username,
+                    Email = email,
+                    Password = hashedPassword,
+                    Role = "User",
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now
+                };
 
-        return RedirectToAction("Login", "Account");
-    }
+                _context.Users.Add(user);
+                _context.SaveChanges();
 
-    ModelState.AddModelError("", "Mã xác thực không hợp lệ!.");
-    return View("EnterVerificationCode");
-}
+                return RedirectToAction("Login", "Account");
+            }
 
-		private async Task SendEmailAsync(string to, string subject, string body)
-		{
-			var fromAddress = new MailAddress("anzorobd@gmail.com", "Thái Tường An");
+            ModelState.AddModelError("", "Mã xác thực không hợp lệ!.");
+            return View("EnterVerificationCode");
+        }
+
+        private async Task SendEmailAsync(string to, string subject, string body)
+        {
+            var fromAddress = new MailAddress("anzorobd@gmail.com", "Thái Tường An");
             var toAddress = new MailAddress(to);
-			var message = new MailMessage
-			{
+            var message = new MailMessage
+            {
                 Subject = subject,
-				From = fromAddress,
-				Body = body,
-				IsBodyHtml = true
-			};
-			message.To.Add(toAddress);
+                From = fromAddress,
+                Body = body,
+                IsBodyHtml = true
+            };
+            message.To.Add(toAddress);
 
-			using (var smtp = new SmtpClient())
-			{
-				smtp.Host = "smtp.gmail.com";
-				smtp.Port = 587;
-				smtp.Credentials = new NetworkCredential("anzorobd@gmail.com", "wzud casb guyv wsho");
-				smtp.EnableSsl = true;
-				await smtp.SendMailAsync(message);
-			}
-		}
-		[HttpGet]
+            using (var smtp = new SmtpClient())
+            {
+                smtp.Host = "smtp.gmail.com";
+                smtp.Port = 587;
+                smtp.Credentials = new NetworkCredential("anzorobd@gmail.com", "wzud casb guyv wsho");
+                smtp.EnableSsl = true;
+                await smtp.SendMailAsync(message);
+            }
+        }
+        [HttpGet]
         public IActionResult Login()
         {
             return View("Login");
@@ -285,6 +286,61 @@ namespace PhuKienShop.Controllers
             var newPrincipal = new ClaimsPrincipal(newIdentity);
             await HttpContext.SignInAsync("PhuKienShopAuth", newPrincipal);
             return RedirectToAction("Index", "Home");
+        }
+        // GET: Account/UpdateAccount
+        [HttpGet]
+        public IActionResult UpdateAccount()
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                var email = User.FindFirst(ClaimTypes.Email)?.Value;
+                var userDetails = _context.Users.FirstOrDefault(u => u.Email == email);
+
+                if (userDetails != null)
+                {
+                    return View(userDetails);
+                }
+                else
+                {
+                    return RedirectToAction("Error", "Home");
+                }
+            }
+            else
+            {
+                return RedirectToAction("Login", "Account");
+            }
+        }
+
+        // POST: Account/UpdateAccount
+        [HttpPost]
+        public IActionResult UpdateAccount(User updatedUser)
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                var email = User.FindFirst(ClaimTypes.Email)?.Value;
+                var user = _context.Users.FirstOrDefault(u => u.Email == email);
+
+                if (user != null)
+                {
+                    // Update user details
+                    user.FullName = updatedUser.FullName;
+                    user.PhoneNumber = updatedUser.PhoneNumber;
+                    user.Address = updatedUser.Address;
+                    user.UpdatedAt = DateTime.Now;
+                    _context.Users.Update(user);
+                    _context.SaveChanges();
+
+                    return RedirectToAction("MyAccount");
+                }
+                else
+                {
+                    return RedirectToAction("Error", "Home");
+                }
+            }
+            else
+            {
+                return RedirectToAction("Login", "Account");
+            }
         }
 
     }
