@@ -112,7 +112,7 @@
             </a>
         </li>
         <li class="sidebar-nav-item">
-            <a href="quanlyhoadon.jsp" class="sidebar-nav-link">
+                <a href="@Url.Action("Index", "Orders")" class="sidebar-nav-link">
                 <div>
                     <i class="fa-solid fa-layer-group"></i>
                 </div>
@@ -133,7 +133,7 @@
 
     <div style=" margin: 30px 40px;padding-left: 50px; padding-top: 50px">
         @RenderBody()
-        @RenderSection("Scripts", required: false)
+      
     </div>
 
     <!-- import script -->

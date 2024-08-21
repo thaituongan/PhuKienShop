@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PhuKienShop.Data;
+using PhuKienShop.Services;
 namespace PhuKienShop
 {
     public class Program
@@ -35,8 +36,15 @@ namespace PhuKienShop
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
             });
 
-			// Add session
-			builder.Services.AddHttpContextAccessor();
+            // Đăng ký các dịch vụ
+            builder.Services.AddScoped<IOrderDetailService, OrderDetailService>();
+            builder.Services.AddScoped<IProductService, ProductService>();
+
+          
+
+
+            // Add session
+            builder.Services.AddHttpContextAccessor();
 			builder.Services.AddSession(options =>
             {
                 options.IdleTimeout = TimeSpan.FromMinutes(30);
