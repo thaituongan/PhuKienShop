@@ -6,15 +6,62 @@
     <!-- Layout = "~/Views/Shared/_LayoutAdmin.cshtml"; -->
     Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
 
+            <style>
+                tr:nth-child(even) {
+                    background-color: aliceblue;
+                }
+
+                tr:nth-child(odd) {
+                    background-color: #ffffff;
+                }
+
+                .modal-dialog {
+                    width: 80%;
+                    max-width: 100%;
+                }
+
+                .search-form {
+                    display: flex;
+                    align-items: center;
+                    border: 1px solid #fd1111;
+                    border-radius: 50px;
+                    overflow: hidden;
+                    width: 180px;
+                    justify-content: space-between;
+                }
+
+                   
+                .search-form input {
+                        border: none ;
+                        outline: white;
+                        margin-left: 10px;
+                }
+
+
+                .search-form input:focus {
+                    border: none !important;
+                   outline: none !important;
+                }
+
+                .search-form i {
+                    padding: 10px;
+                }
+
+                .search-form i:hover {
+                    cursor: pointer;
+                }
+                </style>
+
 }
    
-@{
+
 <!-- main content -->
 
 
 
 <div class="wrapper" style="">
         <script src="~/js/toast.js"></script>
+       
     <div class="row">
         <div class="col-8 col-m-12 col-sm-12" style="padding: 40px 20px;">
             <div class="card">
@@ -22,53 +69,56 @@
                     <h3>
                         Quản lý đơn hàng
                     </h3>
-                  
                 </div>
                 <div class="card-content" style="display: flex; justify-content:space-between;align-items: center;">
-                    <a href="#confirmOrder" class="btn btn-white-green" data-toggle="modal" style="margin-left: auto">
+                    <a href="#" class="btn btn-white-green" onclick="callUpdateBox(event,'CONFIRM')" style="margin-left: auto">
                         <span>Xác nhận</span>
                     </a>
-                    <a href="#packageOrder" class="btn btn-yellow" data-toggle="modal" style="margin-left: auto">
+                    <a href="#" class="btn btn-yellow" onclick="callUpdateBox(event,'PACKAGE')" style="margin-left: auto">
                         <span>Đóng gói</span>
                     </a>
-                    <a href="#deliveryOrder" class="btn btn-blue" data-toggle="modal" style="margin-left: auto">
-                        <span>Giao hàng</span>
+                    <a href="#" class="btn btn-blue" onclick="callUpdateBox(event,'DELIVERY')" style="margin-left: auto">
+                        <span>Vận chuyển</span>
                     </a>
-                    <a href="#completeOrder" class="btn btn-green" data-toggle="modal" style="margin-left: auto">
+                    <a href="#" class="btn btn-green" onclick="callUpdateBox(event,'COMPLETE')" style="margin-left: auto">
                         <span>Thành công</span>
                     </a>
-                    <a href="#cancelOrder" class="btn btn-white-orange" data-toggle="modal" style="margin-left: auto">
+                    <a href="#" class="btn btn-white-orange" onclick="callUpdateBox(event,'CANCEL')" style="margin-left: auto">
                         <span>Hủy</span>
                     </a>
                 </div>
                 <div class="card-content">
-                    <table class="customerTable">
+                    <div class="card-header" style="display: flex;justify-content:center">
+                        <h4>
+                            Tất cả đơn hàng
+                        </h4>
+                    </div>
+                    <div style="display:flex; justify-content: right;">
+                        <div class="form-group">
+                            <div class="search-form">
+                                <input type="text" name="orderID" class="form-control orderID" placeholder="Mã đơn hàng"><i class="fa-solid fa-magnifying-glass searchBtn" onclick="searchOrder(this)"></i>
+                                <input type="text" name="action" class="form-control" value="SEARCH" hidden>
+
+                            </div>
+                        </div>
+                            
+                    </div>
+                    <table class="order-content">
                         <thead>
                             <tr>
-                                <th>#</th>
+                                <th>ID</th>
                                 <th>Ngày đặt hàng</th>
                                 <th>Danh sách sản phẩm</th>
                                 <th>Tổng tiền (VND)</th>
                                 <th>Trạng thái đơn hàng</th>
+                                <th>Thời gian cập nhật</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <!-- main content
-                            OrderDAO orderDAO = new OrderDAO();
-                            List<Order> list = orderDAO.selectAll();
-                            for (Order order : list) {
-                                    -->
+                            <!-- main content -->
                             @foreach (var orderViewModel in Model)
                             {
-                                <tr>
-                                        <!-- background-color: aliceblue; -->
-                                    <td>@orderViewModel.Order.OrderId</td>
-                                    <td>@orderViewModel.Order.OrderDate</td>
-                                   
-                                    <td>@Html.Raw(orderViewModel.Details)</td>
-                                    <td>@orderViewModel.Order.TotalAmount</td>
-                                    <td>@orderViewModel.Order.Status</td>
-                                </tr>
+                                @Html.Partial("_OrderRow", orderViewModel)
                             }
                            
                             <!--<%}%> -->
@@ -78,255 +128,239 @@
             </div>
         </div>
     </div>
-    <!-- Edit-->
-    <div id="editEmployeeModal" class="modal fade">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form action="oderedit" method="post">
-                    <div class="modal-header">
-                        <h4 class="modal-title">Thay đổi thông tin</h4>
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <label>#</label>
-                            <input type="text" name="id" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Mã khách hàng</label>
-                            <select name="userId" class="form-control" required>
-                                <option value="" disabled selected>Chọn mã khách hàng</option>
-                                <!--<% List<User> u1 = new UserDAO().selectAll();
-                                    for (User user : u1) {%>
-                                <option value="<%= user.getId() %>"><%= user.getId() %></option>
-                                <%
-                                    }
-                                %> -->
-                                <option value="<%= user.getId() %>"><%= user.getId() %></option>
-                                <option value="<%= user.getId() %>"><%= user.getId() %></option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Địa chỉ giao hàng</label>
-                            <input type="text" name="address" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Trạng thái đơn hàng</label>
-                            <select name="status" class="form-control" required>
-                                <option value="" disabled selected>Trạng thái</option>
-                                <option value="Xác nhận đơn hàng">Xác nhận đơn hàng</option>
-                                <option value="Chuẩn bị đơn hàng">Chuẩn bị đơn hàng</option>
-                                <option value="Đang giao">Đang giao</option>
-                                <option value="Hoàn tất">Hoàn tất</option>
-                                <option value="Hủy đơn hàng">Hủy đơn hàng</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Phương thức thanh toán</label>
-                            <select name="payment" class="form-control" required>
-                                <option value="" disabled selected>Phương thức thanh toán</option>
-                                <option value="Chuyển khoản trực tiếp">Chuyển khoản trực tiếp</option>
-                                <option value="Thanh toán khi nhận hàng">Thanh toán khi nhận hàng</option>
-                            </select>
 
-                        </div>
-                        <div class="form-group">
-                            <label>Ngày đặt hàng</label>
-                            <input type="date" name="dateOder" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Ngày nhận hàng</label>
-                            <input type="date" name="doneDate" class="form-control" required>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <input type="button" class="btn btn-default" data-dismiss="modal" value="Hủy">
-                        <input type="submit" class="btn btn-info" value="Lưu">
-                    </div>
-                </form>
-            </div>
-        </div>
+    <!-- chua modal -->
+    <div id="update-container">
+        
     </div>
-    <!--/ Edit-->
-    <!--/ xac nhan-->
-    <div id="confirmOrder" class="modal fade">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form action="oderadmin" method="post">
-                    <div class="modal-header">
-                        <h4 class="modal-title">Xác nhận đơn hàng</h4>
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    </div>
-                        <div id="toast">
-                            toast
-                        </div>
-                        <script>showSuccessToast2("xac nhan don hang thanh cong");</script>
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <label>Mã đơn hàng</label>
-                            <input type="text" name="orderID" class="form-control" required>
-                        </div>
-                       
-                 
-                    </div>
-                    <div class="modal-footer">
-                        <!-- <input type="button" class="btn btn-default" data-dismiss="modal" value="Hủy"> -->
-                            <input type="button" class="btn btn-info" onclick="showSuccessToast2('xac nhan don hang thanh cong')" value="Xác nhận">
-                    </div>
-                </form>
-
-                kg
-            </div>
-        </div>
-    </div>
-    <!--/ xac nhan -->
-
-
-     <!--/ dong goi-->
-    <div id="packageOrder" class="modal fade">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form action="oderadmin" method="post">
-                    <div class="modal-header">
-                        <h4 class="modal-title">Đóng gói đơn hàng</h4>
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    </div>
-                        <div id="toast">
-                            toast
-                        </div>
-                        <script>showSuccessToast2("dong goi don hang thanh cong");</script>
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <label>Mã đơn hàng</label>
-                            <input type="text" name="orderID" class="form-control" required>
-                        </div>
-                       
-                 
-                    </div>
-                    <div class="modal-footer">
-                        <!-- <input type="button" class="btn btn-default" data-dismiss="modal" value="Hủy"> -->
-                            <input type="button" class="btn btn-info" onclick="showSuccessToast2('xac nhan don hang thanh cong')" value="Đóng gói">
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-    <!--/ dong goi -->
-
-    <!--/vận chuyển-->
-    <div id="deliveryOrder" class="modal fade">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form action="oderadmin" method="post">
-                    <div class="modal-header">
-                        <h4 class="modal-title">Vận chuyển đơn hàng</h4>
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    </div>
-                    <div id="toast">
-                        toast
-                    </div>
-                    <script>showSuccessToast2("dong goi don hang thanh cong");</script>
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <label>Mã đơn hàng</label>
-                            <input type="text" name="orderID" class="form-control" required>
-                        </div>
-
-
-                    </div>
-                    <div class="modal-footer">
-                        <!-- <input type="button" class="btn btn-default" data-dismiss="modal" value="Hủy"> -->
-                        <input type="button" class="btn btn-info" onclick="showSuccessToast2('xac nhan don hang thanh cong')" value="Vận chuyển">
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-    <!--/van chuyen -->
-
-    <!--/Hoan thanh-->
-    <div id="completeOrder" class="modal fade">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form action="oderadmin" method="post">
-                    <div class="modal-header">
-                        <h4 class="modal-title">Hoàn thành đơn hàng</h4>
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    </div>
-                    <div id="toast">
-                        toast
-                    </div>
-                    <script>showSuccessToast2("dong goi don hang thanh cong");</script>
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <label>Mã đơn hàng</label>
-                            <input type="text" name="orderID" class="form-control" required>
-                        </div>
-
-
-                    </div>
-                    <div class="modal-footer">
-                        <!-- <input type="button" class="btn btn-default" data-dismiss="modal" value="Hủy"> -->
-                        <input type="button" class="btn btn-info" onclick="showSuccessToast2('xac nhan don hang thanh cong')" value="Hoàn thành">
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-    <!--/Hoan thanh -->
-
-    <!--/Huy-cancelOrder" class="modal fade"> -->
-    <div id="cancelOrder" class="modal fade">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form action="oderadmin" method="post">
-                    <div class="modal-header">
-                        <h4 class="modal-title">Hủy đơn hàng</h4>
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    </div>
-                    <div id="toast">
-                        toast
-                    </div>
-                    <script>showSuccessToast2("dong goi don hang thanh cong");</script>
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <label>Mã đơn hàng</label>
-                            <input type="text" name="orderID" class="form-control" required>
-                        </div>
-
-
-                    </div>
-                    <div class="modal-footer">
-                        <!-- <input type="button" class="btn btn-default" data-dismiss="modal" value="Hủy"> -->
-                            <input type="button" class="btn btn-info" onclick="showSuccessToast2('xac nhan don hang thanh cong')" value="Hủy">
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-        <!--/Huy -->
-
-
     <!-- <p>
         <a asp-action="Create">Create New</a>
     </p>
     -->
-    <table class="table">
-        <thead>
-            <tr>
-               
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
-                <tr>
-                 
-                </tr>
+    
+    @section Scripts {
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <script>
+
+            function getOrderDetails(idin) {
+                var action = `Chi tiết đơn hàng ${idin}`;
+            var modalID = "DETAIL";
+           
+            var html = `
+                    <div id="${modalID}" class="modal fade">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <form action="oderadmin" method="post">
+                                <div class="modal-header">
+                                    <h4 class="modal-title">${action}</h4>
+                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                </div>
+                            </form>
+
+                            <div class="card-content">
+                                <table class="tableModal">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Ngày đặt hàng</th>
+                                            <th>ID người dùng</th>
+                                            <th>Danh sách đơn hàng</th>
+                                            <th>Tổng tiền (VND)</th>
+                                            <th>Trạng thái đơn hàng</th>
+                                            <th>Thời gian cập nhật</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        `;
+             
+            document.querySelector('#update-container').innerHTML = html;
+                $.ajax({
+                    url: '@Url.Action("orderDetail", "Orders")',
+                    type: 'POST',
+                    data: { idin: idin },
+                    success: function (response) {
+                      
+                        $('.tableModal tbody').html(response);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Lỗi: ' + error);
+                    }
+                });
+            $(`#${modalID}`).modal('show');
+        }
+
+        function callUpdateBox(e, action) {
+            e.preventDefault();
+            console.log(e.target);
+
+            let title;
+            if (e.target.tagName === 'SPAN') {
+                title = e.target.innerText;
+            } else {
+                title = e.target.querySelector('span').innerText;
             }
-        </tbody>
-    </table>
+            var html = `
+                    <div id="${action}ORDER" class="modal fade">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <form action="oderadmin" method="post">
+                                    <div class="modal-header">
+                                        <h4 class="modal-title">${title} đơn hàng</h4>
+                                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                    </div>
+
+                                    <div class="modal-body">
+                                        <div class="form-group">
+                                            <label>Mã đơn hàng</label>
+                                            <input type="text" name="orderID" class="form-control" required>
+                                                        <input type="text" name="action" class="form-control" value="${action}" hidden>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <input type="button" class="btn btn-info" onclick="callUpdateOrder(this)" value="Xác nhận">
+                                    </div>
+                                </form>
+
+                                <div class="card-content">
+                                    <div class="toastt-container" style="height: 30px; margin-top: 5px; margin-bottom: 5px">
+                                        <div id="toast-2" style="margin: auto 0;">
+                                        </div>
+                                   
+                                    </div>
+                                    <table class="tableModal">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Ngày đặt hàng</th>
+                                                <th>Chi tiết đơn hàng</th>
+                                                <th>Tổng tiền (VND)</th>
+                                                <th>Trạng thái đơn hàng</th>
+                                                <th>Thời gian cập nhật</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+            `;
+            console.log(html);
+            console.log(document.querySelector('#update-container'));
+            document.querySelector('#update-container').innerHTML = html;
+            $(`#${action}ORDER`).modal('show');
+        }
+ 
+
+        function callUpdateOrder(button) {
+            
+            console.log("goi update tu button");
+            var form = button.closest('form');
+            console.log("form: ");
+            console.log(form);
+                var formdata = new FormData(form);
+            var id = formdata.get("orderID");
+            var action = formdata.get("action");
+            updateOrder(id, action,form);
+        }
+
+            function searchOrder(element) {
+                var idin = $(element).siblings('.orderID').val();
+                $.ajax({
+                    url: '@Url.Action("searchOrder", "Orders")',
+                    type: 'POST',
+                    data: { idin: idin },
+                    success: function (response) {
+                        $('.order-content tbody').html(response);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Lỗi: ' + error);
+                    }
+                });
+        }
+            
+            
+
+            function updateOrder(id, action,element) {
+                console.log(id);
+                console.log(action);
+                $.ajax({
+                    url: '@Url.Action("updateOrder", "Orders")',
+                    type: 'POST',
+                    data: { action: action, id: id},
+                    success: function (response) {
+                        var table = $(element).closest('.modal-content').find('.tableModal tbody');
+                        var curHtml = table.html();
+                        var newHtml = response + curHtml;
+                        $('.tableModal tbody').html(newHtml);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Lỗi: ' + error);
+                    }
+                });
+            }
+         
+        $(document).ready(function () {
+
+          
+        });
+
+        function renderToast2Failed(message) { 
+            var curToast2 = document.querySelector('#toast-2');
+            if (curToast2) curToast2.remove();
+            var trElement = document.querySelector('.modal-row');
+            var cardContent = trElement.closest('.card-content');
+            var toastContainer = cardContent.querySelector('.toastt-container');
+            console.log(toastContainer);
+            var newtoast2 = document.createElement('div');
+            newtoast2.id = 'toast-2';
+            newtoast2.style.margin = 'auto 0';
+
+            if (toastContainer) {
+                toastContainer.appendChild(newtoast2);
+            }
+
+            if (trElement) {
+                trElement.remove();
+            }
+                showErrorToast2(message);
+        }
+
+        function renderToast2Success() {
+            var curToast2 = document.querySelector('#toast-2');
+            if (curToast2) curToast2.remove();
+
+            var trElement = document.querySelector('.modal-row');
+            var cardContent = trElement.closest('.card-content');
+            var toastContainer = cardContent.querySelector('.toastt-container');
+
+            var newtoast2 = document.createElement('div');
+            newtoast2.id = 'toast-2';
+            newtoast2.style.margin = 'auto 0';
+            if (toastContainer) {
+                toastContainer.appendChild(newtoast2);
+            }
+
+            if (trElement) {
+                trElement.classList.remove('modal-row');
+            }
+        }
+            
+    </script>
+   }
+
 </div>
 <!-- end main content -->
-}
+
+
 
