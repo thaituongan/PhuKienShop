@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "Order Confirmation";
+    ViewData["Title"] = "Xác nhận đặt hàng thành công";
 }
 
 <div class="section">
@@ -15,18 +15,36 @@
         <div class="row">
             <div class="col-md-6 offset-md-3">
                 <div class="order-details">
-                    <h3>Order Details</h3>
-                    <p><strong>Order ID:</strong> @Model.OrderId</p>
-                    <p><strong>Order Date:</strong> @Model.OrderDate?.ToString()</p>
-                    <p><strong>Total Amount:</strong> @Model.TotalAmount.ToString("C")</p>
+                    <h3>Chi tiết đơn hàng</h3>
+                    <p><strong>Mã đơn hàng:</strong> @Model.OrderId</p>
+                    <p><strong>Ngày đặt hàng:</strong> @Model.OrderDate?.ToString()</p>
+                    <p><strong>Tổng tiền:</strong> @Model.TotalAmount.ToString("C")</p>
                     <hr>
-                    <h4>Products:</h4>
-                    <ul>
-                        @foreach (var item in Model.OrderDetails)
-                        {
-                            <li>@item.Product.Name - Quantity: @item.Quantity - Price: @item.TotalPrice.ToString("C")</li>
-                        }
-                    </ul>
+                    <h4>Danh sách sản phẩm:</h4>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>STT</th>
+                                <th>Tên sản phẩm</th>
+                                <th>Số lượng</th>
+                                <th>Đơn giá</th>
+                                <th>Tổng tiền</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (int i = 0; i < Model.OrderDetails.Count; i++)
+                            {
+                                var item = Model.OrderDetails[i];
+                                <tr>
+                                    <td>@(i + 1)</td> <!-- Số thứ tự -->
+                                    <td>@item.Product.ProductName</td>
+                                    <td>@item.Quantity</td>
+                                    <td>@item.UnitPrice.ToString("C")</td>
+                                    <td>@item.TotalPrice.ToString("C")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
                     <hr>
                     <h4>Thông tin khách hàng và địa chỉ nhận hàng: </h4>
                     <p>@Model.User.FullName</p>
@@ -37,10 +55,9 @@
         </div>
 
         <div class="row">
-            <div class="col-md-12 text-center">
-                <a href="/" class="btn btn-primary">Tiếp tục mua sắm.</a>
+            <div class="col-md-12">
+                <a href="@Url.Action("Index", "Home")" class="btn btn-primary">Tiếp tục mua sắm.</a>
             </div>
         </div>
     </div>
 </div>
-

@@ -1,7 +1,7 @@
 ﻿@model PhuKienShop.Models.CheckoutViewModel
 
 @{
-    ViewData["Title"] = "Check Out";
+    ViewData["Title"] = "Đặt hàng";
 }
 
 <div class="section">
@@ -14,92 +14,94 @@
                             <h3 class="title">Thông tin Khách hàng</h3>
                         </div>
                         <div class="form-group">
-                            <input class="input" type="text" name="name" placeholder="Họ và tên">
+                            <input class="input" type="text" name="Name" placeholder="Họ và tên" value="@Model.Name" required>
                         </div>
                         <div class="form-group">
-                            <input class="input" type="email" name="email" placeholder="Email">
+                            <input class="input" type="email" name="Email" placeholder="Email" value="@Model.Email" required>
                         </div>
                         <div class="form-group">
-                            <input class="input" type="text" name="address" placeholder="Địa chỉ nhận hàng">
+                            <input class="input" type="text" name="Address" placeholder="Địa chỉ nhận hàng" value="@Model.Address" required>
                         </div>
                         <div class="form-group">
-                            <input class="input" type="tel" name="phone" placeholder="Số điện thoại">
+                            <input class="input" type="tel" name="Phone" placeholder="Số điện thoại" value="@Model.Phone" required>
                         </div>
                     </div>
                     <div class="order-notes">
-                        <textarea class="input" name="OrderNotes" placeholder="Ghi chú"></textarea>
+                        <textarea class="input" name="OrderNotes" placeholder="Ghi chú">@Model.OrderNotes</textarea>
                     </div>
                 </div>
-
-                <div class="col-md-5 order-details">
-                    <div class="section-title text-center">
-                        <h3 class="title">Đơn hàng của tôi</h3>
-                    </div>
-                    <div class="order-summary">
-                        <div class="order-col">
-                            <div><strong>SẢN PHẨM</strong></div>
-                            <div><strong>TỔNG</strong></div>
+                @if (Model != null && Model.CartProducts.Any())
+                {
+                    <div class="col-md-5 order-details">
+                        <div class="section-title text-center">
+                            <h3 class="title">Đơn hàng của tôi</h3>
                         </div>
-                        <div class="order-products">
+                        <div class="order-summary">
                             <div class="order-col">
-                                <div>1x </div>
-                                <div></div>
+                                <div><strong>SẢN PHẨM</strong></div>
+                                <div><strong>TỔNG</strong></div>
+                            </div>
+                            <div class="order-products">
+                                @foreach (var product in Model.CartProducts)
+                                {
+                                    <div class="order-col">
+                                        <div>@product.Quantity x @product.Product.ProductName</div>
+                                        <div>@string.Format("{0:N0}", product.Product.Price * product.Quantity) VND</div>
+                                    </div>
+                                }
                             </div>
                             <div class="order-col">
-                                <div>2x </div>
-                                <div></div>
+                                <div>Phí vận chuyển</div>
+                                <div><strong>Miễn phí</strong></div>
+                            </div>
+                            <div class="order-col">
+                                <div><strong>TỔNG</strong></div>
+                                <div><strong class="order-total">@string.Format("{0:N0}", Model.TotalAmount) VND</strong></div>
                             </div>
                         </div>
-                        <div class="order-col">
-                            <div>Phí vận chuyển</div>
-                            <div><strong>Miễn phí</strong></div>
+                        <div class="payment-method">
+                            <div class="input-radio">
+                                <input type="radio" name="PaymentMethod" id="payment-1" value="Chuyển khoản trực tiếp" required>
+                                <label for="payment-1">
+                                    <span></span>
+                                    Chuyển khoản trực tiếp
+                                </label>
+                                <div class="caption">
+                                    <p>
+                                        Quý khách vui lòng chuyển khoản qua số tài khoản: 0973206403 với nội dung là : Số điện thoại + Họ và tên
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="input-radio">
+                                <input type="radio" name="PaymentMethod" id="payment-2" value="Thanh toán khi nhận hàng" required>
+                                <label for="payment-2">
+                                    <span></span>
+                                    Thanh toán khi nhận hàng
+                                </label>
+                                <div class="caption">
+                                    <p>
+                                        Sản phẩm sẽ được gửi tới cho quý khách theo địa chỉ nhận hàng. Quý khách nhận sản phẩm và thanh toán cho người giao hàng
+                                    </p>
+                                </div>
+                            </div>
                         </div>
-                        <div class="order-col">
-                            <div><strong>TỔNG</strong></div>
-                            <div><strong class="order-total"></strong></div>
-                        </div>
-                    </div>
-                    <div class="payment-method">
-                        <div class="input-radio">
-                            <input type="radio" name="payment" id="payment-1" value="Chuyển khoản trực tiếp">
-                            <label for="payment-1">
+                        <div class="input-checkbox">
+                            <input type="checkbox" id="terms" name="TermsAccepted" required>
+                            <label for="terms">
                                 <span></span>
-                                Chuyển khoản trực tiếp
+                                Tôi đã đọc và chấp nhận <a href="/chinhsachbaomat">các điều khoản trên</a>
                             </label>
-                            <div class="caption">
-                                <p>
-                                    Quý khách vui lòng chuyển khoản qua số tài khoản: 0973206403 với nội dung là : Số
-                                    điện
-                                    thoại + Họ và tên
-                                </p>
-                            </div>
-                        </div>
-                        <div class="input-radio">
-                            <input type="radio" name="payment" id="payment-2" value="Thanh toán khi nhận hàng">
-                            <label for="payment-2">
-                                <span></span>
-                                Thanh toán khi nhận hàng
-                            </label>
-                            <div class="caption">
-                                <p>
-                                    Sản phẩm sẽ được gửi tới cho quý khách theo địa chỉ nhận hàng. Quý khách nhận sản
-                                    phẩm và
-                                    thanh toán cho người giao hàng
-                                </p>
-                            </div>
+                            <button type="submit" class="primary-btn order-submit">Đặt hàng</button>
                         </div>
                     </div>
-                    <div class="input-checkbox">
-                        <input type="checkbox" id="terms" required>
-                        <label for="terms">
-                            <span></span>
-                            Tôi đã đọc và chấp nhận <a href="chinhsachbaomat.jsp">các điều khoản trên</a>
-                        </label>
-                        <button onclick="validateForm()" data-toggle="modal" class="primary-btn order-submit">Đặt hàng</button>
-                    </div>
-                </div>
+                }
+                else
+                {
+                    <p>Không có sản phẩm nào trong giỏ hàng</p>
+                }
             </div>
         </form>
     </div>
 </div>
+
 
