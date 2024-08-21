@@ -1,0 +1,101 @@
+﻿@model CartModel
+@{
+    ViewBag.Title = "Giỏ hàng";
+}
+
+<div id="breadcrumb" class="section">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <ul class="breadcrumb-tree">
+                    <li><a href="@Url.Action("Index", "Home")">Trang chủ</a></li>
+                    <li class="active">Giỏ hàng</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container main-section">
+    <div class="row">
+        <div class="col-lg-12 pl-3 pt-3">
+            @if (Model != null && Model.CartProducts.Any())
+            {
+                <table class="table table-hover border bg-white">
+                    <thead>
+                        <tr>
+                            <th><h4><b>Thông tin sản phẩm</b></h4></th>
+                            <th style="width:20%;"><h4><b>Đơn Giá</b></h4></th>
+                            <th style="width:10%;"><h4><b>Số lượng</b></h4></th>
+                            <th style="width:20%;"><h4><b>Số tiền</b></h4></th>
+                            <th><h4><b>Xóa</b></h4></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var cartProduct in Model.CartProducts)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="row">
+                                        <div class="col-lg-2 Product-img">
+                                            <img src="@cartProduct.Product.ImageUrl" alt="..." class="img-responsive" />
+                                        </div>
+                                        <div class="col-lg-10">
+                                            <h5 class="nomargin"><b>@cartProduct.Product.ProductName</b></h5>
+                                            <p></p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><strong>@string.Format("{0:N0}", cartProduct.Product.Price) VND</strong></td>
+                                <td data-th="Quantity"><b>@cartProduct.Quantity</b></td>
+                                <td><strong>@string.Format("{0:N0}", cartProduct.Product.Price * cartProduct.Quantity) VND</strong></td>
+                                <td class="actions" data-th="" style="width:10%;">
+                                    <button data-toggle="modal" data-target="#deleteEmployeeModal_@cartProduct.Product.ProductId" class="btn btn-danger btn-sm"><i class="fa fa-trash-o"></i></button>
+                                </td>
+                            </tr>
+
+                            <div id="deleteEmployeeModal_@cartProduct.Product.ProductId" class="modal fade">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        @using (Html.BeginForm("Delete", "ShoppingCart", FormMethod.Post))
+                                        {
+                                            <div class="modal-header">
+                                                <h4 class="modal-title">Xóa sản phẩm này khỏi giỏ hàng</h4>
+                                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <input type="button" class="btn btn-default" data-dismiss="modal" value="Hủy">
+                                                <input type="hidden" name="productId" value="@cartProduct.Product.ProductId">
+                                                <input type="submit" class="btn btn-danger" value="Xóa">
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td><a href="@Url.Action("Index", "Home")" class="btn btn-success"><i class="fa fa-angle-left"></i> Tiếp tục mua sắm</a></td>
+                            <td colspan="2" class="hidden-xs"></td>
+                            <td class="hidden-xs text-center" style="width:10%;">
+                                <strong>Tổng tiền : @string.Format("{0:N0}", Model.Amount()) VND</strong>
+                            </td>
+                            <td><a href="@Url.Action("Index", "CheckOut")" class="btn btn-success btn-block">Thanh toán <i class="fa fa-angle-right"></i></a></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            }
+            else
+            {
+                <a style="text-align: center; margin-left: 500px; font-size: 30px">
+                    <strong>Giỏ hàng trống</strong>
+                </a>
+                <br />
+                <br />
+                <a href="@Url.Action("Index", "Home")" class="btn btn-success" style="margin-left: 540px;"><i class="fa fa-angle-left"></i> Tiếp tục mua sắm</a>
+                <br />
+            }
+        </div>
+    </div>
+</div>

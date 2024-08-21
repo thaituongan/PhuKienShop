@@ -27,7 +27,7 @@ namespace PhuKienShop.Controllers
                 var email = User.FindFirst(ClaimTypes.Email)?.Value;
                 var user = _context.Users.FirstOrDefault(u => u.Email == email);
 
-                if (role != null &&  user != null)
+                if (role != null && user != null)
                 {
                     if (role == "Admin") // Kiểm tra nếu người dùng là Admin
                     {
@@ -58,7 +58,7 @@ namespace PhuKienShop.Controllers
             {
                 return RedirectToAction("Login", "Account");
             }
-    }
+        }
 
 
         [HttpGet]
