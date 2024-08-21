@@ -4,19 +4,18 @@
     Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
 }
 
-<div class="container mt-4" style="padding-top: 100px;">
-    <table id="userTable" class="table table-hover table-bordered display nowrap" style="width:100%">
-        <thead class="thead-dark">
-            <tr class="text-center align-self-xl-center">
-                <th class="text-center">Username</th>
-                <th class="text-center">Email</th>
-                <th class="text-center">Họ Tên</th>
-                <th class="text-center">Số Điện Thoại</th>
-                <th class="text-center">Địa Chỉ</th>
-                <th class="text-center">Quyền</th>
-                <th class="text-center">Ngày Tạo</th>
-                <th class="text-center">Ngày cập nhật</th>
-                <th class="text-center">Hành Động</th>
+    <table id="userTable" class="table table-hover" style="width: 100%">
+        <thead class="">
+            <tr class="">
+                <th>Username</th>
+                <th>Email</th>
+                <th>Họ Tên</th>
+                <th>Số Điện Thoại</th>
+                <th>Địa Chỉ</th>
+                <th>Quyền</th>
+                <th>Ngày Tạo</th>
+                <th>Ngày cập nhật</th>
+                <th>Hành Động</th>
             </tr>
         </thead>
         <tbody>
@@ -24,6 +23,7 @@
             {
                 <tr class="text-center">
                     <form asp-action="EditRoleAndDelete" method="post">
+
                         <td>@Html.DisplayFor(modelItem => item.Username)</td>
                         <td>@Html.DisplayFor(modelItem => item.Email)</td>
                         <td>@Html.DisplayFor(modelItem => item.FullName)</td>
@@ -43,15 +43,14 @@
                                 }
                         </select>
                     </td>
-
                         <td>@Html.DisplayFor(modelItem => item.CreatedAt)</td>
                         <td>@Html.DisplayFor(modelItem => item.UpdatedAt)</td>
-                        <td class="d-flex justify-content-center">
+                        <td>
                             <input type="hidden" name="UserId" value="@item.UserId" />
-                            <button type="submit" name="action" value="update" class="btn btn-warning btn-sm mx-1">
+                            <button type="submit" name="action" value="update" class="btn btn-warning btn-sm">
                                 <i class="fas fa-save"></i>
                             </button>
-                            <button type="submit" name="action" value="delete" class="btn btn-danger btn-sm mx-1">
+                            <button type="submit" name="action" value="delete" class="btn btn-danger btn-sm">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </td>
@@ -60,27 +59,8 @@
             }
         </tbody>
     </table>
-</div>
-
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.1/js/dataTables.bootstrap5.min.js"></script>
-<script>
-    $(document).ready(function () {
-        $('#userTable').DataTable({
-            responsive: true,
-            "language": {
-                "paginate": {
-                    "previous": "Trước",
-                    "next": "Tiếp"
-                },
-                "search": "Tìm kiếm:",
-                "lengthMenu": "Hiển thị _MENU_ người dùng",
-                "info": "Hiển thị _START_ đến _END_ trong số _TOTAL_ người dùng",
-                "infoEmpty": "Không có dữ liệu",
-                "zeroRecords": "Không tìm thấy kết quả",
-                "infoFiltered": "(lọc từ _MAX_ tổng số bản ghi)"
-            }
-        });
-    });
-</script>
+
+
