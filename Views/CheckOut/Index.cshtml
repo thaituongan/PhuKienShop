@@ -4,6 +4,27 @@
     ViewData["Title"] = "Đặt hàng";
 }
 
+
+<!-- BREADCRUMB -->
+<div id="breadcrumb" class="section">
+    <!-- container -->
+    <div class="container">
+        <!-- row -->
+        <div class="row">
+            <div class="col-md-12">
+                <ul class="breadcrumb-tree">
+                    <li><a href="@Url.Action("Index", "Home")">Trang chủ</a></li>
+                    <li><a href="@Url.Action("Index", "ShoppingCart")">Giỏ hàng</a></li>
+                    <li class="active">Thanh toán</li>
+                </ul>
+            </div>
+        </div>
+        <!-- /row -->
+    </div>
+    <!-- /container -->
+</div>
+<!-- /BREADCRUMB -->
+
 <div class="section">
     <div class="container">
         <form asp-action="Index" method="post">
