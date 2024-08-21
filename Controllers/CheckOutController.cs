@@ -62,7 +62,7 @@ namespace PhuKienShop.Controllers
             var viewModel = new CheckoutViewModel
             {
                 CartProducts = cart.CartProducts,
-                TotalAmount = cart.Amount(),
+                TotalAmount = cart.Amount(_context),
                 Name = user?.FullName,
                 Email = user?.Email,
                 Address = user?.Address,
@@ -94,7 +94,7 @@ namespace PhuKienShop.Controllers
                 }
 
                 model.UserId = user.UserId;
-                model.TotalAmount = cart.Amount();
+                model.TotalAmount = cart.Amount(_context);
 
             // Tạo đơn hàng mới
                 var order = new Order
