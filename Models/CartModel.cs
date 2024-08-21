@@ -3,18 +3,21 @@
 public class CartModel
 {
     public List<CartProduct> CartProducts { get; set; } = new List<CartProduct>();
-
+    
     public decimal Amount()
     {
         return CartProducts.Sum(cp => cp.Product.Price * cp.Quantity);
     }
-
+    
     public void RemoveProduct(int productId)
     {
         CartProducts.RemoveAll(cp => cp.Product.ProductId == productId);
     }
-
-    public void AddProduct(Product product, int quantity)
+	public int GetTotal()
+	{
+		return CartProducts.Sum(cp => cp.Quantity);
+	}
+	public void AddProduct(Product product, int quantity)
     {
         var existingProduct = CartProducts.FirstOrDefault(cp => cp.Product.ProductId == product.ProductId);
         if (existingProduct != null)

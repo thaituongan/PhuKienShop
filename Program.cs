@@ -35,15 +35,17 @@ namespace PhuKienShop
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
             });
 
-            // Add session
-            builder.Services.AddSession(options =>
+			// Add session
+			builder.Services.AddHttpContextAccessor();
+			builder.Services.AddSession(options =>
             {
                 options.IdleTimeout = TimeSpan.FromMinutes(30);
                 options.Cookie.HttpOnly = true;
                 options.Cookie.IsEssential = true;
             });
+			
 
-            var app = builder.Build();
+			var app = builder.Build();
 
 
             // Configure the HTTP request pipeline.
