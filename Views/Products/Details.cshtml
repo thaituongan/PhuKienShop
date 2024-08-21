@@ -227,9 +227,9 @@
 								<div class="col-md-6">
 									<div id="reviews">
 										<ul class="reviews">
-											@if (Model.CurrentProduct.Reviews != null && Model.CurrentProduct.Reviews.Any())
+											@if (Model.Reviews != null && Model.Reviews.Any())
 											{
-												@foreach (var review in Model.CurrentProduct.Reviews)
+												@foreach (var review in Model.Reviews)
 												{
 													<li style="border-bottom: 1px solid #e0e0e0; padding: 15px 0;">
 														<div class="review-heading">
@@ -259,13 +259,17 @@
 												<p>Không có đánh giá nào.</p>
 											}
 										</ul>
-										<ul class="reviews-pagination">
-											<li class="active">1</li>
-											<li><a href="#">2</a></li>
-											<li><a href="#">3</a></li>
-											<li><a href="#">4</a></li>
-											<li><a href="#"><i class="fa fa-angle-right"></i></a></li>
-										</ul>
+										<!-- Reviews Pagination -->
+
+											<ul class="reviews-pagination">
+												@for (int i = 1; i <= Model.TotalPages; i++)
+												{
+													<li class="@(i == Model.CurrentPage ? "active" : "")">
+														<a href="@Url.Action("Details", new { id = Model.CurrentProduct.ProductId, categoryId = Model.CurrentProduct.CategoryId, page = i })">@i</a>
+													</li>
+												}
+											</ul>
+									
 									</div>
 								</div>
 								<!-- /Reviews -->

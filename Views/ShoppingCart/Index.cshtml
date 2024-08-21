@@ -48,9 +48,9 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td><strong>@string.Format("{0:N0}", @price.ToString("C")) VND</strong></td>
+                                <td><strong>@string.Format("{0:N0}", @price.ToString("C")) </strong></td>
                                 <td data-th="Quantity"><b>@cartProduct.Quantity</b></td>
-                                <td><strong>@string.Format("{0:N0}", (price * cartProduct.Quantity).ToString("C")) VND</strong></td>
+                                <td><strong>@string.Format("{0:N0}", (price * cartProduct.Quantity).ToString("C")) </strong></td>
                                 <td class="actions" data-th="" style="width:10%;">
                                     <button data-toggle="modal" data-target="#deleteEmployeeModal_@cartProduct.Product.ProductId" class="btn btn-danger btn-sm"><i class="fa fa-trash-o"></i></button>
                                 </td>
