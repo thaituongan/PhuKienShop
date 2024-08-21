@@ -1,43 +1,39 @@
 ﻿@model IEnumerable<PhuKienShop.Data.ProductSale>
 
 @{
-    ViewData["Title"] = "Danh Sách Khuyến Mãi";
+    ViewData["Title"] = "Quản Lý Khuyến Mãi";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
 }
-
-<h2>@ViewData["Title"]</h2>
-
-<p>
-    <a asp-action="Create" class="btn btn-primary">
-        Thêm Sản phẩm khuyến mãi
-    </a>
-</p>
-
 <table class="table table-hover">
-    <thead class="thead-dark">
+    <thead class="thead-light">
         <tr>
-            <th>@Html.DisplayNameFor(model => model.OriginalPrice)</th>
-            <th>@Html.DisplayNameFor(model => model.DiscountPercentage)</th>
-            <th>@Html.DisplayNameFor(model => model.SalePrice)</th>
-            <th>@Html.DisplayNameFor(model => model.StartDate)</th>
-            <th>@Html.DisplayNameFor(model => model.EndDate)</th>
-            <th>@Html.DisplayNameFor(model => model.CreatedAt)</th>
-            <th>@Html.DisplayNameFor(model => model.UpdatedAt)</th>
-            <th>Sản phẩm</th>
-            <th></th>
+            <th>Tên Sản Phẩm</th>
+            <th>Giá gốc</th>
+            <th>Phần trăm</th>
+            <th>Giá Sale</th>
+            <th>Ngày Bắt Đầu</th>
+            <th>Ngày Kết Thúc</th>
+            <th>Thời Gian Cập Nhật</th>
+           
+            <th>  
+                    <a asp-action="Create">
+                        <i class="fa-solid fa-circle-plus"></i> Thêm
+                    </a>
+            </th>
         </tr>
     </thead>
     <tbody>
         @foreach (var item in Model)
         {
             <tr>
-                <td>@Html.DisplayFor(modelItem => item.OriginalPrice)</td>
-                <td>@Html.DisplayFor(modelItem => item.DiscountPercentage) %</td>
-                <td>@Html.DisplayFor(modelItem => item.SalePrice)</td>
-                <td>@Html.DisplayFor(modelItem => item.StartDate)</td>
-                <td>@Html.DisplayFor(modelItem => item.EndDate)</td>
-                <td>@Html.DisplayFor(modelItem => item.CreatedAt)</td>
-                <td>@Html.DisplayFor(modelItem => item.UpdatedAt)</td>
-                <td>@Html.DisplayFor(modelItem => item.Product.ProductName)</td>
+                <td>@item.Product.ProductName)</td>
+                <td>@item.OriginalPrice.ToString("N0")</td>
+                <td>@item.DiscountPercentage.ToString("N0") %</td>
+                <td>@item.SalePrice.ToString("N0")</td>
+                <td>@item.StartDate</td>
+                <td>@item.EndDate)</td>
+                <td>@item.UpdatedAt)</td>
+                
                 <td>
                     <a asp-action="Edit" asp-route-id="@item.SaleId" class="btn btn-warning btn-sm">
                          Sửa
