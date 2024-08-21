@@ -54,7 +54,7 @@ public partial class Order
             case "CONFIRMED": return Order.CONFIRMED;
             case "PACKAGEED": return Order.PACKAGEED;
             case "DELIVERYED": return Order.DELIVERYED;
-            case "COMPLEETED": return Order.COMPLETEED;
+            case "COMPLETEED": return Order.COMPLETEED;
             case "CANCELED": return Order.CANCELED;
             default: return Order.UNDEFINED;   
         }

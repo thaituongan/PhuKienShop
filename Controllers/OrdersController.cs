@@ -302,7 +302,7 @@ namespace PhuKienShop.Controllers
             Console.WriteLine("goi update");
 
             int orderId = int.Parse(id);
-            var order = _context.Orders.Find(orderId);
+            var order = await _context.Orders.FindAsync(orderId);
 
             if (action == null)
             {
