@@ -1,0 +1,24 @@
+﻿@model PhuKienShop.Models.AdminProductViewModel
+@foreach(var p in Model.products)
+{
+    <tr>
+        <td>@p.ProductId</td>
+        <td>@p.ProductName</td>
+        <td>@p.Price</td>
+        <td>@p.CategoryId</td>
+        <td>@p.StockQuantity</td>
+        <td>@p.Branch</td>
+        <td><img style="width: 70px; height: 70px" src="@p.ImageUrl" alt=""></td>
+        <td>
+                <i class="material-icons" onclick="callUpdateBox(@p.ProductId)" title="Edit">&#xE254;</i>
+            
+
+           
+           
+        </td>
+    </tr>
+}
+<script>
+    showSuccessToast('Thêm sản phẩm thành công');
+</script>
+

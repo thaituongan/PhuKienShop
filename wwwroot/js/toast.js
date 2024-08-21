@@ -49,6 +49,7 @@ function toast({title = '', message = '', type = 'info', duration = 3000}) {
 
 
 function showSuccessToast(messagein) {
+    console.log("call showsuccesstoast");
     toast({
         title: 'Successful',
         message: messagein,
