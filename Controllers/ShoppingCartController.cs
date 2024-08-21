@@ -36,7 +36,7 @@ namespace PhuKienShop.Controllers
         public IActionResult Index()
         {
             var cart = GetCart();
-            return View(cart);
+			return View(cart);
         }
 
         [HttpPost]
