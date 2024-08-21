@@ -53,15 +53,14 @@
                     </div>
                   </a>  
                 </div>
-                
             }
         </div>
         <div id="slick-nav-1" class="products-slick-nav"></div>
     </div>
     <div id="tab-2" class="tab-pane">
-        <div class="products-slick" data-nav="#slick-nav-1">
-        @foreach(var item in Model)
-        {
+        <div class="products-slick" data-nav="#slick-nav-2">
+            @foreach(var item in Model)
+            {
             if(item.Product.CategoryId == 1)
             {
                 <div class="product">
@@ -112,13 +111,13 @@
                         </div>
                     </a>
                 </div>
-                
             }
         }
         </div>
+        <div id="slick-nav-2" class="products-slick-nav"></div>
     </div>
     <div id="tab-3" class="tab-pane">
-        <div class="products-slick" data-nav="#slick-nav-1">
+        <div class="products-slick" data-nav="#slick-nav-3">
             @foreach (var item in Model)
             {
                 if (item.Product.CategoryId == 2)
@@ -175,9 +174,10 @@
                 }
             }
         </div>
+        <div id="slick-nav-3" class="products-slick-nav"></div>
     </div>
     <div id="tab-4" class="tab-pane">
-        <div class="products-slick" data-nav="#slick-nav-1">
+        <div class="products-slick" data-nav="#slick-nav-4">
             @foreach (var item in Model)
             {
                 if (item.Product.CategoryId == 3)
@@ -234,9 +234,10 @@
                 }
             }
         </div>
+        <div id="slick-nav-4" class="products-slick-nav"></div>
     </div>
     <div id="tab-5" class="tab-pane">
-        <div class="products-slick" data-nav="#slick-nav-1">
+        <div class="products-slick" data-nav="#slick-nav-5">
             @foreach (var item in Model)
             {
                 if (item.Product.CategoryId == 4)
@@ -289,9 +290,9 @@
                             </div>
                         </a>
                     </div>
-
                 }
             }
         </div>
     </div>
+    <div id="slick-nav-5" class="products-slick-nav"></div>
 </div>
