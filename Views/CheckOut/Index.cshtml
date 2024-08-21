@@ -46,7 +46,7 @@
                                 {
                                     <div class="order-col">
                                         <div>@product.Quantity x @product.Product.ProductName</div>
-                                        <div>@string.Format("{0:N0}", product.Product.Price * product.Quantity) VND</div>
+                                        <div>@string.Format("{0:N0}", Model.TotalAmount) VND</div>
                                     </div>
                                 }
                             </div>

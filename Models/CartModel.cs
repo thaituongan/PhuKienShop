@@ -3,12 +3,42 @@
 public class CartModel
 {
     public List<CartProduct> CartProducts { get; set; } = new List<CartProduct>();
-    
-    public decimal Amount()
+	public decimal Amount(PkShopContext _db)
+	{
+		decimal totalAmount = 0;
+
+		foreach (var cartProduct in CartProducts)
+		{
+			var product = cartProduct.Product;
+			var sale = _db.ProductSales
+				.FirstOrDefault(ps => ps.ProductId == product.ProductId &&
+									  ps.StartDate <= DateTime.Now &&
+									  ps.EndDate >= DateTime.Now);
+
+			decimal priceToUse = sale != null ? sale.SalePrice : product.Price;
+			totalAmount += priceToUse * cartProduct.Quantity;
+		}
+
+		return totalAmount;
+	}
+    public decimal IsSale(PkShopContext _db)
     {
-        return CartProducts.Sum(cp => cp.Product.Price * cp.Quantity);
+        decimal priceToUse = 0;
+
+        foreach (var cartProduct in CartProducts)
+        {
+            var product = cartProduct.Product;
+            var sale = _db.ProductSales
+                .FirstOrDefault(ps => ps.ProductId == product.ProductId &&
+                                      ps.StartDate <= DateTime.Now &&
+                                      ps.EndDate >= DateTime.Now);
+
+            priceToUse = sale != null ? sale.SalePrice : product.Price;
+        }
+
+        return priceToUse;
     }
-    
+
     public void RemoveProduct(int productId)
     {
         CartProducts.RemoveAll(cp => cp.Product.ProductId == productId);
