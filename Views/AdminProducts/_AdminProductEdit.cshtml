@@ -1,0 +1,80 @@
+﻿@model PhuKienShop.Models.AdminProductViewModel
+<div id="editProductModal" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content" style="width:60%">
+<form action="update" method="post" id="updateProduct">
+    <div class="modal-header">
+        <h4 class="modal-title">Cập nhật sản phẩm</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    </div>
+    <div class="modal-body">
+
+        <div class="form-group">
+            <label>Tên sản phẩm</label>
+            <input name="name" type="text" class="form-control" value="@Model.product.ProductName" required>
+            <input name="id" type="text" class="form-control" value="@Model.product.ProductId" hidden>
+        </div>
+        <div style="display:flex; justify-content: space-between; align-items:center">
+            <div class="form-group">
+                <label>Giá</label>
+                <input name="price" type="text" class="form-control" value="@Model.product.Price" required>
+            </div>
+            <div class="form-group">
+                <label>Tồn kho</label>
+                <input name="quantity" type="text" class="form-control" value="@Model.product.StockQuantity" required>
+            </div>
+        </div>
+        <div style="display:flex; justify-content: space-between; align-items:center">
+
+            <div class="form-group">
+                <label>Mã loại sản phẩm</label>
+                <select name="productType" class="form-select">
+                    
+                    @foreach (var cate in Model.categories)
+                    {
+                        <option value="@cate.CategoryId" selected="@(cate.CategoryId == Model.product.CategoryId ? "selected" : null)">@cate.CategoryName</option>
+                    }
+                    
+                   
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Hãng sản xuất</label>
+                <input name="branch" type="text" class="form-control" value="@Model.product.Branch" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Hình ảnh</label>
+            <input name="img" type="text" class="form-control" value="@Model.product.ImageUrl" required>
+        </div>
+        <div class="form-group">
+            <label>Mô tả</label>
+            <textarea name="des" type="text" class="form-control" rows="6" required>@Model.product.Description</textarea>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <input type="button" class="btn btn-default" data-dismiss="modal" value="Hủy">
+        <input type="submit" class="btn btn-success" value="Cập nhật">
+    </div>
+</form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    document.querySelector('#updateProduct').addEventListener('submit', function (e) {
+        e.preventDefault();
+        var formData = new FormData(this);
+        var id = formData.get("id");
+        var name = formData.get("name");
+        var price = formData.get("price");
+        var quantity = formData.get("quantity");
+        var category = formData.get("productType");
+        var branch = formData.get("branch");
+        var img = formData.get("img");
+        var des = formData.get("des");
+
+        updateProduct(id, name, price, quantity, category, branch, img, des);
+    });
+    </script>

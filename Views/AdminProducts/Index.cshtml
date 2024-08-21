@@ -1,0 +1,301 @@
+﻿@model PhuKienShop.Models.AdminProductViewModel
+
+@{
+    ViewData["Title"] = "Quản lý sản phẩm";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+                                    <style>
+                                        tr:nth-child(even) {
+                                            background-color: aliceblue;
+                                        }
+
+                                        tr:nth-child(odd) {
+                                            background-color: #ffffff;
+                                        }
+
+                                        .modal-dialog {
+                                            width: 80%;
+                                            max-width: 100%;
+                                            display: flex;
+                                            justify-content: center;
+                                            align-items: center;
+                                       
+                                        }
+
+                                        .search-form {
+                                            display: flex;
+                                            align-items: center;
+                                            border: 1px solid #fd1111;
+                                            border-radius: 50px;
+                                            overflow: hidden;
+                                            width: 180px;
+                                            justify-content: space-between;
+                                        }
+
+
+                                            .search-form input {
+                                                border: none;
+                                                outline: white;
+                                                margin-left: 10px;
+                                            }
+
+
+                                                .search-form input:focus {
+                                                    border: none !important;
+                                                    outline: none !important;
+                                                }
+
+                                            .search-form i {
+                                                padding: 10px;
+                                            }
+
+                                                .search-form i:hover {
+                                                    cursor: pointer;
+                                                }
+                                    </style>
+}
+
+<!-- main content -->
+<div class="wrapper" style="padding-top:0px;background-color: white;">
+    <div id="toast">
+    </div>
+    <script src="~/js/toast.js"></script>
+    <div class="row">
+        <div class="col-8 col-m-12 col-sm-12">
+            <div class="card">
+                <div class="card-header" style="display: flex">
+                    
+                    <a href="#addEmployeeModal" class="btn btn-success" data-toggle="modal" style="margin-left: auto">
+                        <span>Thêm sản phẩm mới</span>
+                    </a>
+                    <button onclick="showSuccessToast('thanh cong r nef')"></button>
+
+                </div>
+                <div class="card-content">
+                    <table class="product-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Tên sản phẩm</th>
+                                <th>Giá</th>
+                                <th>Mã loại sản phẩm</th>
+                                <th>Tồn kho</th>
+                                <th>Mã hãng sản xuất</th>
+                                <th>Hình ảnh</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var p in Model.products)
+                            {
+                                @Html.Partial("_AdminProductRow", p)
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Edit-->
+   
+    <!--/ Edit-->
+    <!-- Delete-->
+    <div id="modal-container">
+
+    </div>
+    <script>
+       
+            function callUpdateBox(id) {
+                $.ajax({
+                url: '@Url.Action("prepareUpdate", "AdminProducts")',
+                    type: 'POST',
+                    data: { id: id },
+                    success: function (response) {
+                    $('#modal-container').html(response);
+                    $('#editProductModal').modal('show');
+
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Lỗi: ' + error);
+                    }
+                });
+                console.log(document.querySelector('#updateProduct'));
+                
+
+            }
+
+        function updateProduct(id,name, price, quantity, category, branch, img, des) {
+            $.ajax({
+                url: '@Url.Action("updateProduct", "AdminProducts")',
+                type: 'POST',
+                data: {id:id, name: name, price: price, quantity: quantity, category: category, branch: branch, img: img, des: des },
+                success: function (response) {
+                    let curhtml = $('.product-table tbody').html();
+                    let newhtml = response + curhtml;
+                    $('.product-table tbody').html(newhtml);
+                    $('#updateProduct .close').click(); // Ẩn modal
+                   
+
+                },
+                error: function (xhr, status, error) {
+                    console.error('Lỗi: ' + error);
+                }
+            });
+        }
+
+        function callDeleteBox(e,idin) {
+            e.preventDefault();
+            console.log("call delete box");
+            var html = `
+                    <div id="deleteEmployeeModal" class="modal fade">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <form id="deleteForm" action="delete" method="post">
+                            <div class="modal-header">
+                                <h4 class="modal-title">Xóa sản phẩm này</h4>
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            </div>
+                            <div class="modal-body">
+                                <p>Bạn có chắc chắn muốn xóa sản phẩm này?</p>
+                                <p class="text-warning"><small>Hành động này sẽ không thể hoàn lại.</small></p>
+                                <input type="text" name="id" class="btn btn-danger" value="${idin}" hidden>
+
+                            </div>
+                            <div class="modal-footer">
+                                <input type="button" class="btn btn-default" data-dismiss="modal" value="Hủy">
+                                        <input type="submit" class="btn btn-danger" value="Xóa" onclick="deleteProduct(${idin})">
+                                <input type="hidden" id="productIdToDelete" name="productIdToDelete" value="">
+                            </div>
+                        </form>
+                        
+                    </div>
+                    </div>
+                </div>
+            `
+            document.querySelector('#modal-container').innerHTML = html;
+            $('#deleteEmployeeModal').modal('show');
+            document.querySelector("#deleteForm").addEventListener('submit', function (event) {
+                event.preventDefault();
+                var formData = new FormData(this);
+                var id = formData.get("id");
+                deleteProduct(id);
+            });
+        }
+        
+        
+
+        function deleteProduct(id) {
+            $.ajax({
+                url: '@Url.Action("deleteProductById", "AdminProducts")',
+                type: 'POST',
+                data: { id: id },
+                success: function (response) {
+                    $('.product-table tbody').html(response);
+                    $('#deleteForm .close').click(); // Ẩn modal
+
+                },
+                error: function (xhr, status, error) {
+                    console.error('Lỗi: ' + error);
+                }
+            });
+        }
+   
+        </script>
+    
+    <!--/ Delete-->
+    <!--/ Add-->
+    <div id="addEmployeeModal" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content" style="width:60%">
+                <form action="add" method="post" id="addProduct">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Thêm sản phẩm</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                      
+                        <div class="form-group">
+                            <label>Tên sản phẩm</label>
+                            <input name="name" type="text" class="form-control" required>
+                        </div>
+                        <div style="display:flex; justify-content: space-between; align-items:center">
+                            <div class="form-group">
+                                <label>Giá</label>
+                                <input name="price" type="text" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Tồn kho</label>
+                                <input name="quantity" type="text" class="form-control" required>
+                            </div>
+                        </div>
+                        <div style="display:flex; justify-content: space-between; align-items:center">
+
+                            <div class="form-group">
+                                <label>Mã loại sản phẩm</label>
+                                <select name="productType" class="form-select">
+                                    @foreach (var cate in Model.categories)
+                                    {
+                                        @Html.Partial("_CategoryRow", cate)
+                                    }
+                                </select>
+                            </div>
+                      
+                            <div class="form-group">
+                                <label>Hãng sản xuất</label>
+                                <input name="branch" type="text" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Hình ảnh</label>
+                            <input name="img" type="text" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <input type="button" class="btn btn-default" data-dismiss="modal" value="Hủy">
+                        <input type="submit" class="btn btn-success" value="Thêm">
+                    </div>
+                </form>
+                <script>
+                    document.querySelector('#addProduct').addEventListener('submit', function (e) {
+                        e.preventDefault();
+                        var formData = new FormData(this);
+                        var name = formData.get("name");
+                        var price = formData.get("price");
+                        var quantity = formData.get("quantity");
+                        var category = formData.get("productType");
+                        var branch = formData.get("branch");
+                        var img = formData.get("img");
+                        console.log(formData);
+                        console.log(name);
+                        console.log(price);
+                        console.log(quantity);
+                        console.log(category);
+                        console.log(branch);
+                        console.log(img);
+                        addProduct(name, price, quantity, category, branch, img);
+                    });
+                    function addProduct(name, price, quantity, category, branch, img) {
+                        $.ajax({
+                            url: '@Url.Action("addProduct", "AdminProducts")',
+                            type: 'POST',
+                            data: { name: name, price: price, quantity: quantity, category: category, branch: branch, img: img },
+                            success: function (response) {
+                                let curhtml = $('.product-table tbody').html();
+                                let newhtml = response + curhtml;
+                                $('.product-table tbody').html(newhtml);
+                                $('#addProduct .close').click(); // Ẩn modal
+
+                            },
+                            error: function (xhr, status, error) {
+                                console.error('Lỗi: ' + error);
+                            }
+                        });
+                    }
+                </script>
+            </div>
+        </div>
+    </div>
+    <!--/ Add -->
+</div>
+<!-- end main content -->
+
+
+
