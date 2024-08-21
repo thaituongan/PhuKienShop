@@ -26,25 +26,26 @@ namespace PhuKienShop.Controllers
 			var pkshopContext = _context.ProductSales.Include(ps => ps.Product);
 			return View(await pkshopContext.ToListAsync());
 		}
-
-
-		// GET: ProductSales/Details/5
-		public async Task<IActionResult> Details(int? id)
+        [HttpPost]
+        public async Task<IActionResult> Update(int SaleId, decimal DiscountPercentage, DateTime StartDate, DateTime EndDate)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            var productSale = await _context.ProductSales.FindAsync(SaleId);
 
-            var productSale = await _context.ProductSales
-                .Include(p => p.Product)
-                .FirstOrDefaultAsync(m => m.SaleId == id);
             if (productSale == null)
             {
                 return NotFound();
             }
 
-            return View(productSale);
+            productSale.DiscountPercentage = DiscountPercentage;
+            productSale.SalePrice = productSale.OriginalPrice - (productSale.OriginalPrice * DiscountPercentage / 100);
+            productSale.StartDate = StartDate;
+            productSale.EndDate = EndDate;
+            productSale.UpdatedAt = DateTime.Now;
+
+            _context.Update(productSale);
+            await _context.SaveChangesAsync();
+
+            return Json(new { success = true });
         }
 
         // GET: ProductSales/Create
@@ -53,153 +54,52 @@ namespace PhuKienShop.Controllers
             ViewData["ProductId"] = new SelectList(_context.Products, "ProductId", "ProductName");
             return View();
         }
+        // Action to get the price of a product by its ID
+        [HttpGet]
+        public async Task<IActionResult> GetProductPrice(int id)
+        {
+            var product = await _context.Products
+                .Where(p => p.ProductId == id)
+                .Select(p => new { p.Price })
+                .FirstOrDefaultAsync();
+
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            return Json(new { price = product.Price });
+        }
 
         // POST: ProductSales/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ProductId,DiscountPercentage,StartDate,EndDate")] ProductSale productSale)
         {
-
-
-            // Tìm sản phẩm dựa trên ProductId
-            var product = await _context.Products.SingleOrDefaultAsync(p => p.ProductId == productSale.ProductId);
-
-            if (product != null)
+            if (ModelState.IsValid)
             {
-                // Set OriginalPrice based on the selected product's price
-                productSale.OriginalPrice = product.Price;
-                productSale.SalePrice = product.Price - (product.Price * productSale.DiscountPercentage / 100);
-                // Set CreatedAt and UpdatedAt to default values
-                productSale.CreatedAt = DateTime.Now;
-                productSale.UpdatedAt = DateTime.Now;
+                var product = await _context.Products.SingleOrDefaultAsync(p => p.ProductId == productSale.ProductId);
 
+                if (product != null)
+                {
+                    productSale.OriginalPrice = product.Price;
+                    productSale.SalePrice = product.Price - (product.Price * productSale.DiscountPercentage / 100);
+                    productSale.CreatedAt = DateTime.Now;
+                    productSale.UpdatedAt = DateTime.Now;
 
-                // SalePrice không cần đặt, nó được tự động tính toán trong database
-
-                // Thêm ProductSale vào database
-                _context.Add(productSale);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                    _context.Add(productSale);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+                else
+                {
+                    ModelState.AddModelError("", "Product not found.");
+                }
             }
-            else
-            {
-                ModelState.AddModelError("", "Product not found.");
-            }
-
-
 
             ViewData["ProductId"] = new SelectList(_context.Products, "ProductId", "ProductName", productSale.ProductId);
             return View(productSale);
         }
-
-
-
-		// GET: ProductSales/Edit/5
-		public async Task<IActionResult> Edit(int? id)
-		{
-			if (id == null)
-			{
-				return NotFound();
-			}
-
-			var productSale = await _context.ProductSales
-				.Include(ps => ps.Product)
-				.FirstOrDefaultAsync(ps => ps.SaleId == id);
-
-			if (productSale == null)
-			{
-				return NotFound();
-			}
-
-			ViewData["ProductId"] = new SelectList(_context.Products, "ProductId", "ProductName", productSale.ProductId);
-			return View(productSale);
-		}
-
-		// POST: ProductSales/Edit/5
-		[HttpPost]
-		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> Edit(int id, [Bind("SaleId,ProductId,DiscountPercentage,StartDate,EndDate")] ProductSale productSale)
-		{
-			if (id != productSale.SaleId)
-			{
-				return NotFound();
-			}
-
-			if (ModelState.IsValid)
-			{
-				try
-				{
-					var existingProductSale = await _context.ProductSales
-						.Include(ps => ps.Product)
-						.FirstOrDefaultAsync(ps => ps.SaleId == id);
-
-					if (existingProductSale == null)
-					{
-						return NotFound();
-					}
-
-					// Cập nhật thông tin dựa trên form
-					existingProductSale.DiscountPercentage = productSale.DiscountPercentage;
-					existingProductSale.StartDate = productSale.StartDate;
-					existingProductSale.EndDate = productSale.EndDate;
-					existingProductSale.SalePrice = existingProductSale.OriginalPrice - (existingProductSale.OriginalPrice * productSale.DiscountPercentage / 100);
-					existingProductSale.UpdatedAt = DateTime.Now;
-
-					_context.Update(existingProductSale);
-					await _context.SaveChangesAsync();
-				}
-				catch (DbUpdateConcurrencyException)
-				{
-					if (!ProductSaleExists(productSale.SaleId))
-					{
-						return NotFound();
-					}
-					else
-					{
-						throw;
-					}
-				}
-				return RedirectToAction(nameof(Index));
-			}
-
-			ViewData["ProductId"] = new SelectList(_context.Products, "ProductId", "ProductName", productSale.ProductId);
-			return View(productSale);
-		}
-
-		// GET: ProductSales/Delete/5
-		public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var productSale = await _context.ProductSales
-                .Include(p => p.Product)
-                .FirstOrDefaultAsync(m => m.SaleId == id);
-            if (productSale == null)
-            {
-                return NotFound();
-            }
-
-            return View(productSale);
-        }
-
-        // POST: ProductSales/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var productSale = await _context.ProductSales.FindAsync(id);
-            if (productSale != null)
-            {
-                _context.ProductSales.Remove(productSale);
-            }
-
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
         private bool ProductSaleExists(int id)
         {
             return _context.ProductSales.Any(e => e.SaleId == id);
