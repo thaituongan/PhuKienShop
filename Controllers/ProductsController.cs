@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration.UserSecrets;
 using Microsoft.IdentityModel.Tokens;
 using PhuKienShop.Data;
 using PhuKienShop.Models;
@@ -44,6 +46,8 @@ namespace PhuKienShop.Controllers
 			var product = await _context.Products
 				.Include(p => p.Category)
 				.Include(p => p.ProductSales) // Thêm dòng này để nạp đầy đủ dữ liệu ProductSales
+				.Include(p => p.Reviews)
+				.ThenInclude(r => r.User)
 				.FirstOrDefaultAsync(m => m.ProductId == id);
 
 			if (product == null)
@@ -59,12 +63,41 @@ namespace PhuKienShop.Controllers
 				.Take(4)
 				.ToList();
 
-			//truyen vao ProductDetailModel
+			var reviews = product.Reviews.ToList();
+
+			int totalReviews = reviews.Count();
+
+			// Tính số lượng đánh giá cho từng loại sao
+			int fiveStar = reviews.Count(r => r.Rating == 5);
+			int fourStar = reviews.Count(r => r.Rating == 4);
+			int threeStar = reviews.Count(r => r.Rating == 3);
+			int twoStar = reviews.Count(r => r.Rating == 2);
+			int oneStar = reviews.Count(r => r.Rating == 1);
+
+			// Tính tỷ lệ phần trăm của từng loại sao
+			double fiveStarPercentage = totalReviews > 0 ? (double)fiveStar / totalReviews * 100 : 0;
+			double fourStarPercentage = totalReviews > 0 ? (double)fourStar / totalReviews * 100 : 0;
+			double threeStarPercentage = totalReviews > 0 ? (double)threeStar / totalReviews * 100 : 0;
+			double twoStarPercentage = totalReviews > 0 ? (double)twoStar / totalReviews * 100 : 0;
+			double oneStarPercentage = totalReviews > 0 ? (double)oneStar / totalReviews * 100 : 0;
+
+			// Tính trung bình điểm đánh giá
+			double averageRating = reviews.Any() ? reviews.Average(r => r.Rating) : 0;
+
+
 			var viewModel = new ProductDetailModel
 			{
 				CurrentProduct = product,
-				RelatedProducts = relatedProduct
+				RelatedProducts = relatedProduct,
+				Reviews = reviews,
+				AverageRating = averageRating,
+				FiveStarPercentage = fiveStarPercentage,
+				FourStarPercentage = fourStarPercentage,
+				ThreeStarPercentage = threeStarPercentage,
+				TwoStarPercentage = twoStarPercentage,
+				OneStarPercentage = oneStarPercentage
 			};
+
 			return View(viewModel);
 		}
 
@@ -204,6 +237,32 @@ namespace PhuKienShop.Controllers
 		private bool ProductExists(int id)
 		{
 			return _context.Products.Any(e => e.ProductId == id);
+		}
+		[HttpPost]
+		public async Task<IActionResult> AddReview(int productId, string comment, int rating)
+		{
+			if (User.Identity.IsAuthenticated)
+			{
+				var email = User.FindFirst(ClaimTypes.Email)?.Value;
+				var userDetails = _context.Users.FirstOrDefault(u => u.Email == email);
+				int userId = userDetails.UserId;
+
+				var review = new Review
+				{
+					ProductId = productId,
+					UserId = userId,
+					Rating = rating,
+					Comment = comment,
+					CreatedAt = DateTime.UtcNow
+				};
+
+				_context.Reviews.Add(review);
+				await _context.SaveChangesAsync();
+
+				return RedirectToAction("Details", new { id = productId });
+			}
+
+			return RedirectToAction("Login", "Account");
 		}
 	}
 }
