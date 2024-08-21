@@ -8,6 +8,9 @@ namespace PhuKienShop.Models
         [Required]
         public int UserId { get; set; }
 
+        [Required] 
+        public string Price { get; set; }
+
         [Required]
         public decimal TotalAmount { get; set; }
 
