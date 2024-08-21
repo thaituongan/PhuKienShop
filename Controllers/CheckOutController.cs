@@ -1,0 +1,169 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using PhuKienShop.Data;
+using PhuKienShop.Models;
+using Microsoft.AspNetCore.Http;
+using System.Text.Json;
+using System.Linq;
+using System.Threading.Tasks;
+using static PhuKienShop.Models.CheckoutViewModel;
+
+namespace PhuKienShop.Controllers
+{
+    public class CheckOutController : Controller
+    {
+        private readonly PkShopContext _context;
+
+        public CheckOutController(PkShopContext context)
+        {
+            _context = context;
+        }
+
+        // Lấy giỏ hàng từ session
+        private CartModel GetCart()
+        {
+            var cartJson = HttpContext.Session.GetString("Cart");
+            if (string.IsNullOrEmpty(cartJson))
+            {
+                return new CartModel();
+            }
+            try
+            {
+                return JsonSerializer.Deserialize<CartModel>(cartJson) ?? new CartModel();
+            }
+            catch (JsonException)
+            {
+                // Log exception or handle it as needed
+                return new CartModel();
+            }
+        }
+
+        // Lưu giỏ hàng vào session
+        private void SaveCart(CartModel cart)
+        {
+            var cartJson = JsonSerializer.Serialize(cart);
+            HttpContext.Session.SetString("Cart", cartJson);
+        }
+
+        [HttpGet]
+        public IActionResult Index()
+        {
+            var cart = GetCart();
+            if (!cart.CartProducts.Any())
+            {
+                // Redirect hoặc thông báo giỏ hàng trống nếu không có sản phẩm
+                return RedirectToAction("Index", "Home");
+            }
+
+            // Giả sử bạn đã xác thực người dùng và lấy thông tin người dùng từ HttpContext.User
+            var userName = HttpContext.User.Identity.Name; // hoặc từ session nếu lưu trữ thông tin người dùng khác
+            var user = _context.Users.FirstOrDefault(u => u.Username == userName);
+
+            var viewModel = new CheckoutViewModel
+            {
+                CartProducts = cart.CartProducts,
+                TotalAmount = cart.Amount(),
+                Name = user?.FullName,
+                Email = user?.Email,
+                Address = user?.Address,
+                Phone = user?.PhoneNumber
+            };
+
+            return View(viewModel);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Index(CheckoutViewModel model)
+        {
+          
+            
+                var cart = GetCart();
+                if (!cart.CartProducts.Any())
+                {
+                    ModelState.AddModelError("", "Giỏ hàng trống. Không thể đặt hàng.");
+                    return View(model);
+                }
+
+                var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == model.Email);
+
+                if (user == null)
+                {
+                    ModelState.AddModelError("", "Người dùng không tồn tại với email này.");
+                    return View(model);
+                }
+
+                model.UserId = user.UserId;
+                model.TotalAmount = cart.Amount();
+
+            // Tạo đơn hàng mới
+                var order = new Order
+                {
+                    UserId = model.UserId,
+                    OrderDate = DateTime.Now,
+                    TotalAmount = model.TotalAmount,
+                    Status = "waiting",
+                    CreatedAt = DateTime.Now
+                };
+
+                _context.Orders.Add(order);
+                await _context.SaveChangesAsync();
+
+                // Thêm chi tiết đơn hàng từ CartProducts
+                foreach (var cartProduct in cart.CartProducts)
+                {
+                    var orderDetail = new OrderDetail
+                    {
+                        OrderId = order.OrderId,
+                        ProductId = cartProduct.Product.ProductId,
+                        Quantity = cartProduct.Quantity,
+                        UnitPrice = cartProduct.Product.Price,
+                        TotalPrice = cartProduct.Quantity * cartProduct.Product.Price
+                    };
+
+                    _context.OrderDetails.Add(orderDetail);
+                }
+
+                await _context.SaveChangesAsync();
+
+                // Xóa giỏ hàng sau khi đặt hàng thành công
+                HttpContext.Session.Remove("Cart");
+
+                return RedirectToAction("Confirmation", new { orderId = order.OrderId });
+            
+
+            return View(model);
+        }
+
+        public async Task<IActionResult> Confirmation(int orderId)
+        {
+            var order = await _context.Orders
+                .Include(o => o.OrderDetails)
+                .ThenInclude(od => od.Product)
+                .Include(o => o.User)  // Bao gồm thông tin người dùng
+                .FirstOrDefaultAsync(o => o.OrderId == orderId);
+
+            if (order == null)
+            {
+                return NotFound();
+            }
+
+            var viewModel = new ConfirmationViewModel
+            {
+                OrderId = order.OrderId,
+                OrderDate = DateTime.Now,
+                TotalAmount = order.TotalAmount,
+                OrderDetails = order.OrderDetails.Select(od => new OrderDetailViewModel
+                {
+                    Product = od.Product,
+                    Quantity = od.Quantity,
+                    UnitPrice = od.UnitPrice,
+                    TotalPrice = od.TotalPrice
+                }).ToList(),
+                User = order.User  // Gán thông tin người dùng
+            };
+
+            return View(viewModel);
+        }
+    }
+}
