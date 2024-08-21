@@ -35,9 +35,14 @@ namespace PhuKienShop.Controllers
 
         public IActionResult Index()
         {
-            var cart = GetCart();
-			return View(cart);
-        }
+			var cart = GetCart();
+			var totalAmount = cart.Amount(_db);
+            var isSale = cart.IsSale(_db);
+            ViewBag.TotalAmount = totalAmount;
+            ViewBag.IsSale = isSale;// Truyền giá trị xuống view
+
+            return View(cart);
+		}
 
         [HttpPost]
         public IActionResult Delete(int productId)
@@ -46,6 +51,22 @@ namespace PhuKienShop.Controllers
             cart.RemoveProduct(productId);
             SaveCart(cart);
             return RedirectToAction("Index");
+        }
+        [HttpPost]
+        public IActionResult UpdateQuantity(int productId, int quantity)
+        {
+            // Lấy giỏ hàng từ session
+            var cart = GetCart();
+
+            // Cập nhật số lượng sản phẩm trong giỏ hàng
+            var cartProduct = cart.CartProducts.FirstOrDefault(p => p.Product.ProductId == productId);
+            if (cartProduct != null)
+            {
+                cartProduct.Quantity = quantity;
+                SaveCart(cart);
+            }
+
+            return Json(new { success = true });
         }
 
         public IActionResult AddToCart(int productId, int quantity)

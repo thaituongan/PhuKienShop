@@ -46,9 +46,9 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td><strong>@string.Format("{0:N0}", cartProduct.Product.Price) VND</strong></td>
+                                <td><strong>@string.Format("{0:N0}", ViewBag.IsSale) VND</strong></td>
                                 <td data-th="Quantity"><b>@cartProduct.Quantity</b></td>
-                                <td><strong>@string.Format("{0:N0}", cartProduct.Product.Price * cartProduct.Quantity) VND</strong></td>
+                                <td><strong>@string.Format("{0:N0}", ViewBag.IsSale * cartProduct.Quantity) VND</strong></td>
                                 <td class="actions" data-th="" style="width:10%;">
                                     <button data-toggle="modal" data-target="#deleteEmployeeModal_@cartProduct.Product.ProductId" class="btn btn-danger btn-sm"><i class="fa fa-trash-o"></i></button>
                                 </td>
@@ -78,8 +78,9 @@
                         <tr>
                             <td><a href="@Url.Action("Index", "Home")" class="btn btn-success"><i class="fa fa-angle-left"></i> Tiếp tục mua sắm</a></td>
                             <td colspan="2" class="hidden-xs"></td>
+
                             <td class="hidden-xs text-center" style="width:10%;">
-                                <strong>Tổng tiền : @string.Format("{0:N0}", Model.Amount()) VND</strong>
+                                <strong>Tổng tiền :@string.Format("{0:N0}", ViewBag.TotalAmount) VND</strong>
                             </td>
                             <td><a href="@Url.Action("Index", "Home")" class="btn btn-success btn-block">Thanh toán <i class="fa fa-angle-right"></i></a></td>
                         </tr>
