@@ -11,7 +11,7 @@
 				@foreach (var item in Model)
 				{
 					<div class="product" >
-					<a asp-controller="Products" asp-action="Details" asp-route-id="@item.Product.ProductId">
+						<a asp-controller="Products" asp-action="Details" asp-route-id="@item.Product.ProductId" asp-route-categoryId="@item.Product.CategoryId">
 						<div class="product-img">
 							<img height="150px" src="@item.Product.ImageUrl" alt="@item.Product.ImageUrl>">
 							<div class="product-label">
@@ -25,19 +25,6 @@
 							<h4 class="product-price">@item.SalePrice.ToString("N0") VND</h4>
 
 							<del class="product-old-price">@item.Product.Price.ToString("N0") VND</del>
-
-							<div class="product-rating">
-								<i class="fa fa-star"></i>
-								<i class="fa fa-star"></i>
-								<i class="fa fa-star"></i>
-								<i class="fa fa-star"></i>
-								<i class="fa fa-star"></i>
-							</div>
-							<div class="product-btns">
-								<button class="add-to-wishlist"><i class="fa fa-heart-o"></i><span class="tooltipp">add to wishlist</span></button>
-								<button class="add-to-compare"><i class="fa fa-exchange"></i><span class="tooltipp">add to compare</span></button>
-								<button class="quick-view"><i class="fa fa-eye"></i><span class="tooltipp">quick view</span></button>
-							</div>
 						</div>
 							<div class="add-to-cart">
 								@if (User.Identity.IsAuthenticated)
@@ -70,5 +57,11 @@
 			<div id="slick-nav-2" class="products-slick-nav"></div>
 		</div>
 		<!-- /tab -->
+
+		<!-- tab2 -->
+		<div id="tab-2" class="tab-pane">
+		San pham
+		</div>
 	</div>
+	
 }

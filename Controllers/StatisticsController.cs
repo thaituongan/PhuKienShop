@@ -36,15 +36,12 @@ namespace PhuKienShop.Controllers
                 .Where(od => od.Order.OrderDate.Value.Month == previousMonth && od.Order.OrderDate.Value.Year == previousYear)
                 .Sum(od => od.Quantity);
 
-            var totalProductsSoldThisMonth = _db.OrderDetails
-                .Where(od => od.Order.OrderDate.Value.Month == currentMonth && od.Order.OrderDate.Value.Year == currentYear)
-                .Sum(od => od.Quantity);
-
             var viewModel = new StatisticsModel
             {
                 TotalOrders = _db.Orders.Count(),
                 TotalRevenue = _db.Orders.Sum(o => o.TotalAmount),
                 TotalCustomers = _db.Users.Count(),
+                TotalProduct = _db.Products.Count(),
                 TotalOrdersThisMonth = _db.Orders
                     .Where(o => o.OrderDate.Value.Month == currentMonth && o.OrderDate.Value.Year == currentYear)
                     .Count(),
@@ -54,10 +51,13 @@ namespace PhuKienShop.Controllers
                 TotalCustomersThisMonth = _db.Users
                     .Where(c => c.CreatedAt.Value.Month == currentMonth && c.CreatedAt.Value.Year == currentYear)
                     .Count(),
+                TotalProductThisMonth = _db.OrderDetails
+                .Where(od => od.Order.OrderDate.Value.Month == currentMonth && od.Order.OrderDate.Value.Year == currentYear)
+                .Sum(od => od.Quantity),
                 OrderChangePercentage = totalOrdersLastMonth == 0 ? 100 : ((double)(_db.Orders.Count() - totalOrdersLastMonth) / totalOrdersLastMonth) * 100,
                 CustomerChangePercentage = totalCustomersLastMonth == 0 ? 100 : ((double)(_db.Users.Count() - totalCustomersLastMonth) / totalCustomersLastMonth) * 100,
                 RevenueChangePercentage = totalRevenueLastMonth == 0 ? 100 : ((double)(_db.Orders.Sum(o => o.TotalAmount) - totalRevenueLastMonth) / (double)totalRevenueLastMonth) * 100,
-                ProductSoldChangePercentage = totalProductsSoldLastMonth == 0 ? 100 : ((double)(totalProductsSoldThisMonth - totalProductsSoldLastMonth) / totalProductsSoldLastMonth) * 100
+                ProductSoldChangePercentage = totalProductsSoldLastMonth == 0 ? 100 : ((double)(_db.Products.Count() - totalProductsSoldLastMonth) / totalProductsSoldLastMonth) * 100
             };
             return View(viewModel);
         }

@@ -3,15 +3,18 @@
 *@
 @model IEnumerable<PhuKienShop.Data.Category>
 @{
+	//bắt đầu từ tab2
+	int tabCounter = 2;
+	<div class="section-nav">
+		<ul class="section-tab-nav tab-nav">
+			<li class="active"><a data-toggle="tab" href="#tab1">Tất cả</a></li>
+			@foreach (var item in Model)
+			{
+				<li><a data-toggle="tab" href="#tab-@tabCounter">@item.CategoryName</a></li>
+				tabCounter++; //tăng biến đếm
+			}
+		</ul>
+	</div>
 
-			<div class="section-nav">
-				<ul class="section-tab-nav tab-nav">
-					<li class="active"><a data-toggle="tab" href="#tab1">Tất cả</a></li>
-					@foreach (var item in Model)
-					{
-						<li><a data-toggle="tab" href="#tab1">@item.CategoryName</a></li>
-					}
-				</ul>
-			</div>
 
 }

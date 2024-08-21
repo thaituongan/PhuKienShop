@@ -17,7 +17,7 @@
            
             <th>  
                     <a asp-action="Create">
-                        <i class="fa-solid fa-circle-plus"></i> Thêm
+                    <i class="fa-solid fa-circle-plus"></i> <span class="p-3">Thêm</span>
                     </a>
             </th>
         </tr>
@@ -26,13 +26,13 @@
         @foreach (var item in Model)
         {
             <tr>
-                <td>@item.Product.ProductName)</td>
+                <td>@item.Product.ProductName</td>
                 <td>@item.OriginalPrice.ToString("N0")</td>
-                <td>@item.DiscountPercentage.ToString("N0") %</td>
+                <td>@item.DiscountPercentage.ToString("N0")%</td>
                 <td>@item.SalePrice.ToString("N0")</td>
                 <td>@item.StartDate</td>
-                <td>@item.EndDate)</td>
-                <td>@item.UpdatedAt)</td>
+                <td>@item.EndDate</td>
+                <td>@item.UpdatedAt</td>
                 
                 <td>
                     <a asp-action="Edit" asp-route-id="@item.SaleId" class="btn btn-warning btn-sm">
