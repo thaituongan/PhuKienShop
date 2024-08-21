@@ -21,22 +21,22 @@ public class CartModel
 
 		return totalAmount;
 	}
-    public decimal IsSale(PkShopContext _db)
+    public decimal IsSale(PkShopContext _db, int productId)
     {
-        decimal priceToUse = 0;
+        var cartProduct = CartProducts.FirstOrDefault(cp => cp.Product.ProductId == productId);
 
-        foreach (var cartProduct in CartProducts)
+        if (cartProduct == null)
         {
-            var product = cartProduct.Product;
-            var sale = _db.ProductSales
-                .FirstOrDefault(ps => ps.ProductId == product.ProductId &&
-                                      ps.StartDate <= DateTime.Now &&
-                                      ps.EndDate >= DateTime.Now);
-
-            priceToUse = sale != null ? sale.SalePrice : product.Price;
+            throw new ArgumentException("Product not found in cart.");
         }
 
-        return priceToUse;
+        var product = cartProduct.Product;
+        var sale = _db.ProductSales
+            .FirstOrDefault(ps => ps.ProductId == product.ProductId &&
+                                  ps.StartDate <= DateTime.Now &&
+                                  ps.EndDate >= DateTime.Now);
+
+        return sale != null ? sale.SalePrice : product.Price;
     }
 
     public void RemoveProduct(int productId)

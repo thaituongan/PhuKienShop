@@ -41,7 +41,7 @@ namespace PhuKienShop.Controllers
                 TotalOrders = _db.Orders.Count(),
                 TotalRevenue = _db.Orders.Sum(o => o.TotalAmount),
                 TotalCustomers = _db.Users.Count(),
-                TotalProduct = _db.Products.Count(),
+                TotalProduct = _db.OrderDetails.Sum(o => o.Quantity),
                 TotalOrdersThisMonth = _db.Orders
                     .Where(o => o.OrderDate.Value.Month == currentMonth && o.OrderDate.Value.Year == currentYear)
                     .Count(),

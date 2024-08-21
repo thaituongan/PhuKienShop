@@ -1,64 +1,128 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration.UserSecrets;
 using Microsoft.IdentityModel.Tokens;
+using NuGet.Packaging.Signing;
 using PhuKienShop.Data;
 using PhuKienShop.Models;
+using PhuKienShop.Services;
 namespace PhuKienShop.Controllers
 {
-	public class ProductsController : Controller
+	public class AdminProductsController : Controller
 	{
 		private readonly PkShopContext _context;
+		private readonly ICategoryService _categoryService;
 
-		public ProductsController(PkShopContext context)
+		public AdminProductsController(PkShopContext context, ICategoryService categoryService)
 		{
 			_context = context;
-		}
+			_categoryService = categoryService;
 
-		public IActionResult DetailsPage(int id, int page = 1)
+        }
+
+		//them san pham
+        public async Task<Product> InsertProductAsync(Product product)
+        {
+            _context.Products.Add(product);
+            await _context.SaveChangesAsync();
+            return product;
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> addProduct(string name, string price, string quantity, string category, string branch, string img)
+        {
+			double nprice = Double.Parse(price);
+			quantity = quantity ?? "0";
+			int nqty = int.Parse(quantity);
+			category = category ?? "1";
+			int ncate = int.Parse(category);
+			Console.WriteLine("thong tin product");
+			Console.WriteLine(name);
+			Console.WriteLine(price);
+			Console.WriteLine(quantity);
+			Console.WriteLine(category);
+			Console.WriteLine(branch);
+			Console.WriteLine(img);
+			Product product = new Product(name, nprice, nqty, ncate, branch,img);
+			product = await InsertProductAsync(product);
+            return PartialView("_AdminProductRowUpdate", product);
+
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> prepareUpdate(string id)
 		{
-			var product = _context.Products
-				.Include(p => p.Reviews)
-				.FirstOrDefault(p => p.ProductId == id);
+            if (id == null) id = "0";
+            int idin = int.Parse(id);
+            var product = await _context.Products.FindAsync(idin) ?? new Product();
+            var categories = await _categoryService.SelectAllAsync()?? new List<Category>();
+            AdminProductViewModel adminProductViewModel = new AdminProductViewModel(product, categories);
+            return PartialView("_AdminProductEdit", adminProductViewModel);
+        }
 
-			if (product == null)
-			{
-				return NotFound();
-			}
 
-			var pageSize = 2; // số bình luận mỗi trang
-			var reviews = product.Reviews
-				.OrderByDescending(r => r.CreatedAt)
-				.Skip((page - 1) * pageSize)
-				.Take(pageSize)
-				.ToList();
+		[HttpPost]
+		public async Task<IActionResult> updateProduct(string id, string name, string price, string quantity, string category, string branch, string img, string des)
+        {
+            if (id == null) id = "0";
+			int idin = int.Parse(id);
+            double nprice = Double.Parse(price);
+            quantity = quantity ?? "0";
+            int nqty = int.Parse(quantity);
+            category = category ?? "1";
+            int ncate = int.Parse(category);
+            Product product = new Product(idin,name, nprice, nqty, ncate, branch, img,des);
+            var existingProduct = await _context.Products.FindAsync(product.ProductId);
+            if (existingProduct == null)
+            {
+                return NotFound();
+            }
+            existingProduct.ProductName = product.ProductName;
+            existingProduct.Price = product.Price;
+            existingProduct.StockQuantity = product.StockQuantity;
+            existingProduct.CategoryId = product.CategoryId;
+            existingProduct.Branch = product.Branch;
+            existingProduct.ImageUrl = product.ImageUrl;
+            existingProduct.Description = product.Description;
+            await _context.SaveChangesAsync();
+            return PartialView("_AdminProductRowUpdate", existingProduct);
+           
+        }
 
-			var totalReviews = product.Reviews.Count();
-			var totalPages = (int)Math.Ceiling(totalReviews / (double)pageSize);
+        public async Task<IActionResult> deleteProductById(string id)
+        {
+			if (id == null) id = "0";
+			int idin = int.Parse(id);
+            var product = _context.Products.Find(idin);
+			product.StockQuantity = -1;
+            _context.SaveChanges();
 
-			var model = new ProductDetailModel
-			{
-				CurrentProduct = product,
-				Reviews = reviews,
-				TotalPages = totalPages,
-				CurrentPage = page
-			};
+            var products = await _context.Products
+                    .Include(p => p.Category)
+                     .Where(p => p.StockQuantity >= 0)
+                    .ToListAsync();
 
-			return View(model);
-		}
+            AdminProductViewModel adminProductViewModel = new AdminProductViewModel(products);
+            return PartialView("_AdminProductTableUpdate",adminProductViewModel);
 
-		// GET: Products
-		public async Task<IActionResult> Index()
+        }
+
+        // GET: Products
+        public async Task<IActionResult> Index()
 		{
-			var pkShopContext = _context.Products.Include(p => p.Category);
-			return View(await pkShopContext.ToListAsync());
-		}
+            var products = await _context.Products
+                             .Include(p => p.Category)
+                             .ToListAsync();
+
+            var categories = await _categoryService.SelectAllAsync();
+			AdminProductViewModel adminProductViewModel = new AdminProductViewModel(products, categories);
+            return View(adminProductViewModel);
+
+        }
         public async Task<List<Product>> SelectByIDsAsync(List<int> ids)
         {
             return await _context.Products
@@ -68,75 +132,37 @@ namespace PhuKienShop.Controllers
         }
 
 		// GET: Products/Details/5
-		public async Task<IActionResult> Details(int? id, int categoryId, int page = 1)
+		public async Task<IActionResult> Details(int? id, int categoryId)
 		{
 			if (id == null)
 			{
 				return NotFound();
 			}
-
-			// Lấy sản phẩm được chọn
+			//lấy ra sản phẩm được chọn
 			var product = await _context.Products
 				.Include(p => p.Category)
-				.Include(p => p.ProductSales)
-				.Include(p => p.Reviews)
-				.ThenInclude(r => r.User)
+				.Include(p => p.ProductSales) // Thêm dòng này để nạp đầy đủ dữ liệu ProductSales
 				.FirstOrDefaultAsync(m => m.ProductId == id);
 
 			if (product == null)
 			{
 				return NotFound();
 			}
-
-			// Lấy sản phẩm liên quan
-			var relatedProducts = _context.Products
+			//lấy ra sản phấm liên quan đến sản phẩm đó
+			var relatedProduct = _context.Products
 				.Include(p => p.Category)
 				.Include(p => p.ProductSales)
+				//lay cac san pham cung category ngoai tru san pham hien tai
 				.Where(p => p.CategoryId == categoryId && p.ProductId != id)
 				.Take(4)
 				.ToList();
 
-			// Xử lý phân trang cho bình luận
-			var pageSize = 2; // số bình luận mỗi trang
-			var reviews = product.Reviews
-				.OrderByDescending(r => r.CreatedAt)
-				.Skip((page - 1) * pageSize)
-				.Take(pageSize)
-				.ToList();
-
-			var totalReviews = product.Reviews.Count();
-			var totalPages = (int)Math.Ceiling(totalReviews / (double)pageSize);
-
-			// Tính toán các chỉ số đánh giá
-			int fiveStar = product.Reviews.Count(r => r.Rating == 5);
-			int fourStar = product.Reviews.Count(r => r.Rating == 4);
-			int threeStar = product.Reviews.Count(r => r.Rating == 3);
-			int twoStar = product.Reviews.Count(r => r.Rating == 2);
-			int oneStar = product.Reviews.Count(r => r.Rating == 1);
-
-			double fiveStarPercentage = totalReviews > 0 ? (double)fiveStar / totalReviews * 100 : 0;
-			double fourStarPercentage = totalReviews > 0 ? (double)fourStar / totalReviews * 100 : 0;
-			double threeStarPercentage = totalReviews > 0 ? (double)threeStar / totalReviews * 100 : 0;
-			double twoStarPercentage = totalReviews > 0 ? (double)twoStar / totalReviews * 100 : 0;
-			double oneStarPercentage = totalReviews > 0 ? (double)oneStar / totalReviews * 100 : 0;
-
-			double averageRating = product.Reviews.Any() ? product.Reviews.Average(r => r.Rating) : 0;
-
+			//truyen vao ProductDetailModel
 			var viewModel = new ProductDetailModel
 			{
 				CurrentProduct = product,
-				RelatedProducts = relatedProducts,
-				Reviews = reviews,
-				AverageRating = averageRating,
-				FiveStarPercentage = fiveStarPercentage,
-				FourStarPercentage = fourStarPercentage,
-				ThreeStarPercentage = threeStarPercentage,
-				TwoStarPercentage = twoStarPercentage,
-				OneStarPercentage = oneStarPercentage,
-				TotalPages = totalPages,
-				CurrentPage = page
+				RelatedProducts = relatedProduct
 			};
-
 			return View(viewModel);
 		}
 
@@ -276,32 +302,6 @@ namespace PhuKienShop.Controllers
 		private bool ProductExists(int id)
 		{
 			return _context.Products.Any(e => e.ProductId == id);
-		}
-		[HttpPost]
-		public async Task<IActionResult> AddReview(int productId, string comment, int rating)
-		{
-			if (User.Identity.IsAuthenticated)
-			{
-				var email = User.FindFirst(ClaimTypes.Email)?.Value;
-				var userDetails = _context.Users.FirstOrDefault(u => u.Email == email);
-				int userId = userDetails.UserId;
-
-				var review = new Review
-				{
-					ProductId = productId,
-					UserId = userId,
-					Rating = rating,
-					Comment = comment,
-					CreatedAt = DateTime.UtcNow
-				};
-
-				_context.Reviews.Add(review);
-				await _context.SaveChangesAsync();
-
-				return RedirectToAction("Details", new { id = productId });
-			}
-
-			return RedirectToAction("Login", "Account");
 		}
 	}
 }

@@ -4,9 +4,8 @@ using PhuKienShop.Data; // Đảm bảo bạn sử dụng namespace chính xác
 
 namespace PhuKienShop.Services
 {
-    public interface IOrderDetailService
+    public interface ICategoryService
     {
-        Task<List<OrderDetail>> SelectByOrdersAsync(List<int> oids);
-        Task<List<OrderDetail>> SelectByOrderIDAsync(int id);
+        Task<List<Category>> SelectAllAsync();
     }
 }

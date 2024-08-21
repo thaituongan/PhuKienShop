@@ -1,13 +1,21 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Data;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Azure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.Web.CodeGeneration;
+using NuGet.Packaging.Signing;
 using PhuKienShop.Data;
 using PhuKienShop.Models;
 using PhuKienShop.Services;
+using static NuGet.Packaging.PackagingConstants;
 
 namespace PhuKienShop.Controllers
 {
@@ -33,79 +41,14 @@ namespace PhuKienShop.Controllers
         // GET: Orders
         public async Task<IActionResult> Index()
         {
-            var pkShopContext = _context.Orders.Include(o => o.User);
-            List<int> oids = new List<int>();
-            foreach(var i in pkShopContext)
-            {
-                oids.Add(i.OrderId);
-            }
+            var orders = await _context.Orders
+                .OrderByDescending(o => o.OrderDate) // Sắp xếp theo thứ tự giảm dần của OrderDate (từ mới nhất đến cũ nhất)
+                .ToListAsync();
 
-            var orderDetails = await _orderDetailService.SelectByOrdersAsync(oids);
-            List<int> pids = new List<int>();
-            foreach (var orderDetail in orderDetails)
-            {
-                if (orderDetail.ProductId.HasValue)
-                {
-                    if(!pids.Contains(orderDetail.ProductId.Value))
-                        pids.Add(orderDetail.ProductId.Value);
-                }
-            }
-
-            var products = await _productService.SelectByIDsAsync(pids);
-            Dictionary<int, string> productInfo = new Dictionary<int, string>();
-            foreach (var p in products)
-            {
-                productInfo.Add(p.ProductId, p.ProductName);
-            }
-
-            Dictionary<Order, string> orders = new Dictionary<Order, string>();
-            foreach(var o in pkShopContext)
-            {
-                orders.Add(o, "");
-            }
-
-            string detail = "";
-            string name = "";
-            Order temp;
-            Console.WriteLine("bat dau lay detail");
-            foreach (var de in orderDetails)
-            {
-                int pid = de.ProductId.GetValueOrDefault(); // Sẽ trả về giá trị 0 nếu ProductId là null
-                name = productInfo[pid];
-                detail = de.Quantity + " x " + name;
-                Console.WriteLine(detail);
-
-                int oid = de.OrderId.GetValueOrDefault();
-                Console.WriteLine($"oid: {oid}");
-                temp = new Order(oid);
-                Console.WriteLine($"order temp id: {temp.OrderId}");
-                if (orders.ContainsKey(temp))
-                {
-                    Console.WriteLine($"if true");
-                    string newDatail = orders[temp] + " <br> " + detail;
-                    orders[temp]= newDatail;
-                    Console.WriteLine($"new detail: {detail}");
-
-                }
-                else
-                {
-                    Console.WriteLine($"if false");
-                    orders.Add(temp, detail);
-                }
-            }
-            Console.WriteLine($"duyet qua dictionary");
-         
-            foreach (KeyValuePair<Order, string> item in orders)
-            {
-                Console.WriteLine(item.Key.OrderId + "\t"+ item.Key.OrderId + "\t" + item.Value);
-            }
-            Console.WriteLine($"ket thuc duyet");
-
-            var orderViewModels = pkShopContext
+            var orderViewModels = orders
                   .Select(o => new OrderViewModel
                   {
-                      Order = o,
-                      Details = orders.ContainsKey(o) ? orders[o] : string.Empty
+                      Order = o
                   })
                   .ToList();
 
@@ -249,5 +192,367 @@ namespace PhuKienShop.Controllers
         {
             return _context.Orders.Any(e => e.OrderId == id);
         }
+
+        // lay trang thai order
+        public async Task<string> GetOrderStatusById(int orderId)
+        {
+            var order = await _context.Orders.FindAsync(orderId);
+
+            if (order != null)
+            {
+                return order.Status;
+            }
+
+            return null;
+        }
+        
+        public async Task<Order> GetOrderById(int orderId)
+        {
+            var order = await _context.Orders.FindAsync(orderId);
+            if (order != null) return order;
+            else return null;
+        }
+
+        public async Task<int> UpdateStatus(int? id, string action)
+        {
+            if (id == null)
+            {
+                return 0;
+            }
+
+            var order = await _context.Orders.FindAsync(id);
+            if (order == null)
+            {
+                return 0;
+            }
+
+            action = action.ToUpper() + "ED";
+            order.Status = action;
+            DateTime time = DateTime.Now;
+            order.CreatedAt = time;
+
+            _context.Orders.Update(order);
+            int rowsAffected = await _context.SaveChangesAsync();
+
+            return rowsAffected;
+        }
+
+        public async Task<Dictionary<Order,string>> selectFullOrderByID(int id)
+        {
+            var order = await _context.Orders.FindAsync(id);
+            List<int> oids = new List<int>();
+            order = order ?? new Order(0);
+            oids.Add(order.OrderId);
+            
+
+            var orderDetails = await _orderDetailService.SelectByOrdersAsync(oids);
+            List<int> pids = new List<int>();
+            foreach (var orderDetail in orderDetails)
+            {
+                if (orderDetail.ProductId.HasValue)
+                {
+                    if (!pids.Contains(orderDetail.ProductId.Value))
+                        pids.Add(orderDetail.ProductId.Value);
+                }
+            }
+
+            var products = await _productService.SelectByIDsAsync(pids);
+            Dictionary<int, string> productInfo = new Dictionary<int, string>();
+            foreach (var p in products)
+            {
+                productInfo.Add(p.ProductId, p.ProductName);
+            }
+
+            Dictionary<Order, string> orders = new Dictionary<Order, string>();
+            orders.Add(order, "");
+            
+
+            string detail = "";
+            string name = "";
+            Order temp;
+            foreach (var de in orderDetails)
+            {
+                int pid = de.ProductId.GetValueOrDefault(); // Sẽ trả về giá trị 0 nếu ProductId là null
+                name = productInfo[pid];
+                detail = de.Quantity + " x " + name;
+
+                int oid = de.OrderId.GetValueOrDefault();
+                temp = new Order(oid);
+                if (orders.ContainsKey(temp))
+                {
+                    string newDatail = orders[temp] + " <br> " + detail;
+                    orders[temp] = newDatail;
+
+                }
+                else
+                {
+                    orders.Add(temp, detail);
+                }
+            }
+            return orders;
+
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> updateOrder(string id, string action)
+        {
+           
+            Console.WriteLine($"id: {id}");
+            Console.WriteLine($"action: {action}");
+            Console.WriteLine("goi update");
+
+            int orderId = int.Parse(id);
+            var order = await _context.Orders.FindAsync(orderId);
+
+            if (action == null)
+            {
+                Console.WriteLine("cap nhat that bai do sai action");
+                OrderViewModel failed = new OrderViewModel(orderId, $"Thất bại. Hành động không hợp lệ.");
+                return PartialView("_OrderUpdateFailed", failed);
+            }
+            if (order != null)
+            {
+               action = action.ToUpper();
+               switch(action)
+                {
+                    case "CONFIRM":
+                        {
+                            string currentStatus = await GetOrderStatusById(orderId);
+                            currentStatus = currentStatus ?? "";
+                            currentStatus = currentStatus.ToUpper();    
+                            //kiem tra cac trang thai co the thuc hien action
+                            if ("WAITING".Equals(currentStatus))
+                            {
+                                int re = await UpdateStatus(orderId, action);
+
+                                if(re>0) { //cap nhat thanh cong
+                                var orderDetails = await selectFullOrderByID(orderId);
+                                var firstOrderDetail = orderDetails.FirstOrDefault();
+                                OrderViewModel success = new OrderViewModel(firstOrderDetail.Key, firstOrderDetail.Value);
+                                    return PartialView("_OrderRowUpdate", success);
+                                } else //cap nhat that bai 
+                                {
+                                    Console.WriteLine("cap nhat that bai ko ro lyu do");
+                                    OrderViewModel failed = new OrderViewModel(orderId, $"Thất bại. Có lỗi truy vấn dữ liệu.");
+                                    return PartialView("_OrderUpdateFailed", failed);
+                                }
+                            }
+                            else //action khong phu hop
+                            {
+                                OrderViewModel failed = new OrderViewModel(orderId, $"Thất bại. Trạng thái đơn hàng {Order.tranlateOrderStatus(currentStatus)}");
+                                return PartialView("_OrderUpdateFailed", failed);
+                            }
+                            break;
+                        }
+                    case "PACKAGE":
+                        {
+                            List<string> statusCanUpdate = new List<string>();
+                            statusCanUpdate.Add("WAITING");
+                            statusCanUpdate.Add("CONFIRMED");
+                            string currentStatus = await GetOrderStatusById(orderId);
+                            currentStatus = currentStatus ?? "";
+                            currentStatus = currentStatus.ToUpper();
+                            //kiem tra cac trang thai co the thuc hien action
+                            if (statusCanUpdate.Contains(currentStatus))
+                            {
+                                int re = await UpdateStatus(orderId, action);
+
+                                if (re > 0)
+                                {
+                                    var orderDetails = await selectFullOrderByID(orderId);
+                                    var firstOrderDetail = orderDetails.FirstOrDefault();
+                                    OrderViewModel success = new OrderViewModel(firstOrderDetail.Key, firstOrderDetail.Value);
+                                    // Trả về partial view dưới dạng HTML
+                                    Console.WriteLine("cap nhat thanh cong");
+                                    return PartialView("_OrderRowUpdate", success);
+                                }
+                                else
+                                {
+                                    OrderViewModel failed = new OrderViewModel(orderId, $"Thất bại. Có lỗi truy vấn dữ liệu.");
+                                    return PartialView("_OrderUpdateFailed", failed);
+                                }
+                            }
+                            else
+                            {
+                                Console.WriteLine("cap nhat that bai do sai action");
+                                OrderViewModel failed = new OrderViewModel(orderId, $"Thất bại. Trạng thái đơn hàng {Order.tranlateOrderStatus(currentStatus)}");
+                                // Trả về partial view dưới dạng HTML
+                                return PartialView("_OrderUpdateFailed", failed);
+                            }
+                            break;
+                        }
+                    case "DELIVERY":
+                        {
+                            List<string> statusCanUpdate = new List<string>();
+                            statusCanUpdate.Add("WAITING");
+                            statusCanUpdate.Add("CONFIRMED");
+                            statusCanUpdate.Add("PACKAGEED");
+                            string currentStatus = await GetOrderStatusById(orderId);
+                            currentStatus = currentStatus ?? "";
+                            currentStatus = currentStatus.ToUpper();
+                            //kiem tra cac trang thai co the thuc hien action
+                            if (statusCanUpdate.Contains(currentStatus))
+                            {
+                                int re = await UpdateStatus(orderId, action);
+
+                                if (re > 0)
+                                {
+                                    var orderDetails = await selectFullOrderByID(orderId);
+                                    var firstOrderDetail = orderDetails.FirstOrDefault();
+                                    OrderViewModel success = new OrderViewModel(firstOrderDetail.Key, firstOrderDetail.Value);
+                                    // Trả về partial view dưới dạng HTML
+                                    return PartialView("_OrderRowUpdate", success);
+                                }
+                                else
+                                {
+                                    OrderViewModel failed = new OrderViewModel(orderId, $"Thất bại. Có lỗi truy vấn dữ liệu.");
+                                    return PartialView("_OrderUpdateFailed", failed);
+
+                                }
+                            }
+                            else
+                            {
+                                OrderViewModel failed = new OrderViewModel(orderId, $"Thất bại. Trạng thái đơn hàng {Order.tranlateOrderStatus(currentStatus)}");
+                                // Trả về partial view dưới dạng HTML
+                                return PartialView("_OrderUpdateFailed", failed);
+                            }
+                            break;
+                        }
+                    case "COMPLETE":
+                        {
+                            List<string> statusCanUpdate = new List<string>();
+                            statusCanUpdate.Add("WAITING");
+                            statusCanUpdate.Add("CONFIRMED");
+                            statusCanUpdate.Add("PACKAGEED");
+                            statusCanUpdate.Add("DELIVERYED");
+                            string currentStatus = await GetOrderStatusById(orderId);
+                            currentStatus = currentStatus ?? "";
+                            currentStatus = currentStatus.ToUpper();
+                            //kiem tra cac trang thai co the thuc hien action
+                            if (statusCanUpdate.Contains(currentStatus))
+                            {
+                                int re = await UpdateStatus(orderId, action);
+
+                                if (re > 0)
+                                {
+                                    var orderDetails = await selectFullOrderByID(orderId);
+                                    var firstOrderDetail = orderDetails.FirstOrDefault();
+                                    OrderViewModel success = new OrderViewModel(firstOrderDetail.Key, firstOrderDetail.Value);
+                                    // Trả về partial view dưới dạng HTML
+                                    return PartialView("_OrderRowUpdate", success);
+                                }
+                                else
+                                {
+                                    Console.WriteLine("cap nhat that bai ko ro lyu do");
+                                    OrderViewModel failed = new OrderViewModel(orderId, $"Thất bại. Có lỗi truy vấn dữ liệu.");
+                                    return PartialView("_OrderUpdateFailed", failed);
+
+                                }
+                            }
+                            else
+                            {
+                                Console.WriteLine("cap nhat that bai do sai action");
+                                OrderViewModel failed = new OrderViewModel(orderId, $"Thất bại. Trạng thái đơn hàng {Order.tranlateOrderStatus(currentStatus)}");
+                                // Trả về partial view dưới dạng HTML
+                                return PartialView("_OrderUpdateFailed", failed);
+                            }
+                            break;
+                        }
+                    case "CANCEL":
+                        {
+                            List<string> statusCanUpdate = new List<string>();
+                            statusCanUpdate.Add("WAITING");
+                            statusCanUpdate.Add("CONFIRMED");
+                            statusCanUpdate.Add("PACKAGEED");
+                            string currentStatus = await GetOrderStatusById(orderId);
+                            currentStatus = currentStatus ?? "";
+                            currentStatus = currentStatus.ToUpper();
+                            //kiem tra cac trang thai co the thuc hien action
+                            if (statusCanUpdate.Contains(currentStatus))
+                            {
+                                int re = await UpdateStatus(orderId, action);
+
+                                if (re > 0)
+                                {
+                                    var orderDetails = await selectFullOrderByID(orderId);
+                                    var firstOrderDetail = orderDetails.FirstOrDefault();
+                                    OrderViewModel success = new OrderViewModel(firstOrderDetail.Key, firstOrderDetail.Value);
+                                    // Trả về partial view dưới dạng HTML
+                                    return PartialView("_OrderRowUpdate", success);
+                                }
+                                else
+                                {
+                                    OrderViewModel failed = new OrderViewModel(orderId, $"Thất bại. Có lỗi truy vấn dữ liệu.");
+                                    return PartialView("_OrderUpdateFailed", failed);
+
+                                }
+                            }
+                            else
+                            {
+                                Console.WriteLine("cap nhat that bai do sai action");
+                                OrderViewModel failed = new OrderViewModel(orderId, $"Thất bại. Trạng thái đơn hàng {Order.tranlateOrderStatus(currentStatus)}");
+                                // Trả về partial view dưới dạng HTML
+                                return PartialView("_OrderUpdateFailed", failed);
+                            }
+                            break;
+                        }
+                    default:
+                        {
+                            OrderViewModel failed = new OrderViewModel(orderId, $"Thất bại. Hành động không hợp lệ.");
+                            return PartialView("_OrderUpdateFailed", failed);
+                        }
+                }
+            } 
+            else
+            {
+                OrderViewModel notfound = new OrderViewModel(orderId, $"Thất bại. Không tìm thấy đơn hàng {orderId}");
+                return PartialView("_OrderUpdateFailed", notfound);
+            }
+
+       
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> orderDetail(string idin)
+        {
+            int id = int.Parse(idin);
+            Dictionary<Order, string> orderDetails = await selectFullOrderByID(id);
+            var firstOrderDetail = orderDetails.FirstOrDefault();
+            OrderViewModel re = new OrderViewModel(firstOrderDetail.Key, firstOrderDetail.Value);
+            return PartialView("_OrderDetail", re);
+
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> searchOrder(string idin)
+        {
+            if(idin==null)
+            {
+                var orders = await _context.Orders
+                 .OrderByDescending(o => o.OrderDate) // Sắp xếp theo thứ tự giảm dần của OrderDate (từ mới nhất đến cũ nhất)
+                 .ToListAsync();
+
+                var orderViewModels = orders
+                      .Select(o => new OrderViewModel
+                      {
+                          Order = o
+                      })
+                      .ToList();
+
+                return View(orderViewModels);
+
+            }
+            else
+            {
+                int id = int.Parse(idin);
+                Order order = await GetOrderById(id);
+                OrderViewModel re = new OrderViewModel(order);
+                return PartialView("_OrderRow", re);
+            }
+           
+
+        }
     }
+
+    
 }

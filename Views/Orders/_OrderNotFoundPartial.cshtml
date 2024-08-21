@@ -1,0 +1,19 @@
+﻿@model PhuKienShop.Models.OrderViewModel
+
+<script>
+    // Đoạn JS này sẽ được thực thi khi partial view được thêm vào DOM
+    $(document).ready(function () {
+
+        var trElement = document.querySelector('.modal-row');
+
+        var cardContent = trElement.parentNode.parentNode.parentNode;
+
+        var toastContainer = cardContent.querySelector('.toastt-container');
+        var toast = toastContainer.querySelector('#toast-2');
+
+        console.log("toast thanh cong");
+
+        showErrorToast2ByElement(toast, 'Không tìm thấy đơn hàng đơn hàng @Model.Order.OrderId!');
+
+    });
+</script>

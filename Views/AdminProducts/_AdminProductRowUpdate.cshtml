@@ -1,0 +1,20 @@
+﻿@model PhuKienShop.Data.Product
+
+<tr>
+    <td>@Model.ProductId</td>
+    <td>@Model.ProductName</td>
+    <td>@Model.Price</td>
+    <td>@Model.CategoryId</td>
+    <td>@Model.StockQuantity</td>
+    <td>@Model.Branch</td>
+    <td><img style="width: 70px; height: 70px" src="@Model.ImageUrl" alt=""></td>
+    <td>
+            <i class="material-icons" onclick="callUpdateBox(@Model.ProductId)" title="Edit">&#xE254;</i>
+
+        
+        
+    </td>
+</tr>
+<script>
+    showSuccessToast('Thêm sản phẩm thành công');
+</script>
