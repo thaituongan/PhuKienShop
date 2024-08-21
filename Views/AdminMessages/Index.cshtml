@@ -31,6 +31,7 @@
         <div class="col-md-8">
             @if (Model.SelectedUser != null)
             {
+               
                 <h4>Chat with @Model.SelectedUser.Username</h4>
 
                 <div class="chat-history" style="border: 1px solid #ccc; padding: 10px; height: 400px; overflow-y: auto;">
@@ -95,7 +96,7 @@
         $(document).ready(function () {
             // Function to fetch messages
             function fetchMessages() {
-                <p>@Model.SelectedUser.Username</p>
+               // <p>@@Model.SelectedUser.Username</p>
             }
 
             var userId = '@Model.SelectedUser?.UserId';
@@ -116,12 +117,11 @@
         }
 
             // Set an interval to fetch messages every second
-            setInterval(fetchMessages, 1000);
+            //setInterval(fetchMessages, 1000);
 
         // Submit the message form via AJAX
         $("#chat-form").submit(function (e) {
             e.preventDefault();
-
             $.ajax({
                 url: $(this).attr('action'),
                 type: 'POST',

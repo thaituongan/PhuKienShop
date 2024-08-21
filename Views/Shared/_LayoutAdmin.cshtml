@@ -48,7 +48,7 @@
         <!-- nav right -->
         <ul class="navbar-nav nav-right" style="display: flex; align-items: center;">
             <li class="nav-item">
-                <div class="avt dropdown">
+                <div class="avt dropdown" >
                     <a> @User.Identity.Name</a>
                 </div>
             </li>
@@ -58,11 +58,9 @@
                     <a href="@Url.Action("Index", "AdminMessages")">
                         <i class="fa-solid fa-message p-3"></i>
                     </a>
-
-                   
                     <ul id="user-menu" class="dropdown-menu" style="position:absolute;left:-140px; max-width:200px;">
                         <li class="dropdown-menu-item">
-                            <a href="logout" class="dropdown-menu-link">
+                            <a href="@Url.Action("Logout", "Account")" class="dropdown-menu-link">
                                 <div>
                                     <i class="fas fa-sign-out-alt"></i>
                                 </div>
@@ -137,8 +135,22 @@
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
     <!-- Render script sections -->
-    @RenderSection("Scripts", required: false);
+   
+    <script>
+        $(document).ready(function () {
+            // Toggle the dropdown menu when the avatar or icon is clicked
+            $('.avt.dropdown').on('click', function (event) {
+                event.stopPropagation(); // Prevent the click event from bubbling up
+                $(this).find('#user-menu').toggle(); // Toggle the visibility of the dropdown menu
+            });
 
+            // Close the dropdown menu if clicked outside
+            $(document).on('click', function () {
+                $('#user-menu').hide(); // Hide the dropdown menu
+            });
+        });
+    </script>
+    @RenderSection("Scripts", required: false);
     <!-- end import script -->
 </body>
 </html>
