@@ -2,53 +2,118 @@
 
 @{
     ViewData["Title"] = "Thêm Sản Phẩm Khuyến Mãi";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
 }
 
-<h2>@ViewData["Title"]</h2>
+<div class="container" style="width: 100%">
+    <div class="row justify-content-center">
+        <div class="col-md-11">
+            <div class="card shadow-sm">
 
-<div class="row">
-    <div class="col-md-6">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
-            <div class="form-group">
-                <label asp-for="ProductId" class="control-label">Chọn Sản Phẩm</label>
-                <select asp-for="ProductId" class="form-control" asp-items="ViewBag.ProductId"></select>
-                <span asp-validation-for="ProductId" class="text-danger"></span>
-            </div>
+                <div class="card-body">
+                    <form asp-action="Create">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
 
-            <div class="form-group">
-                <label asp-for="DiscountPercentage" class="control-label">Phần trăm giảm giá</label>
-                <input asp-for="DiscountPercentage" class="form-control" />
-                <span asp-validation-for="DiscountPercentage" class="text-danger"></span>
-            </div>
+                        <div class="form-group mb-3">
+                            <label asp-for="ProductId" class="control-label">Chọn Sản Phẩm</label>
+                            <select asp-for="ProductId" class="form-control" asp-items="ViewBag.ProductId"></select>
+                            <span asp-validation-for="ProductId" class="text-danger"></span>
+                        </div>
 
-            <div class="form-group">
-                <label asp-for="StartDate" class="control-label">Ngày bắt đầu khuyến mãi</label>
-                <input asp-for="StartDate" class="form-control" type="datetime-local" />
-                <span asp-validation-for="StartDate" class="text-danger"></span>
-            </div>
+                        <div class="form-group mb-3">
+                            <label class="control-label">Giá Gốc</label>
+                            <input type="text" id="OriginalPrice" class="form-control" readonly />
+                        </div>
 
-            <div class="form-group">
-                <label asp-for="EndDate" class="control-label">Ngày kết thúc khuyến mãi</label>
-                <input asp-for="EndDate" class="form-control" type="datetime-local" />
-                <span asp-validation-for="EndDate" class="text-danger"></span>
-            </div>
+                        <div class="form-group mb-3">
+                            <label asp-for="DiscountPercentage" class="control-label">Phần Trăm Giảm Giá</label>
+                            <input asp-for="DiscountPercentage" class="form-control discount-input" type="number" min="0" max="100" value="0"/>
+                            <span asp-validation-for="DiscountPercentage" class="text-danger"></span>
+                        </div>
 
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-success" />
+                        <div class="form-group mb-3">
+                            <label class="control-label">Giá Sale</label>
+                            <input type="text" id="SalePrice" class="form-control" readonly />
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="StartDate" class="control-label">Ngày Bắt Đầu Khuyến Mãi</label>
+                            <input asp-for="StartDate" class="form-control" type="datetime-local" value="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" />
+                            <span asp-validation-for="StartDate" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="EndDate" class="control-label">Ngày Kết Thúc Khuyến Mãi</label>
+                            <input asp-for="EndDate" class="form-control" type="datetime-local" value="@DateTime.Now.AddDays(1).ToString("yyyy-MM-ddTHH:mm")" />
+                            <span asp-validation-for="EndDate" class="text-danger"></span>
+                        </div>
+
+
+                        <div class="form-group">
+                            <input type="submit" value="Tạo" class="btn btn-success w-100" />
+                           
+                        </div>
+                        <button class="btn btn-dark w-100 m-lg-auto"">
+                            <a asp-action="Index" style="color:aliceblue">
+                                <i class="fas fa-arrow-left"></i>  Quay Lại Danh Sách
+                            </a>
+                        </button>
+                    </form>
+                </div>
             </div>
-        </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index" class="btn btn-secondary">
-        <i class="fas fa-arrow-left"></i> Quay lại danh sách
-    </a>
-</div>
-
-
 @section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Fetch the original price when a product is selected
+            $('select[name="ProductId"]').on('change', function () {
+                var productId = $(this).val();
+                if (productId) {
+                    $.ajax({
+                        url: '@Url.Action("GetProductPrice", "ProductSales")', // Change to your actual controller action
+                        type: 'GET',
+                        data: { id: productId },
+                        success: function (data) {
+                            $('#OriginalPrice').val(data.price.toLocaleString('vi-VN')+"đ"); // Display original price formatted
+                            calculateSalePrice(); // Recalculate sale price based on new original price
+                        }
+                    });
+                } else {
+                    $('#OriginalPrice').val('');
+                    $('#SalePrice').val('');
+                }
+            });
+
+            function calculateSalePrice() {
+                var originalPriceText = $('#OriginalPrice').val().replace(/[^\d]/g, ''); // Remove non-numeric characters
+                var originalPrice = parseFloat(originalPriceText || 0); // Parse the cleaned string to a number
+                var discountPercentage = parseFloat($('input[name="DiscountPercentage"]').val());
+                var salePrice = originalPrice - (originalPrice * discountPercentage / 100);
+
+                // Ensure sale price is a valid number and format it
+                if (!isNaN(salePrice)) {
+                    $('#SalePrice').val(salePrice.toLocaleString('vi-VN', { minimumFractionDigits: 0 }) + "đ");
+                } else {
+                    $('#SalePrice').val('');
+                }
+            }
+
+
+            // Trigger calculation when the discount input changes
+            $('.discount-input').on('input', function () {
+                calculateSalePrice();
+            });
+
+            // Initial calculation on page load if product is already selected
+            if ($('select[name="ProductId"]').val()) {
+                $('select[name="ProductId"]').trigger('change');
+            }
+        });
+    </script>
+
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }

@@ -4,7 +4,8 @@
     ViewData["Title"] = "Quản Lý Khuyến Mãi";
     Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
 }
-<table class="table table-hover">
+
+<table id="productSaleTable" class="table table-hover">
     <thead class="thead-light">
         <tr>
             <th>Tên Sản Phẩm</th>
@@ -14,11 +15,11 @@
             <th>Ngày Bắt Đầu</th>
             <th>Ngày Kết Thúc</th>
             <th>Thời Gian Cập Nhật</th>
-           
-            <th>  
-                    <a asp-action="Create">
+            <th>
+                <a asp-action="Create">
                     <i class="fa-solid fa-circle-plus"></i> <span class="p-3">Thêm</span>
-                    </a>
+                </a>
+           
             </th>
         </tr>
     </thead>
@@ -28,24 +29,73 @@
             <tr>
                 <td>@item.Product.ProductName</td>
                 <td>@item.OriginalPrice.ToString("N0")</td>
-                <td>@item.DiscountPercentage.ToString("N0")%</td>
-                <td>@item.SalePrice.ToString("N0")</td>
-                <td>@item.StartDate</td>
-                <td>@item.EndDate</td>
-                <td>@item.UpdatedAt</td>
-                
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.SaleId" class="btn btn-warning btn-sm">
-                         Sửa
-                    </a>
-                    <a asp-action="Details" asp-route-id="@item.SaleId" class="btn btn-info btn-sm">
-                        Xem
-                    </a>
-                    <a asp-action="Delete" asp-route-id="@item.SaleId" class="btn btn-danger btn-sm">
-                        Xóa
-                    </a>
+                    <input type="number" class="form-control discount-input" data-sale-id="@item.SaleId" value="@Math.Round(item.DiscountPercentage, 0)" min="0" max="100" />
+                </td>
+                <td class="sale-price" data-original-price="@item.OriginalPrice">@item.SalePrice.ToString("N0")</td>
+                <td>
+                    <input type="date" class="form-control" id="startDate_@item.SaleId" value="@item.StartDate.ToString("yyyy-MM-dd")" />
+                </td>
+                <td>
+                    <input type="date" class="form-control" id="endDate_@item.SaleId" value="@item.EndDate.ToString("yyyy-MM-dd")" />
+                </td>
+                <td>@item.UpdatedAt?.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                <td>
+                    <button class="btn btn-success btn-sm update-btn" data-sale-id="@item.SaleId">Cập Nhật</button>
                 </td>
             </tr>
         }
     </tbody>
 </table>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Update sale price in UI as discount percentage is changed
+            $('.discount-input').on('input', function () {
+                // Get the original price and remove any formatting (e.g., commas)
+                var originalPriceText = $(this).closest('tr').find('.sale-price').data('original-price').toString();
+                var originalPrice = parseFloat(originalPriceText);
+
+                // Get the discount percentage as a number
+                var discountPercentage = parseFloat($(this).val());
+
+                // Calculate the sale price
+                var salePrice = originalPrice - (originalPrice * discountPercentage / 100);
+
+                // Display the sale price formatted with commas
+                $(this).closest('tr').find('.sale-price').text(salePrice.toLocaleString('vi-VN'))
+            });
+
+            // Update the database when "Cập Nhật" button is clicked
+            $('.update-btn').click(function () {
+                var saleId = $(this).data('sale-id');
+                var discountPercentage = $(this).closest('tr').find('.discount-input').val();
+                var startDate = $('#startDate_' + saleId).val();
+                var endDate = $('#endDate_' + saleId).val();
+
+                $.ajax({
+                    url: '/ProductSales/Update',
+                    method: 'POST',
+                    data: {
+                        SaleId: saleId,
+                        DiscountPercentage: discountPercentage,
+                        StartDate: startDate,
+                        EndDate: endDate
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            alert('Cập nhật thành công!');
+                            location.reload(); // Reload the page to reflect the changes
+                        } else {
+                            alert('Cập nhật thất bại!');
+                        }
+                    },
+                    error: function () {
+                        alert('Có lỗi xảy ra, vui lòng thử lại!');
+                    }
+                });
+            });
+        });
+    </script>
+}

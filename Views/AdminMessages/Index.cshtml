@@ -90,4 +90,53 @@
         border: 1px solid #ccc;
     }
 </style>
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Function to fetch messages
+            function fetchMessages() {
+                <p>@Model.SelectedUser.Username</p>
+            }
 
+            var userId = '@Model.SelectedUser?.UserId';
+            console.log("load message...")
+            if (userId) {
+                $.ajax({
+                    url: '@Url.Action("GetMessages", "AdminMessages", new { userId = "__USER_ID__" })'.replace('__USER_ID__', userId),
+                    type: 'GET',
+                    success: function (data) {
+                        $('.chat-history').html(data);
+                        $('.chat-history').scrollTop($('.chat-history')[0].scrollHeight);
+                    },
+                    error: function () {
+                        console.error('Failed to load messages');
+                    }
+                });
+            }
+        }
+
+            // Set an interval to fetch messages every second
+            setInterval(fetchMessages, 1000);
+
+        // Submit the message form via AJAX
+        $("#chat-form").submit(function (e) {
+            e.preventDefault();
+
+            $.ajax({
+                url: $(this).attr('action'),
+                type: 'POST',
+                data: $(this).serialize(),
+                success: function () {
+                    fetchMessages(); // Reload messages after sending a new one
+                    $('#messageContent').val(''); // Clear the input field
+                },
+                error: function () {
+                    alert('Failed to send message. Please try again.');
+                }
+            });
+        });
+        });
+    </script>
+
+}
+   
