@@ -1,10 +1,11 @@
-﻿@model PhuKienShop.Data.Product
 
+@model PhuKienShop.Models.ProductDetailModel
 @{
     ViewData["Title"] = "Details";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-
+<!--liên kết script để cuộn xuống màn hình-->
+<script src="~/js/scroll.js" defer></script>
 <h2>Details</h2>
 <!-- BREADCRUMB -->
 <div id="breadcrumb" class="section">
@@ -38,15 +39,15 @@
 			<div class="col-md-5 col-md">
 				<div id="product-main-img">
 					<div class="product-preview">
-						<img src="@Model.RelativeImageUrl(Model.ImageUrl)" alt="@Model.RelativeImageUrl(Model.ImageUrl)">
+						<img src="@Model.CurrentProduct.RelativeImageUrl(Model.CurrentProduct.ImageUrl)" alt="@Model.CurrentProduct.RelativeImageUrl(Model.CurrentProduct.ImageUrl)">
 					</div>
 				</div>
 			</div>
 			<!-- Product details -->
 			<div class="col-md-5 align-content-md-center">
 				<div class="product-details">
-					<h2 class="product-name">@Model.ProductName</h2>
-<div>
+					<h2 class="product-name">@Model.CurrentProduct.ProductName</h2>
+					<div>
 						<div class="product-rating">
 							<i class="fa fa-star"></i>
 							<i class="fa fa-star"></i>
@@ -58,12 +59,21 @@
 					</div>
 					<div>
 						<!--xem sản phẩm có đang giảm giá hay không-->
-						@Model.isProductSale(1)
-						@* <!--NO sẽ định dạng không có chữ số thập phân và định dạng hàng nghìn bằng dấu phẩy-->
-						<h3 class="product-price">@Model.Price.ToString("N0") VND<del class="product-old-price">  $990.00</del></h3> *@
+						@if (Model.CurrentProduct.isProductSale())
+						{
+							<!--NO sẽ định dạng không có chữ số thập phân và định dạng hàng nghìn bằng dấu phẩy-->
+							<h3 class="product-price">
+								@Model.CurrentProduct.GetPrice().ToString("N0") VND
+								<del class="product-old-price">@Model.CurrentProduct.Price.ToString("N0") VND</del>
+							</h3>
+						}
+						else
+						{
+							<h3 class="product-price">@Model.CurrentProduct.Price.ToString("N0") VND</h3>
+						}
 						<span class="product-available">Còn hàng</span>
 					</div>
-					<p>@Model.Description</p>
+					<p>@Model.CurrentProduct.Description</p>
 
 					<div class="add-to-cart">
 						<div class="qty-label">
@@ -84,7 +94,7 @@
 
 					<ul class="product-links">
 						<li>Loại:</li>
-						<li><a href="#">@Model.Category.CategoryName</a></li>
+						<li><a href="#">@Model.CurrentProduct.Category.CategoryName</a></li>
 
 					</ul>
 
@@ -315,123 +325,60 @@
 					<h3 class="title">Sản phẩm liên quan</h3>
 				</div>
 			</div>
+			<h3>Các loại @Model.CurrentProduct.Category.CategoryName.ToLower() khác</h3>
+			@if(!@Model.RelatedProducts.Any()){
+				<h2>Không có sản phẩm liên quan nào được hiển thị</h2>
+			} else{
+			<!-- product: hiển thị lên các sẩn phẩm liên quan -->
+			<div class="products-tabs">
+				<div id="tab1" class="tab-pane active">
+					<div class="products-slick" data-nav="#slick-nav-1">
+						@foreach (var item in Model.RelatedProducts)
+						{
+							<div class="product">
+								<a asp-controller="Products" asp-action="Details" asp-route-id="@item.ProductId" asp-route-categoryId="@item.CategoryId">
+									<div class="product-img">
+										<img height="150px" src="@item.RelativeImageUrl(item.ImageUrl)" alt="@item.Description">
+									</div>
+									<div class="product-body">
+										<p class="product-category">@item.Category.CategoryName</p>
+										<h3 class="product-name"><a asp-controller="Products" asp-action="Details" asp-route-id="@item.ProductId">@item.ProductName</a></h3>
+										@if (item.isProductSale())
+										{
+											<h4 class="product-price">@item.GetPrice().ToString("N0") VND</h4>
+											<del class="product-old-price">@item.Price.ToString("N0") VND</del>
+										}
+										else
+										{
+											<h4 class="product-price">@item.Price.ToString("N0") VND</h4>
+										}
+										<div class="product-rating">
+											<i class="fa fa-star"></i>
+											<i class="fa fa-star"></i>
+											<i class="fa fa-star"></i>
+											<i class="fa fa-star"></i>
+											<i class="fa fa-star"></i>
+										</div>
+										<div class="product-btns">
+											<button class="add-to-wishlist"><i class="fa fa-heart-o"></i><span class="tooltipp">add to wishlist</span></button>
+											<button class="add-to-compare"><i class="fa fa-exchange"></i><span class="tooltipp">add to compare</span></button>
+											<button class="quick-view"><i class="fa fa-eye"></i><span class="tooltipp">quick view</span></button>
+										</div>
+									</div>
 
-			<!-- product -->
-			<div class="col-md-3 col-xs-6">
-				<div class="product">
-					<div class="product-img">
-						<img src="./img/product01.png" alt="">
-						<div class="product-label">
-							<span class="sale">-30%</span>
-						</div>
+									<div class="add-to-cart">
+										<button class="add-to-cart-btn"><i class="fa fa-shopping-cart"></i> add to cart</button>
+									</div>
+								</a>
+							</div>
+						}
 					</div>
-					<div class="product-body">
-						<p class="product-category">Sản phầm</p>
-						<h3 class="product-name"><a href="#">product name goes here</a></h3>
-						<h4 class="product-price">$980.00 <del class="product-old-price">$990.00</del></h4>
-						<div class="product-rating">
-						</div>
-						<div class="product-btns">
-							<button class="add-to-wishlist"><i class="fa fa-heart-o"></i><span class="tooltipp">add to wishlist</span></button>
-							<button class="add-to-compare"><i class="fa fa-exchange"></i><span class="tooltipp">add to compare</span></button>
-							<button class="quick-view"><i class="fa fa-eye"></i><span class="tooltipp">quick view</span></button>
-						</div>
-					</div>
-					<div class="add-to-cart">
-						<button class="add-to-cart-btn"><i class="fa fa-shopping-cart"></i> add to cart</button>
-					</div>
+					<div id="slick-nav-1" class="products-slick-nav"></div>
 				</div>
 			</div>
 			<!-- /product -->
 			<!-- product -->
-			<div class="col-md-3 col-xs-6">
-				<div class="product">
-					<div class="product-img">
-						<img src="./img/product02.png" alt="">
-						<div class="product-label">
-							<span class="new">NEW</span>
-						</div>
-					</div>
-					<div class="product-body">
-						<p class="product-category">Category</p>
-						<h3 class="product-name"><a href="#">product name goes here</a></h3>
-						<h4 class="product-price">$980.00 <del class="product-old-price">$990.00</del></h4>
-						<div class="product-rating">
-							<i class="fa fa-star"></i>
-							<i class="fa fa-star"></i>
-							<i class="fa fa-star"></i>
-							<i class="fa fa-star"></i>
-							<i class="fa fa-star"></i>
-						</div>
-						<div class="product-btns">
-							<button class="add-to-wishlist"><i class="fa fa-heart-o"></i><span class="tooltipp">add to wishlist</span></button>
-							<button class="add-to-compare"><i class="fa fa-exchange"></i><span class="tooltipp">add to compare</span></button>
-							<button class="quick-view"><i class="fa fa-eye"></i><span class="tooltipp">quick view</span></button>
-						</div>
-					</div>
-					<div class="add-to-cart">
-						<button class="add-to-cart-btn"><i class="fa fa-shopping-cart"></i> add to cart</button>
-					</div>
-				</div>
-			</div>
-			<!-- /product -->
-
-			<div class="clearfix visible-sm visible-xs"></div>
-
-			<!-- product -->
-			<div class="col-md-3 col-xs-6">
-				<div class="product">
-					<div class="product-img">
-						<img src="./img/product03.png" alt="">
-					</div>
-					<div class="product-body">
-						<p class="product-category">Category</p>
-						<h3 class="product-name"><a href="#">product name goes here</a></h3>
-						<h4 class="product-price">$980.00 <del class="product-old-price">$990.00</del></h4>
-						<div class="product-rating">
-							<i class="fa fa-star"></i>
-							<i class="fa fa-star"></i>
-							<i class="fa fa-star"></i>
-							<i class="fa fa-star"></i>
-							<i class="fa fa-star-o"></i>
-						</div>
-						<div class="product-btns">
-							<button class="add-to-wishlist"><i class="fa fa-heart-o"></i><span class="tooltipp">add to wishlist</span></button>
-							<button class="add-to-compare"><i class="fa fa-exchange"></i><span class="tooltipp">add to compare</span></button>
-							<button class="quick-view"><i class="fa fa-eye"></i><span class="tooltipp">quick view</span></button>
-						</div>
-					</div>
-					<div class="add-to-cart">
-						<button class="add-to-cart-btn"><i class="fa fa-shopping-cart"></i> add to cart</button>
-					</div>
-				</div>
-			</div>
-			<!-- /product -->
-			<!-- product -->
-			<div class="col-md-3 col-xs-6">
-				<div class="product">
-					<div class="product-img">
-						<img src="./img/product04.png" alt="">
-					</div>
-					<div class="product-body">
-						<p class="product-category">Category</p>
-						<h3 class="product-name"><a href="#">product name goes here</a></h3>
-						<h4 class="product-price">$980.00 <del class="product-old-price">$990.00</del></h4>
-						<div class="product-rating">
-						</div>
-						<div class="product-btns">
-							<button class="add-to-wishlist"><i class="fa fa-heart-o"></i><span class="tooltipp">add to wishlist</span></button>
-							<button class="add-to-compare"><i class="fa fa-exchange"></i><span class="tooltipp">add to compare</span></button>
-							<button class="quick-view"><i class="fa fa-eye"></i><span class="tooltipp">quick view</span></button>
-						</div>
-					</div>
-					<div class="add-to-cart">
-						<button class="add-to-cart-btn"><i class="fa fa-shopping-cart"></i> add to cart</button>
-					</div>
-				</div>
-			</div>
-			<!-- /product -->
-
+			}
 		</div>
 		<!-- /row -->
 	</div>
@@ -475,28 +422,8 @@
 <!-- /NEWSLETTER -->
 
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.ProductId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+	<a asp-action="Edit" asp-route-id="@Model.CurrentProduct.ProductId">Edit</a> |
+	<a asp-action="Index">Back to List</a>
 </div>
 
-<!-- hiển thị phần cuộn xuống tab bình luận khi nhấn vào Bình luận -->
-@section Scripts {
-	<script>
-		$(document).ready(function () {
-			// Khi nhấn vào "10 Bình luận"
-			$('a[href="#tab2"]').on('click', function (event) {
-				event.preventDefault(); // Ngăn chặn hành vi mặc định của liên kết
-				$('.tab-nav li').removeClass('active'); // Loại bỏ active khỏi tất cả các tab
-				$('a[href="#tab2"]').closest('li').addClass('active'); // Thêm active cho tab đúng
-				$('.tab-content .tab-pane').removeClass('in active'); // Ẩn tất cả nội dung tab
-				$('#tab2').addClass('in active'); // Hiển thị nội dung của tab 2
-
-				// Cuộn trang xuống phần Bình luận (3)
-				$('html, body').animate({
-					scrollTop: $('#tab2').offset().top - $('.tab-nav').height()
-				}, 500); //thời gian cuộn
-			});
-		});
-	</script>
-}
 

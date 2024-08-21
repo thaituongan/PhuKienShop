@@ -21,8 +21,7 @@ namespace PhuKienShop.Controllers
 			DateTime dealEndTime = DateTime.Now.AddDays(2);
 			String deal = dealEndTime.ToString("yyyy-MM-ddTHH:mm:ss");
 			ViewBag.DealEndTime = deal;
-
-			return View();
+            return View();
             //_context.Products.ToList()
         }
 
