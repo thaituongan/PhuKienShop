@@ -1,0 +1,28 @@
+﻿@model IEnumerable<PhuKienShop.Data.Product>
+
+<div class="row">
+    @foreach (var product in Model)
+    {
+        <div class="col-md-3 col-sm-6">
+            <div class="product">
+                <a asp-controller="Products" asp-action="Details" asp-route-id="@product.ProductId" asp-route-categoryId="@product.CategoryId">
+                    <div class="product-img">
+                        <img height="180px" src="@product.RelativeImageUrl(product.ImageUrl)" alt="@product.Description" class="img-fluid">
+                    </div>
+                    <div class="product-body">
+                        <h3 class="product-name">@product.ProductName</h3>
+                        @if (product.isProductSale())
+                        {
+                            <h4 class="product-price">@product.GetPrice().ToString("N0") VND</h4>
+                            <del class="product-old-price">@product.Price.ToString("N0") VND</del>
+                        }
+                        else
+                        {
+                            <h4 class="product-price">@product.Price.ToString("N0") VND</h4>
+                        }
+                    </div>
+                </a>
+            </div>
+        </div>
+    }
+</div>
