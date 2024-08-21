@@ -1,5 +1,5 @@
-﻿@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
-﻿<!DOCTYPE html>
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor﻿
+<!DOCTYPE html>
 <html lang="en">
 <head>
 	<meta charset="utf-8" />
@@ -22,8 +22,7 @@
 
 	<!-- Slick -->
 	<link type="text/css" rel="stylesheet" href="~/css/slick.css" />
-	<link type="text/css" rel="stylesheet" href="css/slick-theme.css" />
-
+	<link type="text/css" rel="stylesheet" href="~/css/slick-theme.css" />
 	<!-- nouislider -->
 	<link type="text/css" rel="stylesheet" href="~/css/nouislider.min.css" />
 
@@ -32,6 +31,9 @@
 
 	<!-- Custom stlylesheet -->
 	<link type="text/css" rel="stylesheet" href="~/css/style.css" />
+	<!-- js-->
+	
+	<script src="~/js/searchpartial.js" defer></script>
 
 	<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
 	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -48,12 +50,12 @@
 		<div id="top-header">
 			<div class="container">
 				<ul class="header-links pull-left">
-					<li><a href="#"><i class="fa fa-phone"></i> +021-95-51-84</a></li>
-					<li><a href="#"><i class="fa fa-envelope-o"></i> email@email.com</a></li>
-					<li><a href="#"><i class="fa fa-map-marker"></i> 1734 Stonecoal Road</a></li>
+					<li><a href="#"><i class="fa fa-phone"></i> 0949497383</a></li>
+					<li><a href="#"><i class="fa fa-envelope-o"></i> dhnl@email.com</a></li>
+					<li><a href="#"><i class="fa fa-map-marker"></i> Đại Học Nông Lâm</a></li>
 				</ul>
 				<ul class="header-links pull-right">
-					<li><a href="#"><i class="fa fa-dollar"></i> VND</a></li>
+					<li><a href="#"><i></i> VND</a></li>
 					<li><a href="@Url.Action("MyAccount", "Account")"><i class="fa fa-user-o"></i>
 							@{if(User.Identity.Name != null)
 								{
@@ -75,14 +77,13 @@
 		<div id="header">
 			<!-- container -->
 			<div class="container">
-				var total = 0;}
 				<!-- row -->
 				<div class="row">
 					<!-- LOGO -->
 					<div class="col-md-3">
 						<div class="header-logo">
 							<a href="#" class="logo">
-								<img height="100px", width="180px" src="~/img/mylogo.png" alt="">
+								<img height="100px" , width="180px" src="~/img/mylogo.png" alt="">
 							</a>
 						</div>
 					</div>
@@ -90,15 +91,9 @@
 					<!-- SEARCH BAR -->
 					<div class="col-md-6">
 						<div class="header-search">
-							<form>
-								<select class="input-select">
-									<option value="0">Tất Cả</option>
-									<option value="1">Cáp Sạc</option>
-									<option value="1">Ốp lưng</option>
-									<option value="1">Tai Nghe</option>
-									<option value="1">Loa</option>
-								</select>
-								<input class="input" placeholder="Tìm kiếm sản phẩm">
+							<form action="/Products/Search" method="get" id="searchForm">
+								
+								<input id="searchInput" name="searchTerm" class="input-select" placeholder="Tìm kiếm sản phẩm">
 								<button class="search-btn">Search</button>
 							</form>
 						</div>
@@ -159,9 +154,9 @@
 					<li class="active"><a href="#">Trang Chủ</a></li>
 					<li><a href="#">Danh Mục</a></li>
 					<li><a href="#">Khuyến mãi</a></li>
-					<li><a href="#">Giới Thiệu</a></li>
+					<li><a href="@Url.Action("Introduction", "Home")">Giới Thiệu</a></li>
 					<li><a href="#">Liên Hệ</a></li>
-					<li><a href="#">Chính Sách Bảo Mật</a></li>
+					<li><a href="@Url.Action("Privacy", "Home")">Chính Sách Bảo Mật</a></li>
 				</ul>
 				<!-- /NAV -->
 			</div>
@@ -170,6 +165,9 @@
 		<!-- /container -->
 	</nav>
 	<!-- /NAVIGATION -->
+	<!-- hiển thị cho phần tìm kiếm-->
+	<div id="searchResults"></div>
+
 	</header>
 
 	<div id="main" style="min-height: 600px" >
