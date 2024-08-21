@@ -52,22 +52,6 @@ namespace PhuKienShop.Controllers
             SaveCart(cart);
             return RedirectToAction("Index");
         }
-        [HttpPost]
-        public IActionResult UpdateQuantity(int productId, int quantity)
-        {
-            // Lấy giỏ hàng từ session
-            var cart = GetCart();
-
-            // Cập nhật số lượng sản phẩm trong giỏ hàng
-            var cartProduct = cart.CartProducts.FirstOrDefault(p => p.Product.ProductId == productId);
-            if (cartProduct != null)
-            {
-                cartProduct.Quantity = quantity;
-                SaveCart(cart);
-            }
-
-            return Json(new { success = true });
-        }
 
         public IActionResult AddToCart(int productId, int quantity)
         {
