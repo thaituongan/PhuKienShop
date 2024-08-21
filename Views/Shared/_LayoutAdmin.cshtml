@@ -15,7 +15,9 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.css">
-    <link rel="stylesheet" type="text/css" href="~/css/all.min.css">
+    <!--  <link rel="stylesheet" type="text/css" href="~/css/all.min.css">  -->
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
     <link type="text/css" rel="stylesheet" href="~/css/style.css" />
@@ -133,6 +135,7 @@
 
     <div style="">
         @RenderBody()
+        @RenderSection("Scripts", required: false)
     </div>
 
     <!-- import script -->

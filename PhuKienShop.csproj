@@ -70,4 +70,11 @@
     <Folder Include="Views\Orders\NewFolder\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="Views\Orders\_OrderDetail.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>
