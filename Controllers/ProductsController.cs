@@ -21,6 +21,38 @@ namespace PhuKienShop.Controllers
 			_context = context;
 		}
 
+		public IActionResult DetailsPage(int id, int page = 1)
+		{
+			var product = _context.Products
+				.Include(p => p.Reviews)
+				.FirstOrDefault(p => p.ProductId == id);
+
+			if (product == null)
+			{
+				return NotFound();
+			}
+
+			var pageSize = 2; // số bình luận mỗi trang
+			var reviews = product.Reviews
+				.OrderByDescending(r => r.CreatedAt)
+				.Skip((page - 1) * pageSize)
+				.Take(pageSize)
+				.ToList();
+
+			var totalReviews = product.Reviews.Count();
+			var totalPages = (int)Math.Ceiling(totalReviews / (double)pageSize);
+
+			var model = new ProductDetailModel
+			{
+				CurrentProduct = product,
+				Reviews = reviews,
+				TotalPages = totalPages,
+				CurrentPage = page
+			};
+
+			return View(model);
+		}
+
 		// GET: Products
 		public async Task<IActionResult> Index()
 		{
@@ -36,16 +68,17 @@ namespace PhuKienShop.Controllers
         }
 
 		// GET: Products/Details/5
-		public async Task<IActionResult> Details(int? id, int categoryId)
+		public async Task<IActionResult> Details(int? id, int categoryId, int page = 1)
 		{
 			if (id == null)
 			{
 				return NotFound();
 			}
-			//lấy ra sản phẩm được chọn
+
+			// Lấy sản phẩm được chọn
 			var product = await _context.Products
 				.Include(p => p.Category)
-				.Include(p => p.ProductSales) // Thêm dòng này để nạp đầy đủ dữ liệu ProductSales
+				.Include(p => p.ProductSales)
 				.Include(p => p.Reviews)
 				.ThenInclude(r => r.User)
 				.FirstOrDefaultAsync(m => m.ProductId == id);
@@ -54,48 +87,54 @@ namespace PhuKienShop.Controllers
 			{
 				return NotFound();
 			}
-			//lấy ra sản phấm liên quan đến sản phẩm đó
-			var relatedProduct = _context.Products
+
+			// Lấy sản phẩm liên quan
+			var relatedProducts = _context.Products
 				.Include(p => p.Category)
 				.Include(p => p.ProductSales)
-				//lay cac san pham cung category ngoai tru san pham hien tai
 				.Where(p => p.CategoryId == categoryId && p.ProductId != id)
 				.Take(4)
 				.ToList();
 
-			var reviews = product.Reviews.ToList();
+			// Xử lý phân trang cho bình luận
+			var pageSize = 2; // số bình luận mỗi trang
+			var reviews = product.Reviews
+				.OrderByDescending(r => r.CreatedAt)
+				.Skip((page - 1) * pageSize)
+				.Take(pageSize)
+				.ToList();
 
-			int totalReviews = reviews.Count();
+			var totalReviews = product.Reviews.Count();
+			var totalPages = (int)Math.Ceiling(totalReviews / (double)pageSize);
 
-			// Tính số lượng đánh giá cho từng loại sao
-			int fiveStar = reviews.Count(r => r.Rating == 5);
-			int fourStar = reviews.Count(r => r.Rating == 4);
-			int threeStar = reviews.Count(r => r.Rating == 3);
-			int twoStar = reviews.Count(r => r.Rating == 2);
-			int oneStar = reviews.Count(r => r.Rating == 1);
+			// Tính toán các chỉ số đánh giá
+			int fiveStar = product.Reviews.Count(r => r.Rating == 5);
+			int fourStar = product.Reviews.Count(r => r.Rating == 4);
+			int threeStar = product.Reviews.Count(r => r.Rating == 3);
+			int twoStar = product.Reviews.Count(r => r.Rating == 2);
+			int oneStar = product.Reviews.Count(r => r.Rating == 1);
 
-			// Tính tỷ lệ phần trăm của từng loại sao
 			double fiveStarPercentage = totalReviews > 0 ? (double)fiveStar / totalReviews * 100 : 0;
 			double fourStarPercentage = totalReviews > 0 ? (double)fourStar / totalReviews * 100 : 0;
 			double threeStarPercentage = totalReviews > 0 ? (double)threeStar / totalReviews * 100 : 0;
 			double twoStarPercentage = totalReviews > 0 ? (double)twoStar / totalReviews * 100 : 0;
 			double oneStarPercentage = totalReviews > 0 ? (double)oneStar / totalReviews * 100 : 0;
 
-			// Tính trung bình điểm đánh giá
-			double averageRating = reviews.Any() ? reviews.Average(r => r.Rating) : 0;
-
+			double averageRating = product.Reviews.Any() ? product.Reviews.Average(r => r.Rating) : 0;
 
 			var viewModel = new ProductDetailModel
 			{
 				CurrentProduct = product,
-				RelatedProducts = relatedProduct,
+				RelatedProducts = relatedProducts,
 				Reviews = reviews,
 				AverageRating = averageRating,
 				FiveStarPercentage = fiveStarPercentage,
 				FourStarPercentage = fourStarPercentage,
 				ThreeStarPercentage = threeStarPercentage,
 				TwoStarPercentage = twoStarPercentage,
-				OneStarPercentage = oneStarPercentage
+				OneStarPercentage = oneStarPercentage,
+				TotalPages = totalPages,
+				CurrentPage = page
 			};
 
 			return View(viewModel);
