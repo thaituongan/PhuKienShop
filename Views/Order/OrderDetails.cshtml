@@ -65,7 +65,7 @@
     <div class="order-info">
         <h3>Thông Tin Đơn Hàng</h3>
         <p><strong>Ngày Đặt:</strong> @Model.OrderDate?.ToString("dd/MM/yyyy")</p>
-        <p><strong>Tổng Tiền:</strong> @Model.TotalAmount.ToString("C")</p>
+        <p><strong>Tổng Tiền:</strong> @string.Format("{0:N0}", @Model.TotalAmount) VND</p>
         <p><strong>Trạng Thái:</strong> @Model.Status</p>
     </div>
 
@@ -86,8 +86,8 @@
                     <tr>
                         <td>@detail.Product?.ProductName</td>
                         <td>@detail.Quantity</td>
-                        <td>@detail.UnitPrice.ToString("C")</td>
-                        <td>@detail.TotalPrice.ToString("C")</td>
+                        <td>@string.Format("{0:N0}", @detail.UnitPrice) VND</td>
+                        <td>@string.Format("{0:N0}", @detail.TotalPrice) VND</td>
                     </tr>
                 }
             </tbody>

@@ -1,7 +1,7 @@
 ﻿@model MyAccountViewModel
 
 @{
-    ViewData["Title"] = "User Profile";
+    ViewData["Title"] = "Hồ sơ của người dùng";
 }
 
 <style>
@@ -11,6 +11,7 @@
         justify-content: space-between;
         padding: 20px;
         gap: 20px; /* Khoảng cách giữa các phần */
+        align-items: flex-start; /* Căn chỉnh phần tử bắt đầu từ trên cùng */
     }
 
     /* Phần thông tin người dùng */
@@ -21,6 +22,9 @@
         padding: 15px;
         max-width: 300px; /* Đặt kích thước tối đa */
         background-color: #f9f9f9; /* Màu nền nhẹ */
+        display: flex;
+        flex-direction: column; /* Đặt phần tử con theo cột */
+        gap: 10px; /* Khoảng cách giữa các phần tử con */
     }
 
     /* Phần danh sách đơn hàng */
@@ -30,6 +34,8 @@
         border-radius: 10px;
         padding: 15px;
         background-color: #fff; /* Màu nền trắng */
+        height: 500px; /* Chiều cao cố định */
+        overflow-y: auto; /* Thanh cuộn dọc nếu nội dung vượt quá chiều cao cố định */
     }
 
     /* Các kiểu cho bảng */
@@ -60,7 +66,8 @@
         text-decoration: none;
         display: inline-block;
         border-radius: 5px;
-        margin-left: 50px;
+        margin-top: 10px;
+        margin-left: 55px
     }
 
         .update-btn:hover {
@@ -81,53 +88,100 @@
         .details-btn:hover {
             background-color: #31b0d5; /* Màu xanh dương đậm khi hover */
         }
+
+    /* Input upload ảnh người dùng */
+    .upload-photo {
+        margin-bottom: 15px; /* Khoảng cách giữa input ảnh và thông tin người dùng */
+    }
+
+        .upload-photo input[type="file"] {
+            display: inline-block;
+            width: 150px; /* Đặt chiều rộng ngắn hơn cho ô input */
+            margin-right: 5px;
+            padding: 2px; /* Điều chỉnh padding để thu nhỏ kích thước */
+            font-size: 12px; /* Thu nhỏ cỡ chữ */
+        }
+
+        .upload-photo button {
+            background-color: #5bc0de; /* Màu xanh dương nhạt */
+            color: #fff;
+            border: none;
+            padding: 2px 5px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+            .upload-photo button:hover {
+                background-color: #31b0d5; /* Màu xanh dương đậm khi hover */
+            }
+    /* Hiển thị ảnh */
+    .user-photo {
+        width: 100px; /* Đặt chiều rộng cố định cho ảnh */
+        height: 100px; /* Đặt chiều cao cố định cho ảnh */
+        border: 2px solid #ddd; /* Tăng độ dày của viền */
+        border-radius: 50%; /* Tạo khung tròn */
+        object-fit: cover; /* Đảm bảo ảnh bao phủ toàn bộ khung mà không bị méo */
+        margin-bottom: 15px;
+        margin-left: 75px
+    }
 </style>
 
-
-<div class="profile-container">
-    <!-- Thông Tin Người Dùng -->
-    <div class="user-info-section">
-        <h4>Thông Tin Người Dùng</h4>
-        <div>
-            <p><strong>Họ và tên:</strong> @Model.User.FullName</p>
-            <p><strong>Email:</strong> @Model.User.Email</p>
-            <p><strong>Tên đăng nhập:</strong> @Model.User.Username</p>
-            <p><strong>Số điện thoại:</strong> @Model.User.PhoneNumber</p>
-            <p><strong>Địa chỉ:</strong> @Model.User.Address</p>
-            <p><strong>Ngày tạo:</strong> @Model.User.CreatedAt?.ToString()</p>
-            <p><strong>Ngày cập nhật:</strong> @Model.User.UpdatedAt?.ToString()</p>
-            <a href="@Url.Action("UpdateAccount", "Account")" class="update-btn">Cập Nhật Tài Khoản</a>
+<form asp-action="UploadPhoto" method="post" enctype="multipart/form-data">
+    <div class="profile-container">
+        <!-- Thông Tin Người Dùng -->
+        <div class="user-info-section">
+            <h4>Thông Tin Người Dùng</h4>
+            <div>
+                @if (TempData["UserPhotoUrl"] != null)
+                {
+                    string userPhotoUrl = TempData["UserPhotoUrl"].ToString();
+                    <img src="@userPhotoUrl" alt="Ảnh người dùng" style="max-width: 100%; height: auto;" class="user-photo" />
+                }
+                <p><strong>Họ và tên:</strong> @Model.User.FullName</p>
+                <p><strong>Email:</strong> @Model.User.Email</p>
+                <p><strong>Tên đăng nhập:</strong> @Model.User.Username</p>
+                <p><strong>Số điện thoại:</strong> @Model.User.PhoneNumber</p>
+                <p><strong>Địa chỉ:</strong> @Model.User.Address</p>
+                <p><strong>Ngày tạo:</strong> @Model.User.CreatedAt?.ToString()</p>
+                <p><strong>Ngày cập nhật:</strong> @Model.User.UpdatedAt?.ToString()</p>
+                <a href="@Url.Action("UpdateAccount", "Account")" class="update-btn">Cập Nhật Tài Khoản</a>
+            </div>
+            <div class="upload-photo">
+                <input type="file" name="userPhoto" id="userPhoto" />
+                <button type="submit">Tải ảnh lên</button>
+            </div>
+        </div>
+        <!-- Danh Sách Đơn Hàng -->
+        <div class="order-list-section">
+            <h2>Danh Sách Đơn Hàng Của Tôi</h2>
+            <table class="order-table">
+                <thead>
+                    <tr>
+                        <th>Mã Đơn Hàng</th>
+                        <th>Ngày Đặt</th>
+                        <th>Tổng Tiền</th>
+                        <th>Trạng Thái</th>
+                        <th>Hành Động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var order in Model.Orders)
+                    {
+                        <tr>
+                            <td>@order.OrderId</td>
+                            <td>@order.OrderDate?.ToString()</td>
+                            <td>@string.Format("{0:N0}", (@order.TotalAmount)) VND</td>
+                            <td>@order.Status</td>
+                            <td>
+                                <a href="@Url.Action("OrderDetails", "Order", new { id = order.OrderId })" class="details-btn">Xem Chi Tiết</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
         </div>
     </div>
-
-    <!-- Danh Sách Đơn Hàng -->
-    <div class="order-list-section">
-        <h2>Danh Sách Đơn Hàng Của Tôi</h2>
-        <table class="order-table">
-            <thead>
-                <tr>
-                    <th>Mã Đơn Hàng</th>
-                    <th>Ngày Đặt</th>
-                    <th>Tổng Tiền</th>
-                    <th>Trạng Thái</th>
-                    <th>Hành Động</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var order in Model.Orders)
-                {
-                    <tr>
-                        <td>@order.OrderId</td>
-                        <td>@order.OrderDate?.ToString("dd/MM/yyyy")</td>
-                        <td>@order.TotalAmount.ToString("C")</td>
-                        <td>@order.Status</td>
-                        <td>
-                            <a href="@Url.Action("OrderDetails", "Order", new { id = order.OrderId })" class="details-btn">Xem Chi Tiết</a>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
-</div>
-
+</form>

@@ -45,12 +45,18 @@
 				<div class="product-details">
 					<h2 class="product-name">@Model.CurrentProduct.ProductName</h2>
 					<div>
-						<div class="product-rating">
-							<i class="fa fa-star"></i>
-							<i class="fa fa-star"></i>
-							<i class="fa fa-star"></i>
-							<i class="fa fa-star"></i>
-							<i class="fa fa-star-o"></i>
+						<div class="rating-avg">
+							<span>@Model.AverageRating.ToString("0.0")</span>
+							<div class="rating-stars">
+								@for (int i = 0; i < (int)Model.AverageRating; i++)
+								{
+									<i class="fa fa-star"></i>
+								}
+								@for (int i = (int)Model.AverageRating; i < 5; i++)
+								{
+									<i class="fa fa-star-o"></i>
+								}
+							</div>
 						</div>
 						<a data-toggle="tab" href="#tab2">Thêm bình luận</a>
 					</div>
@@ -101,16 +107,7 @@
 					<ul class="product-links">
 						<li>Loại:</li>
 						<li><a href="#">@Model.CurrentProduct.Category.CategoryName</a></li>
-
 					</ul>
-
-					<ul class="product-links">
-						<li>Chia sẻ:</li>
-						<li><a href="#"><i class="fa fa-facebook"></i></a></li>
-						<li><a href="#"><i class="fa fa-google-plus"></i></a></li>
-						<li><a href="#"><i class="fa fa-envelope"></i></a></li>
-					</ul>
-
 				</div>
 			</div>
 			<!-- /Product details -->
