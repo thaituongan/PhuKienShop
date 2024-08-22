@@ -91,9 +91,7 @@ public class AdminMessagesController : Controller
         _context.Messages.Add(message);
         await _context.SaveChangesAsync();
         await _hubContext.Clients.User(userId.ToString()).SendAsync("ReceiveMessage", "Admin", message.Content);
-        // You can also send a separate notification to alert the admin
-        //await _hubContext.Clients.User(userId.ToString()).SendAsync("NewMessageNotification", "Admin", message.Content);
-        //await _hubContext.Clients.All.SendAsync("ReceiveMessage", "Admin", message.Content);
+     
         return RedirectToAction("Index", new { userId });
     }
     private int? GetAdminId()

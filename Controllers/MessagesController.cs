@@ -42,7 +42,7 @@ public class MessagesController : ControllerBase
         // Create the message and save it to the database
         var msg = new PhuKienShop.Data.Message
         {
-            SenderId = 1,
+            SenderId = GetAdminId(),
             ReceiverId = sender.UserId,
             Content = message.Content,
             SentAt = DateTime.UtcNow
@@ -62,5 +62,10 @@ public class MessagesController : ControllerBase
         }
 
         return Ok();
+    }
+    private int? GetAdminId()
+    {
+        var admin = _context.Users.Take(1).SingleOrDefault(u => u.Role == "Admin");
+        return admin?.UserId;
     }
 }
