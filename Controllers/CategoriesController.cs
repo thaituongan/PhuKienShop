@@ -21,7 +21,15 @@ namespace PhuKienShop.Controllers
         // GET: Categories
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Categories.ToListAsync());
+            // Lấy danh sách sản phẩm (giả sử bạn đã có code này)
+            var products = await _context.Products.ToListAsync();
+
+            // Lấy danh sách các danh mục
+            var categories = await _context.Categories.ToListAsync();
+
+            // Truyền cả hai danh sách đến view thông qua ViewData
+            ViewData["Categories"] = categories;
+            return View(products);
         }
 
         // GET: Categories/Details/5
