@@ -49,6 +49,7 @@ function toast({title = '', message = '', type = 'info', duration = 3000}) {
 
 
 function showSuccessToast(messagein) {
+    console.log("call showsuccesstoast");
     toast({
         title: 'Successful',
         message: messagein,
@@ -94,14 +95,62 @@ function toast2({title = '', message = '', type = 'info', duration = 3000}) {
     }
 }
 
+function toast2ByElement({ element,title = '', message = '', type = 'info', duration = 3000 }) {
+    const main = element;
+
+    if (main) {
+        if (main.firstChild) {
+            main.removeChild(main.firstChild);
+        }
+        const toast = document.createElement('div');
+
+        // auto remove toast
+        const autoRemoveId = setTimeout(function () {
+            main.removeChild(toast);
+        }, duration + 1000);
+        toast.classList.add('toastt-2', `toast-2--${type}`);
+        const delay = (duration / 1000).toFixed(2);
+        toast.style.animation = `fadeIn ease 0.3s, fadeOut linear 1s ${delay}s forwards`;
+        toast.innerHTML = `
+                <p class="toast__msg"  style="color: white">${message} </p>
+                `;
+
+        main.appendChild(toast);
+        // console.log(main.child);
+
+    }
+}
+
+function showSuccessToast2ByElement(elementin, messagein) {
+    console.log("toast-2 element");
+    playSound('../sounds/successful.mp3');
+    toast2ByElement({
+        element: elementin,
+        title: 'Successful',
+        message: messagein,
+        type: 'success',
+        duration: 500
+    })
+}
 
 function showSuccessToast2(messagein) {
     console.log("toast-2");
-    //playSound('../sounds/successful.mp3');
+    playSound('../sounds/successful.mp3');
     toast2({
         title: 'Successful',
         message: messagein,
         type: 'success',
+        duration: 500
+    })
+}
+
+function showErrorToast2ByElement(elementin, messagein) {
+    playSound('/sounds/error.mp3');
+    toast2({
+        element: elementin,
+        title: 'error',
+        message: messagein,
+        type: 'error',
         duration: 500
     })
 }

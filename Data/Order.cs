@@ -5,6 +5,14 @@ namespace PhuKienShop.Data;
 
 public partial class Order
 {
+    public static string WAITING = "chờ xác nhận";
+    public static string CONFIRMED = "đã xác nhận";
+    public static string PACKAGEED = "đã đóng gói";
+    public static string DELIVERYED = "đang vận chuyển";
+    public static string COMPLETEED = "đã hoàn thành";
+    public static string CANCELED = "đã hủy";
+    public static string UNDEFINED = "không xác định";
+
     public int OrderId { get; set; }
 
     public int? UserId { get; set; }
@@ -28,6 +36,29 @@ public partial class Order
             return OrderId == other.OrderId;
         }
         return false;
+    }
+
+
+    public DateTime getEstimatedDelivery()
+    {
+        DateTime temp = OrderDate ?? DateTime.Now;
+        return temp.AddDays(3);
+    }
+
+    public static string tranlateOrderStatus(string status)
+    {
+        status = status.ToUpper();
+        switch (status)
+        {
+            case "WAITING": return Order.WAITING;
+            case "CONFIRMED": return Order.CONFIRMED;
+            case "PACKAGEED": return Order.PACKAGEED;
+            case "DELIVERYED": return Order.DELIVERYED;
+            case "COMPLETEED": return Order.COMPLETEED;
+            case "CANCELED": return Order.CANCELED;
+            default: return Order.UNDEFINED;   
+        }
+        
     }
 
     public override int GetHashCode()

@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<PhuKienShop.Data.ProductSale>
 <div class="products-tabs">
     <!-- tab -->
-    <div id="tab1" class="tab-pane active">
+    <div id="tab6" class="tab-pane active">
         <div class="products-slick" data-nav="#slick-nav-6">
             <!-- product -->
             @foreach (var item in Model)
@@ -27,7 +27,7 @@
                                     <input type="hidden" name="productId" value="@item.Product.ProductId" />
                                     <input type="hidden" name="quantity" value="1" />
                                     <button type="submit" class="add-to-cart-btn">
-                                        <i class="fa fa-shopping-cart"></i> add to cart
+                                        <i class="fa fa-shopping-cart"></i> Thêm vào giỏ hàng
                                     </button>
                                 </form>
                             }
@@ -35,7 +35,7 @@
                             {
                                 <form asp-controller="Account" asp-action="Login" method="get">
                                     <button type="submit" class="add-to-cart-btn">
-                                        <i class="fa fa-shopping-cart"></i> add to cart
+                                        <i class="fa fa-shopping-cart"></i> Thêm vào giỏ hàng
                                     </button>
                                 </form>
                             }
@@ -51,13 +51,12 @@
     </div> 
     @{
         var categories = Model.Select(p => p.Product.CategoryId).Distinct().ToList();
-        int tabListProduct = 2;
-        int slicknav = 7;
+        int tabListSale= 7;
     }
     @foreach (var categoryId in categories)
     {
-        <div id="tab-@tabListProduct" class="tab-pane active">
-            <div class="products-slick" data-nav="#slick-nav-@slicknav">
+        <div id="tab-@tabListSale" class="tab-pane">
+            <div class="products-slick" data-nav="#slick-nav-@tabListSale">
                 @foreach (var item in Model.Where(p => p.Product.CategoryId == categoryId))
                 {
                     <div class="product">
@@ -81,7 +80,7 @@
                                         <input type="hidden" name="productId" value="@item.Product.ProductId" />
                                         <input type="hidden" name="quantity" value="1" />
                                         <button type="submit" class="add-to-cart-btn">
-                                            <i class="fa fa-shopping-cart"></i> add to cart
+                                            <i class="fa fa-shopping-cart"></i> Thêm vào giỏ hàng
                                         </button>
                                     </form>
                                 }
@@ -89,7 +88,7 @@
                                 {
                                     <form asp-controller="Account" asp-action="Login" method="get">
                                         <button type="submit" class="add-to-cart-btn">
-                                            <i class="fa fa-shopping-cart"></i> add to cart
+                                            <i class="fa fa-shopping-cart"></i> Thêm vào giỏ hàng
                                         </button>
                                     </form>
                                 }
@@ -98,9 +97,8 @@
                     </div>
                 }
             </div>
-            <div id="slick-nav-@slicknav" class="products-slick-nav"></div>
+            <div id="slick-nav-@tabListSale" class="products-slick-nav"></div>
         </div>
-        tabListProduct++;
-        slicknav++;
+        tabListSale++;
     }
 </div>

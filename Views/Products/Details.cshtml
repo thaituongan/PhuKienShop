@@ -45,13 +45,6 @@
 				<div class="product-details">
 					<h2 class="product-name">@Model.CurrentProduct.ProductName</h2>
 					<div>
-						<div class="product-rating">
-							<i class="fa fa-star"></i>
-							<i class="fa fa-star"></i>
-							<i class="fa fa-star"></i>
-							<i class="fa fa-star"></i>
-							<i class="fa fa-star-o"></i>
-						</div>
 						<a data-toggle="tab" href="#tab2">Thêm bình luận</a>
 					</div>
 					<div>
@@ -91,12 +84,6 @@
 							</form>
 						}
 					</div>
-
-					<ul class="product-btns">
-						<li><a href="#"><i class="fa fa-heart-o"></i> Thêm vào dánh sách đợi</a></li>
-
-					</ul>
-
 					<ul class="product-links">
 						<li>Loại:</li>
 						<li><a href="#">@Model.CurrentProduct.Category.CategoryName</a></li>
@@ -119,12 +106,12 @@
 					<!-- product tab nav -->
 					<ul class="tab-nav">
 						<li><a data-toggle="tab" href="#tab1">Chi tiết</a></li>
-						<li><a data-toggle="tab" href="#tab2">Bình luận(3)</a></li>
+						<li><a data-toggle="tab" href="#tab2">Bình luận</a></li>
 					</ul>
 					<!-- /product tab nav -->
 					<!-- product tab content -->
 					<div class="tab-content">
-						<!-- tab1  -->
+						<!-- tab1: chi tiết  -->
 						<div id="tab1" class="tab-pane fade in">
 							<div class="row">
 								<div class="col-md-12">
@@ -133,20 +120,23 @@
 							</div>
 						</div>
 						<!-- /tab1  -->
-						<!-- tab2  -->
+						<!-- tab2: bình luận  -->
 						<div id="tab2" class="tab-pane fade in">
 							<div class="row">
 								<!-- Rating -->
 								<div class="col-md-3">
 									<div id="rating">
 										<div class="rating-avg">
-											<span>4.5</span>
+											<span>@Model.AverageRating.ToString("0.0")</span>
 											<div class="rating-stars">
-												<i class="fa fa-star"></i>
-												<i class="fa fa-star"></i>
-												<i class="fa fa-star"></i>
-												<i class="fa fa-star"></i>
-												<i class="fa fa-star-o"></i>
+												@for (int i = 0; i < (int)Model.AverageRating; i++)
+												{
+													<i class="fa fa-star"></i>
+												}
+												@for (int i = (int)Model.AverageRating; i < 5; i++)
+												{
+													<i class="fa fa-star-o"></i>
+												}
 											</div>
 										</div>
 										<ul class="rating">
@@ -159,9 +149,9 @@
 													<i class="fa fa-star"></i>
 												</div>
 												<div class="rating-progress">
-													<div style="width: 80%;"></div>
+													<div style="width: @Model.FiveStarPercentage%;"></div>
 												</div>
-												<span class="sum">3</span>
+												<span class="sum">@Model.FiveStarPercentage.ToString("0")%</span>
 											</li>
 											<li>
 												<div class="rating-stars">
@@ -172,9 +162,9 @@
 													<i class="fa fa-star-o"></i>
 												</div>
 												<div class="rating-progress">
-													<div style="width: 60%;"></div>
+													<div style="width: @Model.FourStarPercentage%;"></div>
 												</div>
-												<span class="sum">2</span>
+												<span class="sum">@Model.FourStarPercentage.ToString("0")%</span>
 											</li>
 											<li>
 												<div class="rating-stars">
@@ -185,9 +175,9 @@
 													<i class="fa fa-star-o"></i>
 												</div>
 												<div class="rating-progress">
-													<div></div>
+													<div style="width: @Model.ThreeStarPercentage%;"></div>
 												</div>
-												<span class="sum">0</span>
+												<span class="sum">@Model.ThreeStarPercentage.ToString("0")%</span>
 											</li>
 											<li>
 												<div class="rating-stars">
@@ -198,9 +188,9 @@
 													<i class="fa fa-star-o"></i>
 												</div>
 												<div class="rating-progress">
-													<div></div>
+													<div style="width: @Model.TwoStarPercentage%;"></div>
 												</div>
-												<span class="sum">0</span>
+												<span class="sum">@Model.TwoStarPercentage.ToString("0")%</span>
 											</li>
 											<li>
 												<div class="rating-stars">
@@ -211,9 +201,9 @@
 													<i class="fa fa-star-o"></i>
 												</div>
 												<div class="rating-progress">
-													<div></div>
+													<div style="width: @Model.OneStarPercentage%;"></div>
 												</div>
-												<span class="sum">0</span>
+												<span class="sum">@Model.OneStarPercentage.ToString("0")%</span>
 											</li>
 										</ul>
 									</div>
@@ -223,74 +213,59 @@
 								<div class="col-md-6">
 									<div id="reviews">
 										<ul class="reviews">
-											<li>
-												<div class="review-heading">
-													<h5 class="name">John</h5>
-													<p class="date">27 DEC 2018, 8:0 PM</p>
-													<div class="review-rating">
-														<i class="fa fa-star"></i>
-														<i class="fa fa-star"></i>
-														<i class="fa fa-star"></i>
-														<i class="fa fa-star"></i>
-														<i class="fa fa-star-o empty"></i>
-													</div>
-												</div>
-												<div class="review-body">
-													<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua</p>
-												</div>
-											</li>
-											<li>
-												<div class="review-heading">
-													<h5 class="name">John</h5>
-													<p class="date">27 DEC 2018, 8:0 PM</p>
-													<div class="review-rating">
-														<i class="fa fa-star"></i>
-														<i class="fa fa-star"></i>
-														<i class="fa fa-star"></i>
-														<i class="fa fa-star"></i>
-														<i class="fa fa-star-o empty"></i>
-													</div>
-												</div>
-												<div class="review-body">
-													<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua</p>
-												</div>
-											</li>
-											<li>
-												<div class="review-heading">
-													<h5 class="name">John</h5>
-													<p class="date">27 DEC 2018, 8:0 PM</p>
-													<div class="review-rating">
-														<i class="fa fa-star"></i>
-														<i class="fa fa-star"></i>
-														<i class="fa fa-star"></i>
-														<i class="fa fa-star"></i>
-														<i class="fa fa-star-o empty"></i>
-													</div>
-												</div>
-												<div class="review-body">
-													<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua</p>
-												</div>
-											</li>
+											@if (Model.Reviews != null && Model.Reviews.Any())
+											{
+												@foreach (var review in Model.Reviews)
+												{
+													<li style="border-bottom: 1px solid #e0e0e0; padding: 15px 0;">
+														<div class="review-heading">
+															<h5 class="name" style="margin: 0;">@review.User?.Username</h5>
+														</div>
+														<div class="review-body" style="margin-top: 5px;">
+															<p>@review.Comment</p>
+														</div>
+														<div class="review-rating" style="display: flex; align-items: center; margin-top: 5px;">
+															@for (int i = 0; i < review.Rating; i++)
+															{
+																<i class="fa fa-star" style="color: #ffd700;"></i>
+															}
+															@for (int i = review.Rating; i < 5; i++)
+															{
+																<i class="fa fa-star-o empty" style="color: #ddd;"></i>
+															}
+														</div>
+														<div class="review-date" style="margin-top: 5px; color: #757575;">
+															<p>@review.CreatedAt.ToString()</p>
+														</div>
+													</li>
+												}
+											}
+											else
+											{
+												<p>Không có đánh giá nào.</p>
+											}
 										</ul>
-										<ul class="reviews-pagination">
-											<li class="active">1</li>
-											<li><a href="#">2</a></li>
-											<li><a href="#">3</a></li>
-											<li><a href="#">4</a></li>
-											<li><a href="#"><i class="fa fa-angle-right"></i></a></li>
-										</ul>
+										<!-- Reviews Pagination -->
+
+											<ul class="reviews-pagination">
+												@for (int i = 1; i <= Model.TotalPages; i++)
+												{
+													<li class="@(i == Model.CurrentPage ? "active" : "")">
+														<a href="@Url.Action("Details", new { id = Model.CurrentProduct.ProductId, categoryId = Model.CurrentProduct.CategoryId, page = i })">@i</a>
+													</li>
+												}
+											</ul>
+									
 									</div>
 								</div>
 								<!-- /Reviews -->
 								<!-- Review Form -->
 								<div class="col-md-3">
-									<div id="review-form">
-										<form class="review-form">
-											<input class="input" type="text" placeholder="Tên của bạn">
-											<input class="input" type="email" placeholder="Email của bạn">
-											<textarea class="input" placeholder="Nhập bình luận"></textarea>
+									<div id="review-form" class="review-form">
+										<form asp-controller="Products" asp-action="AddReview" method="post">
+											<textarea name="comment" class="input" placeholder="Nhập bình luận"></textarea>
 											<div class="input-rating">
-												<span>Đánh giá </span>
+												<span>Đánh giá</span>
 												<div class="stars">
 													<input id="star5" name="rating" value="5" type="radio"><label for="star5"></label>
 													<input id="star4" name="rating" value="4" type="radio"><label for="star4"></label>
@@ -299,7 +274,8 @@
 													<input id="star1" name="rating" value="1" type="radio"><label for="star1"></label>
 												</div>
 											</div>
-											<button class="primary-btn">Gửi</button>
+											<input type="hidden" name="productId" value="@Model.CurrentProduct.ProductId" />
+											<button type="submit" class="primary-btn">Gửi</button>
 										</form>
 									</div>
 								</div>
@@ -357,13 +333,6 @@
 										{
 											<h4 class="product-price">@item.Price.ToString("N0") VND</h4>
 										}
-										<div class="product-rating">
-											<i class="fa fa-star"></i>
-											<i class="fa fa-star"></i>
-											<i class="fa fa-star"></i>
-											<i class="fa fa-star"></i>
-											<i class="fa fa-star"></i>
-										</div>
 									</div>
 
 									<div class="add-to-cart">
@@ -386,4 +355,15 @@
 </div>
 <!-- /Section -->
 
+<script>
+	function refreshReviews() {
+		$.ajax({
+			url: '@Url.Action("GetReviews", "Products")',
+			type: 'GET',
+			success: function (data) {
+				$('#reviews').html(data);
+			}
+		});
+	}
+</script>
 

@@ -63,11 +63,12 @@
                                 <div><strong>TỔNG</strong></div>
                             </div>
                             <div class="order-products">
-                                @foreach (var product in Model.CartProducts)
+                                @foreach (var cartProduct in Model.CartProducts)
                                 {
+                                    var price = ViewBag.ProductPrices[cartProduct.Product.ProductId];
                                     <div class="order-col">
-                                        <div>@product.Quantity x @product.Product.ProductName</div>
-                                        <div>@string.Format("{0:N0}", Model.TotalAmount) VND</div>
+                                        <div>@cartProduct.Quantity x @cartProduct.Product.ProductName</div>
+                                        <div>@string.Format("{0:N0}", (price * cartProduct.Quantity)) VND</div>
                                     </div>
                                 }
                             </div>

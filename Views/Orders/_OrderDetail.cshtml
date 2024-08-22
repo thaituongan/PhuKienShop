@@ -1,0 +1,11 @@
+﻿@model PhuKienShop.Models.OrderViewModel
+
+<tr>
+    <td>@Model.Order.OrderId</td>
+    <td>@Model.Order.OrderDate</td>
+    <td>@Model.Order.UserId</td>
+    <td>@Html.Raw(Model.Details)</td>
+    <td>@Model.Order.TotalAmount</td>
+    <td>@PhuKienShop.Models.OrderViewModel.translateOrderStatus(Model.Order.Status)</td>
+    <td>@Model.Order.CreatedAt</td>
+</tr>

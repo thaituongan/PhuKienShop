@@ -59,6 +59,11 @@ namespace PhuKienShop.Controllers
             var userName = HttpContext.User.Identity.Name; // hoặc từ session nếu lưu trữ thông tin người dùng khác
             var user = _context.Users.FirstOrDefault(u => u.Username == userName);
 
+            // Tạo một dictionary để lưu trữ giá của từng sản phẩm
+            var productPrices = cart.CartProducts.ToDictionary(
+                cp => cp.Product.ProductId,
+                cp => cart.IsSale(_context, cp.Product.ProductId));
+
             var viewModel = new CheckoutViewModel
             {
                 CartProducts = cart.CartProducts,
@@ -68,6 +73,9 @@ namespace PhuKienShop.Controllers
                 Address = user?.Address,
                 Phone = user?.PhoneNumber
             };
+
+            // Truyền giá sản phẩm vào ViewBag
+            ViewBag.ProductPrices = productPrices;
 
             return View(viewModel);
         }
@@ -109,16 +117,23 @@ namespace PhuKienShop.Controllers
                 _context.Orders.Add(order);
                 await _context.SaveChangesAsync();
 
-                // Thêm chi tiết đơn hàng từ CartProducts
+                var productPrices = cart.CartProducts.ToDictionary(
+                    cp => cp.Product.ProductId,
+                    cp => cart.IsSale(_context, cp.Product.ProductId));
+
+            // Thêm chi tiết đơn hàng từ CartProducts
                 foreach (var cartProduct in cart.CartProducts)
                 {
+
+                    var unitPrice = productPrices[cartProduct.Product.ProductId];
+
                     var orderDetail = new OrderDetail
                     {
                         OrderId = order.OrderId,
                         ProductId = cartProduct.Product.ProductId,
                         Quantity = cartProduct.Quantity,
-                        UnitPrice = cartProduct.Product.Price,
-                        TotalPrice = cartProduct.Quantity * cartProduct.Product.Price
+                        UnitPrice = unitPrice,
+                        TotalPrice = cartProduct.Quantity * unitPrice
                     };
 
                     _context.OrderDetails.Add(orderDetail);

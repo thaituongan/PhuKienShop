@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration.UserSecrets;
 using Microsoft.IdentityModel.Tokens;
 using PhuKienShop.Data;
 using PhuKienShop.Models;
@@ -17,6 +19,38 @@ namespace PhuKienShop.Controllers
 		public ProductsController(PkShopContext context)
 		{
 			_context = context;
+		}
+
+		public IActionResult DetailsPage(int id, int page = 1)
+		{
+			var product = _context.Products
+				.Include(p => p.Reviews)
+				.FirstOrDefault(p => p.ProductId == id);
+
+			if (product == null)
+			{
+				return NotFound();
+			}
+
+			var pageSize = 2; // số bình luận mỗi trang
+			var reviews = product.Reviews
+				.OrderByDescending(r => r.CreatedAt)
+				.Skip((page - 1) * pageSize)
+				.Take(pageSize)
+				.ToList();
+
+			var totalReviews = product.Reviews.Count();
+			var totalPages = (int)Math.Ceiling(totalReviews / (double)pageSize);
+
+			var model = new ProductDetailModel
+			{
+				CurrentProduct = product,
+				Reviews = reviews,
+				TotalPages = totalPages,
+				CurrentPage = page
+			};
+
+			return View(model);
 		}
 
 		// GET: Products
@@ -34,37 +68,75 @@ namespace PhuKienShop.Controllers
         }
 
 		// GET: Products/Details/5
-		public async Task<IActionResult> Details(int? id, int categoryId)
+		public async Task<IActionResult> Details(int? id, int categoryId, int page = 1)
 		{
 			if (id == null)
 			{
 				return NotFound();
 			}
-			//lấy ra sản phẩm được chọn
+
+			// Lấy sản phẩm được chọn
 			var product = await _context.Products
 				.Include(p => p.Category)
-				.Include(p => p.ProductSales) // Thêm dòng này để nạp đầy đủ dữ liệu ProductSales
+				.Include(p => p.ProductSales)
+				.Include(p => p.Reviews)
+				.ThenInclude(r => r.User)
 				.FirstOrDefaultAsync(m => m.ProductId == id);
 
 			if (product == null)
 			{
 				return NotFound();
 			}
-			//lấy ra sản phấm liên quan đến sản phẩm đó
-			var relatedProduct = _context.Products
+
+			// Lấy sản phẩm liên quan
+			var relatedProducts = _context.Products
 				.Include(p => p.Category)
 				.Include(p => p.ProductSales)
-				//lay cac san pham cung category ngoai tru san pham hien tai
 				.Where(p => p.CategoryId == categoryId && p.ProductId != id)
 				.Take(4)
 				.ToList();
 
-			//truyen vao ProductDetailModel
+			// Xử lý phân trang cho bình luận
+			var pageSize = 2; // số bình luận mỗi trang
+			var reviews = product.Reviews
+				.OrderByDescending(r => r.CreatedAt)
+				.Skip((page - 1) * pageSize)
+				.Take(pageSize)
+				.ToList();
+
+			var totalReviews = product.Reviews.Count();
+			var totalPages = (int)Math.Ceiling(totalReviews / (double)pageSize);
+
+			// Tính toán các chỉ số đánh giá
+			int fiveStar = product.Reviews.Count(r => r.Rating == 5);
+			int fourStar = product.Reviews.Count(r => r.Rating == 4);
+			int threeStar = product.Reviews.Count(r => r.Rating == 3);
+			int twoStar = product.Reviews.Count(r => r.Rating == 2);
+			int oneStar = product.Reviews.Count(r => r.Rating == 1);
+
+			double fiveStarPercentage = totalReviews > 0 ? (double)fiveStar / totalReviews * 100 : 0;
+			double fourStarPercentage = totalReviews > 0 ? (double)fourStar / totalReviews * 100 : 0;
+			double threeStarPercentage = totalReviews > 0 ? (double)threeStar / totalReviews * 100 : 0;
+			double twoStarPercentage = totalReviews > 0 ? (double)twoStar / totalReviews * 100 : 0;
+			double oneStarPercentage = totalReviews > 0 ? (double)oneStar / totalReviews * 100 : 0;
+
+			double averageRating = product.Reviews.Any() ? product.Reviews.Average(r => r.Rating) : 0;
+
 			var viewModel = new ProductDetailModel
 			{
 				CurrentProduct = product,
-				RelatedProducts = relatedProduct
+				RelatedProducts = relatedProducts,
+				Reviews = reviews,
+				AverageRating = averageRating,
+				FiveStarPercentage = fiveStarPercentage,
+				FourStarPercentage = fourStarPercentage,
+				ThreeStarPercentage = threeStarPercentage,
+				TwoStarPercentage = twoStarPercentage,
+				OneStarPercentage = oneStarPercentage,
+				TotalPages = totalPages,
+				CurrentPage = page
 			};
+
 			return View(viewModel);
 		}
 
@@ -205,5 +277,33 @@ namespace PhuKienShop.Controllers
 		{
 			return _context.Products.Any(e => e.ProductId == id);
 		}
+
+		[HttpPost]
+		public async Task<IActionResult> AddReview(int productId, string comment, int rating)
+		{
+			if (User.Identity.IsAuthenticated)
+			{
+				var email = User.FindFirst(ClaimTypes.Email)?.Value;
+				var userDetails = _context.Users.FirstOrDefault(u => u.Email == email);
+				int userId = userDetails.UserId;
+
+				var review = new Review
+				{
+					ProductId = productId,
+					UserId = userId,
+					Rating = rating,
+					Comment = comment,
+					CreatedAt = DateTime.Now
+				};
+
+				_context.Reviews.Add(review);
+				await _context.SaveChangesAsync();
+
+				return RedirectToAction("Details", new { id = productId });
+			}
+
+			return RedirectToAction("Login", "Account");
+		}
+
 	}
 }

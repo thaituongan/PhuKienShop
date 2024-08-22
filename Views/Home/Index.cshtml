@@ -1,5 +1,4 @@
-
-﻿@{
+@{
     ViewData["Title"] = "Home Page";
 }
 <div class="section">
@@ -28,7 +27,7 @@
                     <div class="col-md-4 col-xs-6">
                         <div class="shop">
                             <div class="shop-img">
-                                <img src="./img/shop3.png" alt="">
+                                <img src="./img/shop2.png" alt="">
                             </div>
                             <div class="shop-body">
                                 <h3>Tai Nghe<br></h3>
@@ -41,7 +40,7 @@
                     <div class="col-md-4 col-xs-6">
                         <div class="shop">
                             <div class="shop-img">
-                                <img src="./img/shop2.png" alt="">
+                                <img src="./img/shop3.png" alt="">
                             </div>
                             <div class="shop-body">
                                 <h3>Ốp Lưng<br></h3>
@@ -122,56 +121,6 @@
     </div>
     <!-- /container -->
 </div>
-
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        var dealEndTime = new Date('@ViewBag.DealEndTime');
-        console.log("Deal End Time: ", dealEndTime); // Log the date for debugging
-
-        var countdownFunction = setInterval(function () {
-            var now = new Date().getTime();
-            var distance = dealEndTime - now;
-
-            if (distance < 0) {
-                clearInterval(countdownFunction);
-                document.getElementById("days").textContent = "00";
-                document.getElementById("hours").textContent = "00";
-                document.getElementById("minutes").textContent = "00";
-                document.getElementById("seconds").textContent = "00";
-            } else {
-                var days = Math.floor(distance / (1000 * 60 * 60 * 24));
-                var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                var seconds = Math.floor((distance % (1000 * 60)) / 1000);
-			var dealEndTime = new Date('@ViewBag.DealEndTime');
-			console.log("Deal End Time: ", dealEndTime); // Log the date for debugging
-
-			var countdownFunction = setInterval(function () {
-				var now = new Date().getTime();
-				var distance = dealEndTime - now;
-
-				if (distance < 0) {
-					clearInterval(countdownFunction);
-					document.getElementById("days").textContent = "00";
-					document.getElementById("hours").textContent = "00";
-					document.getElementById("minutes").textContent = "00";
-					document.getElementById("seconds").textContent = "00";
-				} else {
-					var days = Math.floor(distance / (1000 * 60 * 60 * 24));
-					var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-					var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-					var seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-					document.getElementById("days").textContent = days;
-					document.getElementById("hours").textContent = hours;
-					document.getElementById("minutes").textContent = minutes;
-					document.getElementById("seconds").textContent = seconds;
-				}
-			}, 1000);
-		});
-
-
-</script>
 	<!-- /HOT DEAL SECTION -->
 	<div class="section">
 		<!-- container -->
@@ -209,3 +158,40 @@
 		</div>
 		<!-- /container -->
 	</div>
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Fetch the deal end time from the ViewBag
+            var dealEndTime = new Date('@ViewBag.DealEndTime');
+            console.log("Deal End Time: ", dealEndTime); // Log the date for debugging
+
+            // Function to update the countdown every second
+            var countdownFunction = setInterval(function () {
+                var now = new Date().getTime();
+                var distance = dealEndTime - now;
+
+                // If the countdown is over, stop the timer and set all values to 00
+                if (distance < 0) {
+                    clearInterval(countdownFunction);
+                    document.getElementById("days").textContent = "00";
+                    document.getElementById("hours").textContent = "00";
+                    document.getElementById("minutes").textContent = "00";
+                    document.getElementById("seconds").textContent = "00";
+                } else {
+                    // Calculate the remaining time
+                    var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                    var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                    var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                    // Update the countdown display
+                    document.getElementById("days").textContent = days;
+                    document.getElementById("hours").textContent = hours;
+                    document.getElementById("minutes").textContent = minutes;
+                    document.getElementById("seconds").textContent = seconds;
+                }
+            }, 1000); // Update the countdown every 1 second
+        });
+    </script>
+}
+

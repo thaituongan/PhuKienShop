@@ -7,5 +7,6 @@ namespace PhuKienShop.Services
     public interface IOrderDetailService
     {
         Task<List<OrderDetail>> SelectByOrdersAsync(List<int> oids);
+        Task<List<OrderDetail>> SelectByOrderIDAsync(int id);
     }
 }
