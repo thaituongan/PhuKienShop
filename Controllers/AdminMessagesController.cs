@@ -4,7 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using System.Linq;
 using Microsoft.AspNetCore.SignalR;
-
+using Microsoft.AspNetCore.Authorization;
+[Authorize(Policy = "AdminOnly")]
 [Route("admin/messages")]
 public class AdminMessagesController : Controller
 {

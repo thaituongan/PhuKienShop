@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Azure;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
@@ -19,6 +20,7 @@ using static NuGet.Packaging.PackagingConstants;
 
 namespace PhuKienShop.Controllers
 {
+    [Authorize(Policy = "AdminOnly")]
     public class OrdersController : Controller
     {
         private readonly PkShopContext _context;

@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using PhuKienShop.Data;
 using System.Security.Claims;
 [ApiController]
 [Route("api/[controller]")]
+[Authorize(Policy = "AdminOnly")]
 public class MessagesController : ControllerBase
 {
     private readonly PkShopContext _context;

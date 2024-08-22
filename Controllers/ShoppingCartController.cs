@@ -3,9 +3,11 @@ using PhuKienShop.Data;
 using PhuKienShop.Models;
 using Microsoft.AspNetCore.Http;
 using System.Text.Json;
+using Microsoft.AspNetCore.Authorization;
 
 namespace PhuKienShop.Controllers
 {
+    [Authorize(Policy = "UserOnly")]
     public class ShoppingCartController : Controller
     {
         private readonly PkShopContext _db;
