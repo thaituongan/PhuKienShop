@@ -8,8 +8,8 @@
 	@*     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
 	<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 	<link rel="stylesheet" href="~/ElectronicsShop.styles.css" asp-append-version="true" /> *@
-		<!-- Other head content -->
-		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+	<!-- Other head content -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 	<link rel="stylesheet" href="https://cdn.datatables.net/1.13.1/css/jquery.dataTables.min.css">
 	<link rel="stylesheet" href="https://cdn.datatables.net/1.13.1/css/dataTables.bootstrap5.min.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -32,7 +32,7 @@
 	<!-- Custom stlylesheet -->
 	<link type="text/css" rel="stylesheet" href="~/css/style.css" />
 	<!-- js-->
-	
+
 	<script src="~/js/searchpartial.js" defer></script>
 
 	<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -72,7 +72,7 @@
 	</style>
 </head>
 <body>
-	
+
 	<!-- HEADER -->
 	<header>
 		<!-- TOP HEADER -->
@@ -84,16 +84,22 @@
 					<li><a href="#"><i class="fa fa-map-marker"></i> Đại Học Nông Lâm</a></li>
 				</ul>
 				<ul class="header-links pull-right">
-					<li><a href="@Url.Action("MyAccount", "Account")"><i class="fa fa-user-o"></i>
-							@{if(User.Identity.Name != null)
+					<li>
+						<a href="@Url.Action("MyAccount", "Account")">
+							<i class="fa fa-user-o"></i>
+							@{
+								if (User.Identity.Name != null)
 								{
 									@User.Identity.Name
-								}else
-									{
-										<span>Đăng Nhập</span>
-									}
-								
-							}</a></li>
+								}
+								else
+								{
+									<span>Đăng Nhập</span>
+								}
+
+							}
+						</a>
+					</li>
 					<li><a href="@Url.Action("Logout", "Account")"> <i class="fas fa-sign-out-alt"></i></i> Đăng Xuất</a></li>
 
 				</ul>
@@ -120,7 +126,7 @@
 					<div class="col-md-6">
 						<div class="header-search">
 							<form action="/Products/Search" method="get" id="searchForm">
-								
+
 								<input id="searchInput" name="searchTerm" class="input-select" placeholder="Tìm kiếm sản phẩm">
 								<button class="search-btn">Tìm kiếm</button>
 							</form>
@@ -130,10 +136,10 @@
 					<!-- ACCOUNT -->
 					<div class="col-md-3 clearfix">
 						<div class="header-ctn">
-								<div class="dropdown">
-									<a class="dropdown-toggle" asp-controller="ShoppingCart" asp-action="Index">
-										<i class="fa fa-shopping-cart"></i>
-										<span>Giỏ Hàng</span>
+							<div class="dropdown">
+								<a class="dropdown-toggle" asp-controller="ShoppingCart" asp-action="Index">
+									<i class="fa fa-shopping-cart"></i>
+									<span>Giỏ Hàng</span>
 									<div class="qty">
 										<div class="qty">
 											@{
@@ -149,9 +155,9 @@
 										</div>
 
 									</div>  <!-- Hiển thị số lượng sản phẩm trong giỏ hàng -->
-									</a>
-								</div>
-						
+								</a>
+							</div>
+
 							<!-- Menu Toogle -->
 							<div class="menu-toggle">
 								<a href="#">
@@ -198,7 +204,7 @@
 
 	</header>
 
-	<div id="main" style="min-height: 600px" >
+	<div id="main" style="min-height: 600px">
 		@RenderBody()
 	</div>
 	@Html.Partial("_Chat")
