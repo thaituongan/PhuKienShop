@@ -247,6 +247,7 @@ namespace PhuKienShop.Controllers
 		{
 			return _context.Products.Any(e => e.ProductId == id);
 		}
+
 		[HttpPost]
 		public async Task<IActionResult> AddReview(int productId, string comment, int rating)
 		{
@@ -262,7 +263,7 @@ namespace PhuKienShop.Controllers
 					UserId = userId,
 					Rating = rating,
 					Comment = comment,
-					CreatedAt = DateTime.UtcNow
+					CreatedAt = DateTime.Now
 				};
 
 				_context.Reviews.Add(review);
@@ -273,5 +274,6 @@ namespace PhuKienShop.Controllers
 
 			return RedirectToAction("Login", "Account");
 		}
+
 	}
 }

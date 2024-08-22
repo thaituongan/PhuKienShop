@@ -10,11 +10,11 @@
         public decimal TotalRevenueThisMonth { get; set; }
         public int TotalCustomersThisMonth { get; set; }
         public int TotalProductThisMonth { get; set; }
-        public double OrderChangePercentage { get; set; }
-        public double CustomerChangePercentage { get; set; }
-        public double RevenueChangePercentage { get; set; }
-        public double ProductSoldChangePercentage { get; set; }
-
+        public int TotalOrdersLastMonth { get; set; }
+        public decimal TotalRevenueLastMonth { get; set; }
+        public int TotalCustomersLastMonth { get; set; }
+        public int TotalProductLastMonth { get; set; }
+     
 
 
     }

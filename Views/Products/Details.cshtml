@@ -83,8 +83,7 @@
 							<form asp-controller="ShoppingCart" asp-action="AddToCart" method="post">
 								<input type="hidden" name="productId" value="@Model.CurrentProduct.ProductId" />
 								<input type="hidden" name="quantity" value="1" />
-								<button type="submit" class="add-to-cart-btn">
-									<i class="fa fa-shopping-cart"></i> Thêm vào giỏ hàng
+								<button type="submit" class="add-to-cart-btn"><i class="fa fa-shopping-cart"></i> Thêm vào giỏ hàng
 								</button>
 							</form>
 						}
@@ -97,12 +96,6 @@
 							</form>
 						}
 					</div>
-
-					<ul class="product-btns">
-						<li><a href="#"><i class="fa fa-heart-o"></i> Thêm vào dánh sách đợi</a></li>
-
-					</ul>
-
 					<ul class="product-links">
 						<li>Loại:</li>
 						<li><a href="#">@Model.CurrentProduct.Category.CategoryName</a></li>
@@ -121,7 +114,7 @@
 					<!-- /product tab nav -->
 					<!-- product tab content -->
 					<div class="tab-content">
-						<!-- tab1  -->
+						<!-- tab1: chi tiết  -->
 						<div id="tab1" class="tab-pane fade in">
 							<div class="row">
 								<div class="col-md-12">
@@ -130,7 +123,7 @@
 							</div>
 						</div>
 						<!-- /tab1  -->
-						<!-- tab2  -->
+						<!-- tab2: bình luận  -->
 						<div id="tab2" class="tab-pane fade in">
 							<div class="row">
 								<!-- Rating -->
@@ -271,17 +264,17 @@
 								<!-- /Reviews -->
 								<!-- Review Form -->
 								<div class="col-md-3">
-									<div id="review-form">
+									<div id="review-form" class="review-form">
 										<form asp-controller="Products" asp-action="AddReview" method="post">
 											<textarea name="comment" class="input" placeholder="Nhập bình luận"></textarea>
 											<div class="input-rating">
 												<span>Đánh giá</span>
 												<div class="stars">
-													<input id="star1" name="rating" value="1" type="radio"><label for="star1"></label>
-													<input id="star2" name="rating" value="2" type="radio"><label for="star2"></label>
-													<input id="star3" name="rating" value="3" type="radio"><label for="star3"></label>
-													<input id="star4" name="rating" value="4" type="radio"><label for="star4"></label>
 													<input id="star5" name="rating" value="5" type="radio"><label for="star5"></label>
+													<input id="star4" name="rating" value="4" type="radio"><label for="star4"></label>
+													<input id="star3" name="rating" value="3" type="radio"><label for="star3"></label>
+													<input id="star2" name="rating" value="2" type="radio"><label for="star2"></label>
+													<input id="star1" name="rating" value="1" type="radio"><label for="star1"></label>
 												</div>
 											</div>
 											<input type="hidden" name="productId" value="@Model.CurrentProduct.ProductId" />
@@ -320,44 +313,31 @@
 			@if (!@Model.RelatedProducts.Any())
 			{
 				<h2>Không có sản phẩm liên quan nào được hiển thị</h2>
-			}
-			else
-			{
-				<!-- product: hiển thị lên các sẩn phẩm liên quan -->
-				<div class="products-tabs">
-					<div id="tab1" class="tab-pane active">
-						<div class="products-slick" data-nav="#slick-nav-1">
-							@foreach (var item in Model.RelatedProducts)
-							{
-								<div class="product">
-									<a asp-controller="Products" asp-action="Details" asp-route-id="@item.ProductId" asp-route-categoryId="@item.CategoryId">
-										<div class="product-img">
-											<img height="150px" src="@item.RelativeImageUrl(item.ImageUrl)" alt="@item.Description">
-										</div>
-										<div class="product-body">
-											<p class="product-category">@item.Category.CategoryName</p>
-											<h3 class="product-name"><a asp-controller="Products" asp-action="Details" asp-route-id="@item.ProductId">@item.ProductName</a></h3>
-											@if (item.isProductSale())
-											{
-												<h4 class="product-price">@item.GetPrice().ToString("N0") VND</h4>
-												<del class="product-old-price">@item.Price.ToString("N0") VND</del>
-											}
-											else
-											{
-												<h4 class="product-price">@item.Price.ToString("N0") VND</h4>
-											}
-											<div class="product-rating">
-												<i class="fa fa-star"></i>
-												<i class="fa fa-star"></i>
-												<i class="fa fa-star"></i>
-												<i class="fa fa-star"></i>
-												<i class="fa fa-star"></i>
-											</div>
-											<div class="product-btns">
-												<button class="add-to-wishlist"><i class="fa fa-heart-o"></i><span class="tooltipp">danh sách đợi</span></button>
-												<button class="quick-view"><i class="fa fa-eye"></i><span class="tooltipp">Xem nhanh</span></button>
-											</div>
-										</div>
+			} else{
+			<!-- product: hiển thị lên các sẩn phẩm liên quan -->
+			<div class="products-tabs">
+				<div id="tab1" class="tab-pane active">
+					<div class="products-slick" data-nav="#slick-nav-1">
+						@foreach (var item in Model.RelatedProducts)
+						{
+							<div class="product">
+								<a asp-controller="Products" asp-action="Details" asp-route-id="@item.ProductId" asp-route-categoryId="@item.CategoryId">
+									<div class="product-img">
+										<img height="150px" src="@item.RelativeImageUrl(item.ImageUrl)" alt="@item.Description">
+									</div>
+									<div class="product-body">
+										<p class="product-category">@item.Category.CategoryName</p>
+										<h3 class="product-name"><a asp-controller="Products" asp-action="Details" asp-route-id="@item.ProductId">@item.ProductName</a></h3>
+										@if (item.isProductSale())
+										{
+											<h4 class="product-price">@item.GetPrice().ToString("N0") VND</h4>
+											<del class="product-old-price">@item.Price.ToString("N0") VND</del>
+										}
+										else
+										{
+											<h4 class="product-price">@item.Price.ToString("N0") VND</h4>
+										}
+									</div>
 
 										<div class="add-to-cart">
 											<button class="add-to-cart-btn"><i class="fa fa-shopping-cart"></i>Thêm vào giỏ hàng</button>

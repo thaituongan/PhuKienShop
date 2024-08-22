@@ -8,8 +8,8 @@
 	@*     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
 	<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 	<link rel="stylesheet" href="~/ElectronicsShop.styles.css" asp-append-version="true" /> *@
-		<!-- Other head content -->
-		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+	<!-- Other head content -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 	<link rel="stylesheet" href="https://cdn.datatables.net/1.13.1/css/jquery.dataTables.min.css">
 	<link rel="stylesheet" href="https://cdn.datatables.net/1.13.1/css/dataTables.bootstrap5.min.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -32,7 +32,7 @@
 	<!-- Custom stlylesheet -->
 	<link type="text/css" rel="stylesheet" href="~/css/style.css" />
 	<!-- js-->
-	
+
 	<script src="~/js/searchpartial.js" defer></script>
 
 	<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -44,13 +44,26 @@
 
 	<style>
 		#searchResults {
-			position: absolute; /* Đặt phần tử đè lên vị trí của layout chính */
-			top: 100px; /* Điều chỉnh khoảng cách từ đỉnh của trang */
+			position: absolute;
+			top: 150pxpx;
 			left: 0;
 			right: 0;
-			z-index: 1000; /* Đảm bảo rằng nó nằm trên các phần tử khác */
+			z-index: 100;
 			padding: 20px;
+			background-color: white; /* Nền trắng cho phần tử chính */
 		}
+
+			#searchResults .result-item {
+				background-color: white; /* Nền trắng cho từng phần tử con */
+				margin-bottom: 20px; /* Khoảng cách giữa các phần tử */
+				padding: 10px; /* Khoảng cách bên trong mỗi phần tử */
+				box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1); /* Đổ bóng cho mỗi phần tử */
+			}
+
+				#searchResults .result-item:last-child {
+					margin-bottom: 0; /* Xóa khoảng cách dưới cùng cho phần tử cuối */
+				}
+
 
 		#main {
 			position: relative;
@@ -59,7 +72,7 @@
 	</style>
 </head>
 <body>
-	
+
 	<!-- HEADER -->
 	<header>
 		<!-- TOP HEADER -->
@@ -71,16 +84,22 @@
 					<li><a href="#"><i class="fa fa-map-marker"></i> Đại Học Nông Lâm</a></li>
 				</ul>
 				<ul class="header-links pull-right">
-					<li><a href="@Url.Action("MyAccount", "Account")"><i class="fa fa-user-o"></i>
-							@{if(User.Identity.Name != null)
+					<li>
+						<a href="@Url.Action("MyAccount", "Account")">
+							<i class="fa fa-user-o"></i>
+							@{
+								if (User.Identity.Name != null)
 								{
 									@User.Identity.Name
-								}else
-									{
-										<span>Đăng Nhập</span>
-									}
-								
-							}</a></li>
+								}
+								else
+								{
+									<span>Đăng Nhập</span>
+								}
+
+							}
+						</a>
+					</li>
 					<li><a href="@Url.Action("Logout", "Account")"> <i class="fas fa-sign-out-alt"></i></i> Đăng Xuất</a></li>
 
 				</ul>
@@ -107,7 +126,7 @@
 					<div class="col-md-6">
 						<div class="header-search">
 							<form action="/Products/Search" method="get" id="searchForm">
-								
+
 								<input id="searchInput" name="searchTerm" class="input-select" placeholder="Tìm kiếm sản phẩm">
 								<button class="search-btn">Tìm kiếm</button>
 							</form>
@@ -117,10 +136,10 @@
 					<!-- ACCOUNT -->
 					<div class="col-md-3 clearfix">
 						<div class="header-ctn">
-								<div class="dropdown">
-									<a class="dropdown-toggle" asp-controller="ShoppingCart" asp-action="Index">
-										<i class="fa fa-shopping-cart"></i>
-										<span>Giỏ Hàng</span>
+							<div class="dropdown">
+								<a class="dropdown-toggle" asp-controller="ShoppingCart" asp-action="Index">
+									<i class="fa fa-shopping-cart"></i>
+									<span>Giỏ Hàng</span>
 									<div class="qty">
 										<div class="qty">
 											@{
@@ -136,9 +155,9 @@
 										</div>
 
 									</div>  <!-- Hiển thị số lượng sản phẩm trong giỏ hàng -->
-									</a>
-								</div>
-						
+								</a>
+							</div>
+
 							<!-- Menu Toogle -->
 							<div class="menu-toggle">
 								<a href="#">
@@ -185,7 +204,7 @@
 
 	</header>
 
-	<div id="main" style="min-height: 600px" >
+	<div id="main" style="min-height: 600px">
 		@RenderBody()
 	</div>
 	@Html.Partial("_Chat")
