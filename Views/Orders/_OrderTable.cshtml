@@ -1,0 +1,13 @@
+﻿@model IEnumerable<PhuKienShop.Models.OrderViewModel>
+
+@foreach(var m in Model) {
+    <tr>
+        <td>@m.Order.OrderId</td>
+        <td>@m.Order.OrderDate</td>
+        <td><a href="#" onclick="getOrderDetails(@m.Order.OrderId)">Chi tiết đơn hàng</a></td>
+        <td>@m.Order.TotalAmount.ToString("C")</td>
+        <td>@PhuKienShop.Models.OrderViewModel.translateOrderStatus(m.Order.Status)</td>
+        <td>@m.Order.CreatedAt</td>
+    </tr>
+}
+

@@ -191,8 +191,32 @@ namespace PhuKienShop.Controllers
 			return View(product);
 		}
 
-		// GET: Products/Create                
-		public IActionResult Create()
+        [HttpPost]
+        public async Task<IActionResult> searchProduct(string input)
+        {
+            // Kiểm tra nếu input là số để so sánh với ID
+            if (int.TryParse(input, out int id))
+            {
+                var products = await _context.Products
+                    .Where(p => p.ProductId == id)
+                    .ToListAsync();
+				AdminProductViewModel pView = new AdminProductViewModel(products);
+				return PartialView("_AdminProductTable", pView);
+            }
+            else
+            {
+                // Nếu input không phải là số, tìm kiếm theo Name
+                var products = await _context.Products
+                    .Where(p => p.ProductName.Contains(input))
+                    .ToListAsync();
+                AdminProductViewModel pView = new AdminProductViewModel(products);
+                return PartialView("_AdminProductTable", pView);
+            }
+
+        }
+
+        // GET: Products/Create                
+        public IActionResult Create()
 		{
 			ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryId");
 			return View();
