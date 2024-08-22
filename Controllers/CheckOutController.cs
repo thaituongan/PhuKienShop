@@ -110,7 +110,7 @@ namespace PhuKienShop.Controllers
                     UserId = model.UserId,
                     OrderDate = DateTime.Now,
                     TotalAmount = model.TotalAmount,
-                    Status = "Chờ xác nhận",
+                    Status = "WAITING",
                     CreatedAt = DateTime.Now
                 };
 

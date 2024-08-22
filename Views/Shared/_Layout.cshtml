@@ -41,6 +41,22 @@
 	  <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 	  <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 	<![endif]-->
+
+	<style>
+		#searchResults {
+			position: absolute; /* Đặt phần tử đè lên vị trí của layout chính */
+			top: 100px; /* Điều chỉnh khoảng cách từ đỉnh của trang */
+			left: 0;
+			right: 0;
+			z-index: 1000; /* Đảm bảo rằng nó nằm trên các phần tử khác */
+			padding: 20px;
+		}
+
+		#main {
+			position: relative;
+			z-index: 1; /* Đảm bảo rằng nội dung chính nằm phía sau kết quả tìm kiếm */
+		}
+	</style>
 </head>
 <body>
 	
@@ -93,7 +109,7 @@
 							<form action="/Products/Search" method="get" id="searchForm">
 								
 								<input id="searchInput" name="searchTerm" class="input-select" placeholder="Tìm kiếm sản phẩm">
-								<button class="search-btn">Search</button>
+								<button class="search-btn">Tìm kiếm</button>
 							</form>
 						</div>
 					</div>
@@ -270,6 +286,8 @@
 	</footer>
 	<!-- /FOOTER -->
 	<!-- jQuery Plugins -->
+	<!-- SignalR Script and Chat Widget Logic -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
 	<script src="~/js/jquery.min.js"></script>
 	<script src="~/js/bootstrap.min.js"></script>
 	<script src="~/js/slick.min.js"></script>

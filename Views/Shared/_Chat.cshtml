@@ -1,7 +1,10 @@
-﻿﻿<!-- Chat Widget -->
+﻿<!-- Chat Widget -->
 <div id="chat-widget" class="chat-widget">
-    <div class="chat-header" >
-        <h5 style="color:aliceblue;">Trò chuyện cùng admin<span id="toggleChat" class="toggle-chat p-5">[Hide]</span></h5>
+    <div class="chat-header">
+        <h5 style="color: white; padding-left: 2px;">Trò chuyện cùng admin
+            <button id="toggleChat" class="toggle-chat">
+        <i class="fas fa-times"></i>
+    </button>
     </div>
     <div id="messages" class="chat-messages"></div>
     <div class="chat-input-container">
@@ -10,7 +13,9 @@
     </div>
 </div>
 
-<button id="toggleChatButton" class="btn btn-info chat-toggle-button">Chat</button>
+<button id="toggleChatButton" class="chat-toggle-button">
+    <i class="fas fa-comment-dots" style="color: #d9534f; font-size: 24px;"></i>
+</button>
 
 <input type="hidden" id="userName" value="@User.Identity.Name" />
 
@@ -25,16 +30,32 @@
 
         connection.on("ReceiveMessage", (user, message) => {
             const msg = document.createElement("div");
-            msg.className = user === "@User.Identity.Name" ? "chat-message user-messageWedget" : "chat-message admin-messageWedget";
-            msg.innerHTML = `<strong>${user}</strong>: ${message}`;
+            msg.className = user === "Admin" ? "chat-message admin-message" : "chat-message user-message";
+            msg.innerHTML = `${message}`;
             document.getElementById("messages").appendChild(msg);
             document.getElementById("messages").scrollTop = document.getElementById("messages").scrollHeight;
+
+            // Save message to sessionStorage
+            const chatHistory = JSON.parse(sessionStorage.getItem('chatHistory')) || [];
+            chatHistory.push({ user, message });
+            sessionStorage.setItem('chatHistory', JSON.stringify(chatHistory));
         });
 
         connection.start()
             .then(() => {
                 console.log("SignalR connected.");
                 document.getElementById("sendButton").disabled = false;
+
+                // Load chat history from sessionStorage
+                const chatHistory = JSON.parse(sessionStorage.getItem('chatHistory')) || [];
+                chatHistory.forEach(({ user, message }) => {
+                    const msg = document.createElement("div");
+                    msg.className = user === "Admin" ? "chat-message admin-message" : "chat-message user-message";
+                    msg.innerHTML = ` ${message}`;
+                    //<strong>${user}</strong>:
+                    document.getElementById("messages").appendChild(msg);
+                });
+                document.getElementById("messages").scrollTop = document.getElementById("messages").scrollHeight;
             })
             .catch(err => console.error("SignalR connection failed: " + err.toString()));
 
@@ -62,9 +83,6 @@
             }
         });
 
-
-        
-
         let chatWidgetVisible = false;
         document.getElementById("toggleChatButton").addEventListener("click", () => {
             chatWidgetVisible = !chatWidgetVisible;
@@ -83,21 +101,21 @@
         z-index: 1000;
         position: fixed;
         bottom: 0;
-        right: 0;
+        right: 10px;
         width: 350px;
-        background-color: #f8f9fa;
-        border: 1px solid #ccc;
+        background-color: #f5f5f5;
+        border: 1px solid #ddd;
         border-radius: 8px;
         display: none;
         flex-direction: column;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
     }
 
     .chat-header {
-        background-color: #007bff;
+        background-color: #343a40;
         color: white;
         padding: 10px;
-        border-bottom: 1px solid #ccc;
+        border-bottom: 1px solid #ddd;
         border-radius: 8px 8px 0 0;
         display: flex;
         justify-content: space-between;
@@ -106,6 +124,14 @@
 
     .toggle-chat {
         cursor: pointer;
+        color: #ccc;
+        margin-left: 120px;
+        font-size: 20px;
+         background-color: transparent;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 5px;
     }
 
     .chat-messages {
@@ -119,37 +145,56 @@
         margin-bottom: 10px;
         padding: 8px;
         border-radius: 10px;
-        max-width: 70%;
+        max-width: 99%;
         word-wrap: break-word;
     }
 
-    .user-messageWedget {
-        background-color: #d1e7dd;
-        align-self: flex-end;
-        justify-content: flex-end;
-    }
+    .user-message {
+    background-color: #eaeaeaf0;
+  color: #373a3e;
+  align-self: flex-end;
+  text-align: right;
+  border-top-right-radius: 0;
+}
 
-    .admin-messageWedget {
-        background-color: #f8d7da;
-        align-self: flex-start;
-        justify-content: flex-start;
-    }
+.admin-message {
+    background-color: #d92323;
+  color: #f9f3f3;
+  align-self: flex-start;
+  text-align: left;
+  border-top-left-radius: 0;
+}
 
     .chat-input-container {
         display: flex;
         padding: 10px;
-        border-top: 1px solid #ccc;
+        border-top: 1px solid #ddd;
         background-color: #f1f1f1;
+        border-radius: 0 0 8px 8px;
     }
 
-        .chat-input-container input {
-            flex: 1;
-            margin-right: 5px;
-        }
+    .chat-input-container input {
+        flex: 1;
+        margin-right: 5px;
+    }
 
     .chat-toggle-button {
         position: fixed;
-        bottom: 10px;
-        right: 10px;
+        bottom: 15px;
+        right: 15px;
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+    }
+
+    .chat-toggle-button i {
+       color: #d9534f;
+  font-size: 45px;
+  padding: 12px;
+  background-color: black;
+  border-radius: 50%;
+  margin: 20px;
+}
     }
 </style>
