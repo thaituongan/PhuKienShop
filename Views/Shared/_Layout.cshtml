@@ -233,11 +233,10 @@
 						<div class="footer">
 							<h3 class="footer-title">Danh Mục</h3>
 							<ul class="footer-links">
-								<li><a href="#">Khuyến Mãi</a></li>
-								<li><a href="#">Cáp Sạc</a></li>
-								<li><a href="#">Tai Nghe</a></li>
-								<li><a href="#">Loa</a></li>
-								<li><a href="#">Ốp Lưng</a></li>
+								<li><a href=" @Url.Action("Index", "ListProduct")" class="cta-btn">Cáp Sạc</a></li>
+								<li><a href=" @Url.Action("Index", "ListProduct")" class="cta-btn">Tai Nghe</a></li>
+								<li><a href=" @Url.Action("Index", "ListProduct")" class="cta-btn">Loa</a></li>
+								<li><a href=" @Url.Action("Index", "ListProduct")" class="cta-btn">Ốp Lưng</a></li>
 							</ul>
 						</div>
 					</div>
@@ -248,11 +247,9 @@
 						<div class="footer">
 							<h3 class="footer-title">Thông Tin</h3>
 							<ul class="footer-links">
-								<li><a href="#">Về Chúng Tôi</a></li>
-								<li><a href="#">Liên Hệ</a></li>
-								<li><a href="#">Chính Sách Bảo Mật</a></li>
-								<li><a href="#">Đơn Hàng và Trả Hàng</a></li>
-								<li><a href="#">Điều Khoản & Điều Kiện</a></li>
+								<li><a href="@Url.Action("Introduction", "Home")">Về Chúng Tôi</a></li>
+								<li><a href="@Url.Action("Contact", "Home")">Liên Hệ</a></li>
+								<li><a href="@Url.Action("Privacy", "Home")">Chính Sách Bảo Mật</a></li>
 							</ul>
 						</div>
 					</div>
@@ -261,9 +258,8 @@
 						<div class="footer">
 							<h3 class="footer-title">Dịch Vụ</h3>
 							<ul class="footer-links">
-								<li><a href="#">Tài Khoản Của Tôi</a></li>
+								<li><a href="@Url.Action("MyAccount", "Account")">Tài Khoản Của Tôi</a></li>
 								<li><a href="#">Xem Giỏ Hàng</a></li>
-								<li><a href="#">Danh Sách Yêu Thích</a></li>
 								<li><a href="#">Theo Dõi Đơn Hàng</a></li>
 								<li><a href="#">Hỗ Trợ</a></li>
 							</ul>
