@@ -21,37 +21,7 @@ namespace PhuKienShop.Controllers
 			_context = context;
 		}
 
-		public IActionResult DetailsPage(int id, int page = 1)
-		{
-			var product = _context.Products
-				.Include(p => p.Reviews)
-				.FirstOrDefault(p => p.ProductId == id);
-
-			if (product == null)
-			{
-				return NotFound();
-			}
-
-			var pageSize = 2; // số bình luận mỗi trang
-			var reviews = product.Reviews
-				.OrderByDescending(r => r.CreatedAt)
-				.Skip((page - 1) * pageSize)
-				.Take(pageSize)
-				.ToList();
-
-			var totalReviews = product.Reviews.Count();
-			var totalPages = (int)Math.Ceiling(totalReviews / (double)pageSize);
-
-			var model = new ProductDetailModel
-			{
-				CurrentProduct = product,
-				Reviews = reviews,
-				TotalPages = totalPages,
-				CurrentPage = page
-			};
-
-			return View(model);
-		}
+		
 
 		// GET: Products
 		public async Task<IActionResult> Index()

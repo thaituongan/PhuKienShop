@@ -41,6 +41,35 @@
 	  <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 	  <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 	<![endif]-->
+
+	<style>
+		#searchResults {
+			position: absolute;
+			top: 150pxpx;
+			left: 0;
+			right: 0;
+			z-index: 100;
+			padding: 20px;
+			background-color: white; /* Nền trắng cho phần tử chính */
+		}
+
+			#searchResults .result-item {
+				background-color: white; /* Nền trắng cho từng phần tử con */
+				margin-bottom: 20px; /* Khoảng cách giữa các phần tử */
+				padding: 10px; /* Khoảng cách bên trong mỗi phần tử */
+				box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1); /* Đổ bóng cho mỗi phần tử */
+			}
+
+				#searchResults .result-item:last-child {
+					margin-bottom: 0; /* Xóa khoảng cách dưới cùng cho phần tử cuối */
+				}
+
+
+		#main {
+			position: relative;
+			z-index: 1; /* Đảm bảo rằng nội dung chính nằm phía sau kết quả tìm kiếm */
+		}
+	</style>
 </head>
 <body>
 	
@@ -93,7 +122,7 @@
 							<form action="/Products/Search" method="get" id="searchForm">
 								
 								<input id="searchInput" name="searchTerm" class="input-select" placeholder="Tìm kiếm sản phẩm">
-								<button class="search-btn">Search</button>
+								<button class="search-btn">Tìm kiếm</button>
 							</form>
 						</div>
 					</div>
@@ -270,6 +299,8 @@
 	</footer>
 	<!-- /FOOTER -->
 	<!-- jQuery Plugins -->
+	<!-- SignalR Script and Chat Widget Logic -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
 	<script src="~/js/jquery.min.js"></script>
 	<script src="~/js/bootstrap.min.js"></script>
 	<script src="~/js/slick.min.js"></script>

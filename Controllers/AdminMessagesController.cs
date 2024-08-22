@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using System.Linq;
 using Microsoft.AspNetCore.SignalR;
+
 [Route("admin/messages")]
 public class AdminMessagesController : Controller
 {
@@ -24,6 +25,16 @@ public class AdminMessagesController : Controller
                                      .ToListAsync();
 
         return PartialView("_MessagesPartial", messages);
+    }
+    [HttpGet("Chat/GetLatestMessages/{userId}/{lastMessageId}")]
+    public async Task<IActionResult> GetLatestMessages(int userId, int lastMessageId)
+    {
+        var newMessages = await _context.Messages
+                                        .Where(m => m.SenderId == userId && m.MessageId > lastMessageId)
+                                        .OrderBy(m => m.SentAt)
+                                        .ToListAsync();
+
+        return PartialView("_MessagesPartial", newMessages);
     }
 
 
@@ -79,6 +90,8 @@ public class AdminMessagesController : Controller
         _context.Messages.Add(message);
         await _context.SaveChangesAsync();
         await _hubContext.Clients.User(userId.ToString()).SendAsync("ReceiveMessage", "Admin", message.Content);
+        // You can also send a separate notification to alert the admin
+        //await _hubContext.Clients.User(userId.ToString()).SendAsync("NewMessageNotification", "Admin", message.Content);
         //await _hubContext.Clients.All.SendAsync("ReceiveMessage", "Admin", message.Content);
         return RedirectToAction("Index", new { userId });
     }

@@ -43,7 +43,8 @@ namespace PhuKienShop.Controllers
                         var viewModel = new MyAccountViewModel
                         {
                             User = user,
-                            Orders = orders
+                            Orders = orders,
+                            UserPhotoUrl = ViewData["UserPhotoUrl"]?.ToString()
                         };
 
                         return View(viewModel);
@@ -59,6 +60,41 @@ namespace PhuKienShop.Controllers
             {
                 return RedirectToAction("Login", "Account");
             }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UploadPhoto(IFormFile userPhoto)
+        {
+            if (userPhoto != null && userPhoto.Length > 0)
+            {
+                // Đường dẫn đến thư mục UserImg
+                var userImgFolderPath = Path.Combine(Directory.GetCurrentDirectory(), "UserImg");
+
+                if (!Directory.Exists(userImgFolderPath))
+                {
+                    Directory.CreateDirectory(userImgFolderPath);
+                }
+
+                // Lưu ảnh vào thư mục UserImg
+                var filePath = Path.Combine(userImgFolderPath, userPhoto.FileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await userPhoto.CopyToAsync(stream);
+                }
+
+                var fileUrl = Url.Action("GetUserImage", "File", new { filename = userPhoto.FileName });
+
+                TempData["UserPhotoUrl"] = fileUrl;
+
+                TempData["Message"] = "Ảnh đã được tải lên thành công!";
+            }
+            else
+            {
+                TempData["Message"] = "Vui lòng chọn ảnh để tải lên.";
+            }
+
+            return RedirectToAction("MyAccount");
         }
 
         [HttpGet]

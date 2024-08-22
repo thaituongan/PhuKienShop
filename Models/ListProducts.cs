@@ -42,4 +42,12 @@ namespace PhuKienShop.Data
         public bool IsOnSale { get; set; }
         public ProductSale? Sale { get; set; }
     }
+
+    public class ProductListViewModel
+    {
+        public List<ProductViewModel> Products { get; set; }
+        public int CurrentPage { get; set; }
+        public int TotalPages { get; set; }
+        public int? CategoryId { get; set; }
+    }
 }
