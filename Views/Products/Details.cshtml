@@ -1,8 +1,7 @@
-
 @model PhuKienShop.Models.ProductDetailModel
 @{
-    ViewData["Title"] = "Details";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+	ViewData["Title"] = "Details";
+	Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <!--liên kết script để cuộn xuống màn hình-->
 <script src="~/js/scroll.js" defer></script>
@@ -15,7 +14,7 @@
 			<div class="col-md-12">
 				<ul class="breadcrumb-tree">
 					<li><a href="@Url.Action("Index", "Home")">Trang chủ</a></li>
-					<li><a href="#">@Model.CurrentProduct.Category.CategoryName</a></li>
+					<li><a href="@Url.Action("Index", "ListProduct", Model.CurrentProduct.Category.CategoryId)">@Model.CurrentProduct.Category.CategoryName</a></li>
 					<li class="active">@Model.CurrentProduct.ProductName</li>
 				</ul>
 			</div>
@@ -45,12 +44,18 @@
 				<div class="product-details">
 					<h2 class="product-name">@Model.CurrentProduct.ProductName</h2>
 					<div>
-						<div class="product-rating">
-							<i class="fa fa-star"></i>
-							<i class="fa fa-star"></i>
-							<i class="fa fa-star"></i>
-							<i class="fa fa-star"></i>
-							<i class="fa fa-star-o"></i>
+						<div class="rating-avg">
+							<span>@Model.AverageRating.ToString("0.0")</span>
+							<div class="rating-stars">
+								@for (int i = 0; i < (int)Model.AverageRating; i++)
+								{
+									<i class="fa fa-star"></i>
+								}
+								@for (int i = (int)Model.AverageRating; i < 5; i++)
+								{
+									<i class="fa fa-star-o"></i>
+								}
+							</div>
 						</div>
 						<a data-toggle="tab" href="#tab2">Thêm bình luận</a>
 					</div>
@@ -70,7 +75,6 @@
 						}
 						<span class="product-available">Còn hàng</span>
 					</div>
-					<p>@Model.CurrentProduct.Description</p>
 
 					<div class="add-to-cart">
 						@if (User.Identity.IsAuthenticated)
@@ -78,8 +82,7 @@
 							<form asp-controller="ShoppingCart" asp-action="AddToCart" method="post">
 								<input type="hidden" name="productId" value="@Model.CurrentProduct.ProductId" />
 								<input type="hidden" name="quantity" value="1" />
-								<button type="submit" class="add-to-cart-btn">
-									<i class="fa fa-shopping-cart"></i> Thêm vào giỏ hàng
+								<button type="submit" class="add-to-cart-btn"><i class="fa fa-shopping-cart"></i> Thêm vào giỏ hàng
 								</button>
 							</form>
 						}
@@ -92,25 +95,10 @@
 							</form>
 						}
 					</div>
-
-					<ul class="product-btns">
-						<li><a href="#"><i class="fa fa-heart-o"></i> Thêm vào dánh sách đợi</a></li>
-
-					</ul>
-
 					<ul class="product-links">
 						<li>Loại:</li>
 						<li><a href="#">@Model.CurrentProduct.Category.CategoryName</a></li>
-
 					</ul>
-
-					<ul class="product-links">
-						<li>Chia sẻ:</li>
-						<li><a href="#"><i class="fa fa-facebook"></i></a></li>
-						<li><a href="#"><i class="fa fa-google-plus"></i></a></li>
-						<li><a href="#"><i class="fa fa-envelope"></i></a></li>
-					</ul>
-
 				</div>
 			</div>
 			<!-- /Product details -->
@@ -125,16 +113,16 @@
 					<!-- /product tab nav -->
 					<!-- product tab content -->
 					<div class="tab-content">
-						<!-- tab1  -->
+						<!-- tab1: chi tiết  -->
 						<div id="tab1" class="tab-pane fade in">
 							<div class="row">
 								<div class="col-md-12">
-									<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+									<p>@Model.CurrentProduct.Description</p>
 								</div>
 							</div>
 						</div>
 						<!-- /tab1  -->
-						<!-- tab2  -->
+						<!-- tab2: bình luận  -->
 						<div id="tab2" class="tab-pane fade in">
 							<div class="row">
 								<!-- Rating -->
@@ -261,31 +249,31 @@
 										</ul>
 										<!-- Reviews Pagination -->
 
-											<ul class="reviews-pagination">
-												@for (int i = 1; i <= Model.TotalPages; i++)
-												{
-													<li class="@(i == Model.CurrentPage ? "active" : "")">
-														<a href="@Url.Action("Details", new { id = Model.CurrentProduct.ProductId, categoryId = Model.CurrentProduct.CategoryId, page = i })">@i</a>
-													</li>
-												}
-											</ul>
-									
+										<ul class="reviews-pagination">
+											@for (int i = 1; i <= Model.TotalPages; i++)
+											{
+												<li class="@(i == Model.CurrentPage ? "active" : "")">
+													<a href="@Url.Action("Details", new { id = Model.CurrentProduct.ProductId, categoryId = Model.CurrentProduct.CategoryId, page = i })">@i</a>
+												</li>
+											}
+										</ul>
+
 									</div>
 								</div>
 								<!-- /Reviews -->
 								<!-- Review Form -->
 								<div class="col-md-3">
-									<div id="review-form">
+									<div id="review-form" class="review-form">
 										<form asp-controller="Products" asp-action="AddReview" method="post">
 											<textarea name="comment" class="input" placeholder="Nhập bình luận"></textarea>
 											<div class="input-rating">
 												<span>Đánh giá</span>
 												<div class="stars">
-													<input id="star1" name="rating" value="1" type="radio"><label for="star1"></label>
-													<input id="star2" name="rating" value="2" type="radio"><label for="star2"></label>
-													<input id="star3" name="rating" value="3" type="radio"><label for="star3"></label>
-													<input id="star4" name="rating" value="4" type="radio"><label for="star4"></label>
 													<input id="star5" name="rating" value="5" type="radio"><label for="star5"></label>
+													<input id="star4" name="rating" value="4" type="radio"><label for="star4"></label>
+													<input id="star3" name="rating" value="3" type="radio"><label for="star3"></label>
+													<input id="star2" name="rating" value="2" type="radio"><label for="star2"></label>
+													<input id="star1" name="rating" value="1" type="radio"><label for="star1"></label>
 												</div>
 											</div>
 											<input type="hidden" name="productId" value="@Model.CurrentProduct.ProductId" />
@@ -321,7 +309,8 @@
 				</div>
 			</div>
 			<h3>Các loại @Model.CurrentProduct.Category.CategoryName.ToLower() khác</h3>
-			@if(!@Model.RelatedProducts.Any()){
+			@if (!@Model.RelatedProducts.Any())
+			{
 				<h2>Không có sản phẩm liên quan nào được hiển thị</h2>
 			} else{
 			<!-- product: hiển thị lên các sẩn phẩm liên quan -->
@@ -347,31 +336,20 @@
 										{
 											<h4 class="product-price">@item.Price.ToString("N0") VND</h4>
 										}
-										<div class="product-rating">
-											<i class="fa fa-star"></i>
-											<i class="fa fa-star"></i>
-											<i class="fa fa-star"></i>
-											<i class="fa fa-star"></i>
-											<i class="fa fa-star"></i>
-										</div>
-										<div class="product-btns">
-											<button class="add-to-wishlist"><i class="fa fa-heart-o"></i><span class="tooltipp">danh sách đợi</span></button>
-											<button class="quick-view"><i class="fa fa-eye"></i><span class="tooltipp">Xem nhanh</span></button>
-										</div>
 									</div>
 
-									<div class="add-to-cart">
-										<button class="add-to-cart-btn"><i class="fa fa-shopping-cart"></i>Thêm vào giỏ hàng</button>
-									</div>
-								</a>
-							</div>
-						}
+										<div class="add-to-cart">
+											<button class="add-to-cart-btn"><i class="fa fa-shopping-cart"></i>Thêm vào giỏ hàng</button>
+										</div>
+									</a>
+								</div>
+							}
+						</div>
+						<div id="slick-nav-1" class="products-slick-nav"></div>
 					</div>
-					<div id="slick-nav-1" class="products-slick-nav"></div>
 				</div>
-			</div>
-			<!-- /product -->
-			<!-- product -->
+				<!-- /product -->
+				<!-- product -->
 			}
 		</div>
 		<!-- /row -->
@@ -391,4 +369,3 @@
 		});
 	}
 </script>
-

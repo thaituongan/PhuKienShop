@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PhuKienShop.Data;
 using PhuKienShop.Models;
 
 namespace PhuKienShop.Controllers
 {
+    [Authorize(Policy = "AdminOnly")]
     public class StatisticsController : Controller
     {
         private readonly PkShopContext _db;
@@ -13,6 +15,7 @@ namespace PhuKienShop.Controllers
         {
             _db = db;
         }
+
         public IActionResult Index()
         {
             var currentMonth = DateTime.Now.Month;
@@ -29,36 +32,61 @@ namespace PhuKienShop.Controllers
                 .Sum(o => o.TotalAmount);
 
             var totalCustomersLastMonth = _db.Users
-                .Where(c => c.CreatedAt.Value.Month == previousMonth && c.CreatedAt.Value.Year == previousYear)
+                .Where(c => c.Role == "User" && _db.Orders.Any(o => o.UserId == c.UserId &&
+                                       o.OrderDate.HasValue &&
+                                       o.OrderDate.Value.Month == previousMonth &&
+                                       o.OrderDate.Value.Year == previousYear))
                 .Count();
 
             var totalProductsSoldLastMonth = _db.OrderDetails
                 .Where(od => od.Order.OrderDate.Value.Month == previousMonth && od.Order.OrderDate.Value.Year == previousYear)
                 .Sum(od => od.Quantity);
 
+            var totalOrders = _db.Orders.Count();
+            var totalRevenue = _db.Orders.Sum(o => o.TotalAmount);
+            var totalCustomers = _db.Users.Count();
+            var totalProduct = _db.OrderDetails.Sum(o => o.Quantity);
+
+            var totalOrdersThisMonth = _db.Orders
+                .Where(o => o.OrderDate.Value.Month == currentMonth && o.OrderDate.Value.Year == currentYear)
+                .Count();
+
+            var totalRevenueThisMonth = _db.Orders
+                .Where(o => o.OrderDate.Value.Month == currentMonth && o.OrderDate.Value.Year == currentYear)
+                .Sum(o => o.TotalAmount);
+
+            var totalCustomersThisMonth = _db.Users
+                .Where(c => c.Role == "User" &&
+                 _db.Orders.Any(o => o.UserId == c.UserId &&
+                                     o.OrderDate.HasValue &&
+                                     o.OrderDate.Value.Month == currentMonth &&
+                                     o.OrderDate.Value.Year == currentYear))
+                .Count();
+
+
+            var totalProductThisMonth = _db.OrderDetails
+                .Where(od => od.Order.OrderDate.Value.Month == currentMonth && od.Order.OrderDate.Value.Year == currentYear)
+                .Sum(od => od.Quantity);
             var viewModel = new StatisticsModel
             {
-                TotalOrders = _db.Orders.Count(),
-                TotalRevenue = _db.Orders.Sum(o => o.TotalAmount),
-                TotalCustomers = _db.Users.Count(),
-                TotalProduct = _db.OrderDetails.Sum(o => o.Quantity),
-                TotalOrdersThisMonth = _db.Orders
-                    .Where(o => o.OrderDate.Value.Month == currentMonth && o.OrderDate.Value.Year == currentYear)
-                    .Count(),
-                TotalRevenueThisMonth = _db.Orders
-                    .Where(o => o.OrderDate.Value.Month == currentMonth && o.OrderDate.Value.Year == currentYear)
-                    .Sum(o => o.TotalAmount),
-                TotalCustomersThisMonth = _db.Users
-                    .Where(c => c.CreatedAt.Value.Month == currentMonth && c.CreatedAt.Value.Year == currentYear)
-                    .Count(),
-                TotalProductThisMonth = _db.OrderDetails
-                .Where(od => od.Order.OrderDate.Value.Month == currentMonth && od.Order.OrderDate.Value.Year == currentYear)
-                .Sum(od => od.Quantity),
-                OrderChangePercentage = totalOrdersLastMonth == 0 ? 100 : ((double)(_db.Orders.Count() - totalOrdersLastMonth) / totalOrdersLastMonth) * 100,
-                CustomerChangePercentage = totalCustomersLastMonth == 0 ? 100 : ((double)(_db.Users.Count() - totalCustomersLastMonth) / totalCustomersLastMonth) * 100,
-                RevenueChangePercentage = totalRevenueLastMonth == 0 ? 100 : ((double)(_db.Orders.Sum(o => o.TotalAmount) - totalRevenueLastMonth) / (double)totalRevenueLastMonth) * 100,
-                ProductSoldChangePercentage = totalProductsSoldLastMonth == 0 ? 100 : ((double)(_db.Products.Count() - totalProductsSoldLastMonth) / totalProductsSoldLastMonth) * 100
+                TotalOrders = totalOrders,
+                TotalRevenue = totalRevenue,
+                TotalCustomers = totalCustomers,
+                TotalProduct = totalProduct,
+                TotalOrdersThisMonth = totalOrdersThisMonth,
+                TotalRevenueThisMonth = totalRevenueThisMonth,
+                TotalCustomersThisMonth = totalCustomersThisMonth,
+                TotalProductThisMonth = totalProductThisMonth,
+                TotalOrdersLastMonth = totalOrdersLastMonth,
+                TotalCustomersLastMonth = totalCustomersLastMonth,
+                TotalRevenueLastMonth = totalRevenueLastMonth,
+                TotalProductLastMonth = totalProductsSoldLastMonth
             };
+
+            // Convert to formatted strings
+            ViewData["FormattedTotalRevenue"] = viewModel.TotalRevenue.ToString("N0");
+            ViewData["FormattedTotalRevenueThisMonth"] = viewModel.TotalRevenueThisMonth.ToString("N0");
+
             return View(viewModel);
         }
     }

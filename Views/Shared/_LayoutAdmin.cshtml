@@ -25,14 +25,11 @@
     <link rel="stylesheet" type="text/css" href="~/css/styleAdmin.css">
     <link rel="stylesheet" type="text/css" href="~/css/baseN.css">
     <link rel="stylesheet" type="text/css" href="~/css/toast.css">
-
-
      @RenderSection("Styles", required: false);
-    @RenderSection("Scripts", required: false);
+  
 </head>
 <body class="overlay-scrollbar">
     <!-- navbar -->
-
     <div class="navbar">
         <!-- nav left -->
         <ul class="navbar-nav" style="display: flex; align-items: center;">
@@ -42,6 +39,7 @@
                 </a>
             </li>
             <li class="nav-item">
+                <a href="@Url.Action("Index", "Home")">
                 <img src="~/img/mylogo.png" alt="logo" class="logo logo-light">
             </li>
             <li class="nav-item" style="flex-grow: 1; text-align: center;">
@@ -52,7 +50,7 @@
         <!-- nav right -->
         <ul class="navbar-nav nav-right" style="display: flex; align-items: center;">
             <li class="nav-item">
-                <div class="avt dropdown">
+                <div class="avt dropdown" >
                     <a> @User.Identity.Name</a>
                 </div>
             </li>
@@ -62,11 +60,9 @@
                     <a href="@Url.Action("Index", "AdminMessages")">
                         <i class="fa-solid fa-message p-3"></i>
                     </a>
-
-                   
                     <ul id="user-menu" class="dropdown-menu" style="position:absolute;left:-140px; max-width:200px;">
                         <li class="dropdown-menu-item">
-                            <a href="logout" class="dropdown-menu-link">
+                            <a href="@Url.Action("Logout", "Account")" class="dropdown-menu-link">
                                 <div>
                                     <i class="fas fa-sign-out-alt"></i>
                                 </div>
@@ -98,13 +94,14 @@
         <li class="sidebar-nav-item">
                 <a class="sidebar-nav-link" href="@Url.Action("Index", "ProductSales")">
                 <div>
-                    <i class="fa fa-user"></i>
+                  
+                    <i class="fa-solid fa-rectangle-ad"></i>
                 </div>
                 <span>Quản lý Khuyến Mãi</span>
             </a>
         </li>
         <li class="sidebar-nav-item">
-            <a href="quanlysanpham.jsp" class="sidebar-nav-link">
+                <a href="@Url.Action("Index", "AdminProducts")" class="sidebar-nav-link">
                 <div>
                     <i class="fa fa-mobile"></i>
                 </div>
@@ -135,59 +132,31 @@
         @RenderBody()
       
     </div>
-
-    <!-- import script -->
+    <!-- Import scripts -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
     <script src="~/js/admin.js"></script>
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
-@*     <script>
-    $(document).ready(function () {
-        // Function to fetch messages
-        function fetchMessages() {
-              <p>@Model.SelectedUser.Username</p>
-        }
+    <!-- Render script sections -->
+   
+   
+    <script>
+        $(document).ready(function () {
+            // Toggle the dropdown menu when the avatar or icon is clicked
+            $('.avt.dropdown').on('click', function (event) {
+                event.stopPropagation(); // Prevent the click event from bubbling up
+                $(this).find('#user-menu').toggle(); // Toggle the visibility of the dropdown menu
+            });
 
-            var userId = '@Model.SelectedUser?.UserId';
-            console.log("load message...")
-            if (userId) {
-                $.ajax({
-                    url: '@Url.Action("GetMessages", "AdminMessages", new { userId = "__USER_ID__" })'.replace('__USER_ID__', userId),
-                    type: 'GET',
-                    success: function (data) {
-                        $('.chat-history').html(data);
-                        $('.chat-history').scrollTop($('.chat-history')[0].scrollHeight);
-                    },
-                    error: function () {
-                        console.error('Failed to load messages');
-                    }
-                });
-            }
-        }
-        
-    // Set an interval to fetch messages every second
-    setInterval(fetchMessages, 1000);
-
-    // Submit the message form via AJAX
-    $("#chat-form").submit(function (e) {
-        e.preventDefault();
-
-    $.ajax({
-        url: $(this).attr('action'),
-    type: 'POST',
-    data: $(this).serialize(),
-    success: function () {
-        fetchMessages(); // Reload messages after sending a new one
-    $('#messageContent').val(''); // Clear the input field
-            },
-    error: function () {
-        alert('Failed to send message. Please try again.');
-            }
+            // Close the dropdown menu if clicked outside
+            $(document).on('click', function () {
+                $('#user-menu').hide(); // Hide the dropdown menu
+            });
         });
-    });
-});
-</script> *@
+    </script>
+    @RenderSection("Scripts", required: false);
     <!-- end import script -->
 </body>
 </html>

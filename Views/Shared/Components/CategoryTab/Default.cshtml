@@ -1,20 +1,47 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@model IEnumerable<PhuKienShop.Data.Category>
+﻿@model IEnumerable<PhuKienShop.Data.Category>
 @{
-	//bắt đầu từ tab2
-	int tabCounter = 2;
-	<div class="section-nav">
-		<ul class="section-tab-nav tab-nav">
-			<li class="active"><a data-toggle="tab" href="#tab1">Tất cả</a></li>
-			@foreach (var item in Model)
-			{
-				<li><a data-toggle="tab" href="#tab-@tabCounter">@item.CategoryName</a></li>
-				tabCounter++; //tăng biến đếm
-			}
-		</ul>
-	</div>
+    int tabSale = 7;
+    int tabProduct = 2;
+    bool hasAddedTabAllSale = false;
+    bool hasAddedTabAllProduct = false;
 
+    <div class="section-nav">
+        <ul class="section-tab-nav tab-nav">
 
+            @foreach (var category in Model)
+            {
+                // Kiểm tra xem danh mục hiện tại có chứa bất kỳ sản phẩm giảm giá nào không
+                bool hasSaleProducts = category.Products.Any(p => p.isProductSale());
+
+                if (hasSaleProducts)
+                {
+                    // Chỉ thêm tab "Tất cả" một lần cho danh sách Sale
+                    if (!hasAddedTabAllSale)
+                    {
+                        <li class="active"><a data-toggle="tab" href="#tab6">Tất cả</a></li>
+                        hasAddedTabAllSale = true;
+                    }
+
+                    // Hiển thị tab cho sản phẩm sale
+                    <li><a data-toggle="tab" href="#tab-@tabSale">@category.CategoryName</a></li>
+                    tabSale++;
+                }
+
+                // Hiển thị tab cho tất cả sản phẩm không sale
+                if (!hasSaleProducts)
+                {
+                    // Chỉ thêm tab "Tất cả" một lần cho danh sách Product
+                    if (!hasAddedTabAllProduct)
+                    {
+                        <li class="active"><a data-toggle="tab" href="#tab1">Tất cả</a></li>
+                        hasAddedTabAllProduct = true;
+                    }
+
+                    // Hiển thị tab cho sản phẩm không sale
+                    <li><a data-toggle="tab" href="#tab-@tabProduct">@category.CategoryName</a></li>
+                    tabProduct++;
+                }
+            }
+        </ul>
+    </div>
 }

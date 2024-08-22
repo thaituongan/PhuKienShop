@@ -6,9 +6,12 @@ using System.Net;
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
+using Microsoft.AspNetCore.Authorization;
 
 namespace PhuKienShop.Controllers
 {
+    [AllowAnonymous]
     public class AccountController : Controller
     {
         private readonly PkShopContext _context;
@@ -17,6 +20,11 @@ namespace PhuKienShop.Controllers
         {
             _context = context;
             _logger = logger;
+        }
+        [AllowAnonymous]
+        public IActionResult AccessDenied()
+        {
+            return View();
         }
         public IActionResult MyAccount()
         {
@@ -42,7 +50,8 @@ namespace PhuKienShop.Controllers
                         var viewModel = new MyAccountViewModel
                         {
                             User = user,
-                            Orders = orders
+                            Orders = orders,
+                            UserPhotoUrl = ViewData["UserPhotoUrl"]?.ToString()
                         };
 
                         return View(viewModel);
@@ -60,6 +69,40 @@ namespace PhuKienShop.Controllers
             }
         }
 
+        [HttpPost]
+        public async Task<IActionResult> UploadPhoto(IFormFile userPhoto)
+        {
+            if (userPhoto != null && userPhoto.Length > 0)
+            {
+                // Đường dẫn đến thư mục UserImg
+                var userImgFolderPath = Path.Combine(Directory.GetCurrentDirectory(), "UserImg");
+
+                if (!Directory.Exists(userImgFolderPath))
+                {
+                    Directory.CreateDirectory(userImgFolderPath);
+                }
+
+                // Lưu ảnh vào thư mục UserImg
+                var filePath = Path.Combine(userImgFolderPath, userPhoto.FileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await userPhoto.CopyToAsync(stream);
+                }
+
+                var fileUrl = Url.Action("GetUserImage", "File", new { filename = userPhoto.FileName });
+
+                TempData["UserPhotoUrl"] = fileUrl;
+
+                TempData["Message"] = "Ảnh đã được tải lên thành công!";
+            }
+            else
+            {
+                TempData["Message"] = "Vui lòng chọn ảnh để tải lên.";
+            }
+
+            return RedirectToAction("MyAccount");
+        }
 
         [HttpGet]
         public IActionResult Register()
@@ -342,6 +385,119 @@ namespace PhuKienShop.Controllers
                 return RedirectToAction("Login", "Account");
             }
         }
+
+        [HttpGet]
+        public IActionResult ForgotPassword()
+        {
+            return View();
+        }
+        
+        [HttpPost]
+        public async Task<IActionResult> ForgotPassword(string email)
+        {
+            var user = _context.Users.FirstOrDefault(u => u.Email == email);
+            if (user == null)
+            {
+                ModelState.AddModelError("", "Email không tồn tại trong hệ thống.");
+                return View();
+            }
+
+            var resetCode = new Random().Next(100000, 999999).ToString(); // Tạo mã xác thực 6 chữ số
+            TempData["ResetCode"] = resetCode;
+            TempData["VerifiedEmail"] = email;
+            
+
+            // Gửi email mã xác thực
+            await SendEmailAsync(email, "Password Reset", $"Your password reset code is: {resetCode}");
+
+            return RedirectToAction("EnterResetCode");
+        }
+        [HttpGet]
+        public IActionResult EnterResetCode()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult EnterResetCode(string code)
+        {
+            var expectedCode = TempData["ResetCode"] as string;
+            var email = TempData["VerifiedEmail"] as string;
+
+            if (expectedCode != null && expectedCode == code)
+            {
+                TempData["VerifiedEmail"] = email;
+                return RedirectToAction("ResetPassword");
+            }
+            // Reassign email back to TempData even if the code is incorrect
+            TempData["VerifiedEmail"] = email;
+            TempData["ResetCode"] = expectedCode;
+
+            ModelState.AddModelError("", "Mã xác thực không hợp lệ.");
+            return View();
+        }
+        [HttpGet]
+        public IActionResult ResetPassword()
+        {
+            if (TempData["VerifiedEmail"] == null)
+            {
+                
+                
+                return RedirectToAction("ForgotPassword");
+            }
+            var email = TempData["VerifiedEmail"] as string;
+            TempData["VerifiedEmail"] = email;
+            return View();
+        }
+        [HttpPost]
+        public IActionResult ResetPassword(string newPassword, string confirmPassword)
+        {
+            var email = TempData["VerifiedEmail"] as string;
+
+            if (email == null)
+            {
+                return RedirectToAction("ForgotPassword");
+            }
+
+            // Reassign the email back to TempData to keep it across multiple requests
+            TempData["VerifiedEmail"] = email;
+
+            // Validate the new password
+            if (newPassword.Length < 8 || !newPassword.Any(char.IsDigit) || !newPassword.Any(char.IsLetter))
+            {
+                ModelState.AddModelError(string.Empty, "Mật khẩu mới phải có ít nhất 8 kí tự bao gồm cả số và chữ.");
+                return View();
+            }
+
+            // Validate if new password and confirm password match
+            if (newPassword != confirmPassword)
+            {
+                ModelState.AddModelError(string.Empty, "Mật khẩu mới và mật khẩu xác nhận không khớp.");
+                return View();
+            }
+
+            var user = _context.Users.FirstOrDefault(u => u.Email == email);
+            if (user != null)
+            {
+                string hashedPassword = BCrypt.Net.BCrypt.HashPassword(newPassword);
+                user.Password = hashedPassword;
+                user.UpdatedAt = DateTime.Now;
+                _context.SaveChanges();
+
+                // Clear TempData after success
+                TempData.Remove("VerifiedEmail");
+                TempData.Remove("ResetCode");
+
+                TempData["SuccessMessage"] = "Mật khẩu đã được đặt lại thành công.";
+                return RedirectToAction("Login");
+            }
+
+            return RedirectToAction("Error", "Home");
+        }
+
+
+
+
 
     }
 }

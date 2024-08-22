@@ -1,0 +1,30 @@
+﻿@{
+    ViewData["Title"] = "Nhập mã xác thực";
+}
+
+<h2>Nhập mã xác thực</h2>
+
+<form asp-action="EnterResetCode" method="post">
+    <div class="form-group">
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                    {
+                        <li>@error.ErrorMessage</li>
+                    }
+                </ul>
+            </div>
+        }
+        <label for="code">Mã xác thực:</label>
+        <input type="text" class="form-control" id="code" name="code" required />
+    </div>
+    <button type="submit" class="btn btn-primary">Xác nhận</button>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

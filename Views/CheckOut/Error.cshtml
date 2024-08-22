@@ -1,0 +1,7 @@
+﻿@{
+    ViewBag.Title = "Đặt hàng không thành công";
+}
+
+<h2>Error</h2>
+<p>@TempData["ErrorMessage"]</p>
+<a href="@Url.Action("Index", "Home")" class="btn btn-primary">Tiếp tục mua sắm.</a>

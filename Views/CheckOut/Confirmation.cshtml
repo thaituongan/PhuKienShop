@@ -2,6 +2,38 @@
     ViewData["Title"] = "Xác nhận đặt hàng thành công";
 }
 
+<style>
+    .section {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+    }
+
+    .order-details-container {
+        max-width: 800px;
+        width: 100%;
+        margin-right: auto;
+        margin-left: 15%; /* Điều chỉnh lệch phải */
+    }
+
+    .order-details {
+        text-align: center;
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    }
+
+        .order-details h3, .order-details h4 {
+            margin-bottom: 20px;
+        }
+
+    .table {
+        margin: 20px 0;
+    }
+</style>
+
 <div class="section">
     <div class="container">
         <div class="row">
@@ -12,13 +44,13 @@
             </div>
         </div>
 
-        <div class="row">
-            <div class="col-md-6 offset-md-3">
+        <div class="row justify-content-center">
+            <div class="col-md-6 order-details-container">
                 <div class="order-details">
                     <h3>Chi tiết đơn hàng</h3>
                     <p><strong>Mã đơn hàng:</strong> @Model.OrderId</p>
                     <p><strong>Ngày đặt hàng:</strong> @Model.OrderDate?.ToString()</p>
-                    <p><strong>Tổng tiền:</strong> @Model.TotalAmount.ToString("C")</p>
+                    <p><strong>Tổng tiền:</strong> @string.Format("{0:N0}", @Model.TotalAmount) VND</p>
                     <hr>
                     <h4>Danh sách sản phẩm:</h4>
                     <table class="table table-bordered">
@@ -36,11 +68,11 @@
                             {
                                 var item = Model.OrderDetails[i];
                                 <tr>
-                                    <td>@(i + 1)</td> <!-- Số thứ tự -->
+                                    <td>@(i + 1)</td>
                                     <td>@item.Product.ProductName</td>
                                     <td>@item.Quantity</td>
-                                    <td>@item.UnitPrice.ToString("C")</td>
-                                    <td>@item.TotalPrice.ToString("C")</td>
+                                    <td>@string.Format("{0:N0}", @item.UnitPrice) VND</td>
+                                    <td>@string.Format("{0:N0}", @item.TotalPrice) VND</td>
                                 </tr>
                             }
                         </tbody>
@@ -55,7 +87,7 @@
         </div>
 
         <div class="row">
-            <div class="col-md-12">
+            <div class="col-md-12 text-center">
                 <a href="@Url.Action("Index", "Home")" class="btn btn-primary">Tiếp tục mua sắm.</a>
             </div>
         </div>
