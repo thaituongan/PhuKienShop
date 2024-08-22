@@ -84,70 +84,88 @@ namespace PhuKienShop.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Index(CheckoutViewModel model)
         {
-          
-            
-                var cart = GetCart();
-                if (!cart.CartProducts.Any())
+            var cart = GetCart();
+            if (!cart.CartProducts.Any())
+            {
+                TempData["ErrorMessage"] = "Giỏ hàng trống. Không thể đặt hàng.";
+                return RedirectToAction("Error");
+            }
+
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == model.Email);
+
+            if (user == null)
+            {
+                TempData["ErrorMessage"] = "Người dùng không tồn tại với email này.";
+                return RedirectToAction("Error");
+            }
+
+            model.UserId = user.UserId;
+            model.TotalAmount = cart.Amount(_context);
+
+            var productPrices = cart.CartProducts.ToDictionary(
+                cp => cp.Product.ProductId,
+                cp => cart.IsSale(_context, cp.Product.ProductId));
+
+            // Kiểm tra tồn kho trước khi xử lý đơn hàng
+            foreach (var cartProduct in cart.CartProducts)
+            {
+                var product = await _context.Products.FindAsync(cartProduct.Product.ProductId);
+                if (product == null || product.StockQuantity < cartProduct.Quantity)
                 {
-                    ModelState.AddModelError("", "Giỏ hàng trống. Không thể đặt hàng.");
-                    return View(model);
+                    TempData["ErrorMessage"] = $"Số lượng sản phẩm {cartProduct.Product.ProductName} không đủ. Số lượng tồn kho hiện tại: {product?.StockQuantity ?? 0}.";
+                    return RedirectToAction("Error");
                 }
-
-                var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == model.Email);
-
-                if (user == null)
-                {
-                    ModelState.AddModelError("", "Người dùng không tồn tại với email này.");
-                    return View(model);
-                }
-
-                model.UserId = user.UserId;
-                model.TotalAmount = cart.Amount(_context);
+            }
 
             // Tạo đơn hàng mới
-                var order = new Order
+            var order = new Order
+            {
+                UserId = model.UserId,
+                OrderDate = DateTime.Now,
+                TotalAmount = model.TotalAmount,
+                Status = "WAITING",
+                CreatedAt = DateTime.Now
+            };
+
+            _context.Orders.Add(order);
+            await _context.SaveChangesAsync();
+
+            // Thêm chi tiết đơn hàng và cập nhật số lượng sản phẩm
+            foreach (var cartProduct in cart.CartProducts)
+            {
+                var unitPrice = productPrices[cartProduct.Product.ProductId];
+
+                var orderDetail = new OrderDetail
                 {
-                    UserId = model.UserId,
-                    OrderDate = DateTime.Now,
-                    TotalAmount = model.TotalAmount,
-                    Status = "WAITING",
-                    CreatedAt = DateTime.Now
+                    OrderId = order.OrderId,
+                    ProductId = cartProduct.Product.ProductId,
+                    Quantity = cartProduct.Quantity,
+                    UnitPrice = unitPrice,
+                    TotalPrice = cartProduct.Quantity * unitPrice
                 };
 
-                _context.Orders.Add(order);
-                await _context.SaveChangesAsync();
+                _context.OrderDetails.Add(orderDetail);
 
-                var productPrices = cart.CartProducts.ToDictionary(
-                    cp => cp.Product.ProductId,
-                    cp => cart.IsSale(_context, cp.Product.ProductId));
-
-            // Thêm chi tiết đơn hàng từ CartProducts
-                foreach (var cartProduct in cart.CartProducts)
+                // Cập nhật số lượng sản phẩm trong kho
+                var product = await _context.Products.FindAsync(cartProduct.Product.ProductId);
+                if (product != null)
                 {
-
-                    var unitPrice = productPrices[cartProduct.Product.ProductId];
-
-                    var orderDetail = new OrderDetail
-                    {
-                        OrderId = order.OrderId,
-                        ProductId = cartProduct.Product.ProductId,
-                        Quantity = cartProduct.Quantity,
-                        UnitPrice = unitPrice,
-                        TotalPrice = cartProduct.Quantity * unitPrice
-                    };
-
-                    _context.OrderDetails.Add(orderDetail);
+                    product.StockQuantity -= cartProduct.Quantity;
+                    _context.Products.Update(product);
                 }
+            }
 
-                await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
-                // Xóa giỏ hàng sau khi đặt hàng thành công
-                HttpContext.Session.Remove("Cart");
+            // Xóa giỏ hàng sau khi đặt hàng thành công
+            HttpContext.Session.Remove("Cart");
 
-                return RedirectToAction("Confirmation", new { orderId = order.OrderId });
-            
+            return RedirectToAction("Confirmation", new { orderId = order.OrderId });
+        }
 
-            return View(model);
+        public IActionResult Error()
+        {
+            return View();
         }
 
         public async Task<IActionResult> Confirmation(int orderId)
