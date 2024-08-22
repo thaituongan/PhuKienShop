@@ -6,15 +6,18 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Azure;
+using CoreWCF.IdentityModel.Protocols.WSTrust;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.Web.CodeGeneration;
+using Newtonsoft.Json.Linq;
 using NuGet.Packaging.Signing;
 using PhuKienShop.Data;
 using PhuKienShop.Models;
 using PhuKienShop.Services;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using static NuGet.Packaging.PackagingConstants;
 
 namespace PhuKienShop.Controllers
@@ -42,7 +45,7 @@ namespace PhuKienShop.Controllers
         public async Task<IActionResult> Index()
         {
             var orders = await _context.Orders
-                .OrderByDescending(o => o.OrderDate) // Sắp xếp theo thứ tự giảm dần của OrderDate (từ mới nhất đến cũ nhất)
+                .OrderByDescending(o => o.CreatedAt) // Sắp xếp theo thứ tự giảm dần của OrderDate (từ mới nhất đến cũ nhất)
                 .ToListAsync();
 
             var orderViewModels = orders
@@ -57,6 +60,8 @@ namespace PhuKienShop.Controllers
          
 
         }
+
+
 
         // GET: Orders/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -477,7 +482,38 @@ namespace PhuKienShop.Controllers
                                     var orderDetails = await selectFullOrderByID(orderId);
                                     var firstOrderDetail = orderDetails.FirstOrDefault();
                                     OrderViewModel success = new OrderViewModel(firstOrderDetail.Key, firstOrderDetail.Value);
-                                    // Trả về partial view dưới dạng HTML
+
+                                    // hoan lai so luong cua san pham vao stock
+                                    List<int> oids = new List<int>();
+                                    oids.Add(orderId);
+                                    var orderDetailsTemp = await _orderDetailService.SelectByOrdersAsync(oids);
+                                    List<int> pids = new List<int>();
+                                    Dictionary<int,int> proAndQty = new Dictionary<int,int>();
+                                    foreach (var o in orderDetailsTemp)
+                                    {
+                                        if (o.ProductId.HasValue)
+                                        {
+                                            proAndQty.Add(o.ProductId.Value,o.Quantity);
+                                        }
+                                    }
+
+                                    foreach (var p in proAndQty)
+                                    {
+                                        int productId = p.Key;
+                                        int quantityToAdd = p.Value;
+                                        var product = _context.Products.FirstOrDefault(p => p.ProductId == productId);
+
+                                        if (product != null)
+                                        {
+                                            product.StockQuantity += quantityToAdd;
+                                            _context.SaveChanges(); // Lưu thay đổi vào database
+                                        }
+                                        else
+                                        {
+                                            Console.WriteLine($"Product with ID {productId} not found.");
+                                        }
+                                    }
+
                                     return PartialView("_OrderRowUpdate", success);
                                 }
                                 else
@@ -529,7 +565,7 @@ namespace PhuKienShop.Controllers
             if(idin==null)
             {
                 var orders = await _context.Orders
-                 .OrderByDescending(o => o.OrderDate) // Sắp xếp theo thứ tự giảm dần của OrderDate (từ mới nhất đến cũ nhất)
+                 .OrderByDescending(o => o.CreatedAt) // Sắp xếp theo thứ tự giảm dần của OrderDate (từ mới nhất đến cũ nhất)
                  .ToListAsync();
 
                 var orderViewModels = orders
@@ -549,10 +585,76 @@ namespace PhuKienShop.Controllers
                 OrderViewModel re = new OrderViewModel(order);
                 return PartialView("_OrderRow", re);
             }
+
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> getAllOrder()
+        {
+            Console.WriteLine("Get all order");
+
+            var orders = await _context.Orders
+                .OrderByDescending(o => o.CreatedAt) // Sắp xếp theo thứ tự giảm dần của OrderDate (từ mới nhất đến cũ nhất)
+                .ToListAsync();
+
+            var orderViewModels = orders
+                  .Select(o => new OrderViewModel
+                  {
+                      Order = o
+                  })
+                  .ToList();
+
+            return PartialView("_OrderTable", orderViewModels);
+
+
+
+
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> searchByStatus(string status)
+        {
+            Console.WriteLine("search by status");
+            status = status ?? "ALL";
+            if (status.Equals("ALL", StringComparison.OrdinalIgnoreCase))
+            {
+                var orders = await _context.Orders
+                .OrderByDescending(o => o.CreatedAt) // Sắp xếp theo thứ tự giảm dần của OrderDate (từ mới nhất đến cũ nhất)
+                .ToListAsync();
+
+                var orderViewModels = orders
+                      .Select(o => new OrderViewModel
+                      {
+                          Order = o
+                      })
+                      .ToList();
+
+                return PartialView("_OrderTable", orderViewModels);
+
+
+            } else
+            {
+                var orders = await _context.Orders
+               .Where(o => o.Status == status)
+                .OrderByDescending(o => o.CreatedAt) // Sắp xếp theo thứ tự giảm dần của OrderDate (từ mới nhất đến cũ nhất)
+                .ToListAsync();
+
+                var orderViewModels = orders
+                      .Select(o => new OrderViewModel
+                      {
+                          Order = o
+                      })
+                      .ToList();
+
+                return PartialView("_OrderTable", orderViewModels);
+            }
            
 
         }
+
+
     }
 
-    
+
 }

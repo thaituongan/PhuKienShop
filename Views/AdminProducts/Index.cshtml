@@ -21,36 +21,36 @@
                                        
                                         }
 
-                                        .search-form {
-                                            display: flex;
-                                            align-items: center;
-                                            border: 1px solid #fd1111;
-                                            border-radius: 50px;
-                                            overflow: hidden;
-                                            width: 180px;
-                                            justify-content: space-between;
-                                        }
+        .search-form {
+            display: flex;
+            align-items: center;
+            border: 1px solid #fd1111;
+            border-radius: 50px;
+            overflow: hidden;
+            width: 180px;
+            justify-content: space-between;
+        }
 
 
-                                            .search-form input {
-                                                border: none;
-                                                outline: white;
-                                                margin-left: 10px;
-                                            }
+            .search-form input {
+                border: none;
+                outline: white;
+                margin-left: 10px;
+            }
 
 
-                                                .search-form input:focus {
-                                                    border: none !important;
-                                                    outline: none !important;
-                                                }
+                .search-form input:focus {
+                    border: none !important;
+                    outline: none !important;
+                }
 
-                                            .search-form i {
-                                                padding: 10px;
-                                            }
+            .search-form i {
+                padding: 10px;
+            }
 
-                                                .search-form i:hover {
-                                                    cursor: pointer;
-                                                }
+                .search-form i:hover {
+                    cursor: pointer;
+                }
                                     </style>
 }
 
@@ -62,9 +62,16 @@
     <div class="row">
         <div class="col-8 col-m-12 col-sm-12">
             <div class="card">
-                <div class="card-header" style="display: flex">
-                    
-                    <a href="#addEmployeeModal" class="btn btn-success" data-toggle="modal" style="margin-left: auto">
+                <div class="card-header" style="display: flex; justify-content:space-between">
+                    <div class="form-group">
+                        <div class="search-form">
+                            <input type="text" name="input" class="form-control input" placeholder="Tìm kiếm">
+                            <i class="fa-solid fa-magnifying-glass searchBtn" onclick="searchProduct(this)" style="position: relative;right: 0;top: 0;transform: translateY(0);"></i>
+                            <input type="text" name="action" class="form-control" value="SEARCH" hidden>
+
+                        </div>
+                    </div>
+                    <a href="#addEmployeeModal" class="btn btn-success" data-toggle="modal" style="margin-left: auto;height: fit-content;">
                         <span>Thêm sản phẩm mới</span>
                     </a>
 
@@ -197,6 +204,23 @@
             });
         }
    
+        function searchProduct(element) {
+            console.log("search product");
+            var input = $(element).siblings('.input').val();
+            $.ajax({
+                url: '@Url.Action("searchProduct", "AdminProducts")',
+                type: 'POST',
+                data: { input: input },
+                success: function (response) {
+                    console.log(response);
+                    console.log($('.product-table tbody'));
+                    $('.product-table tbody').html(response);
+                },
+                error: function (xhr, status, error) {
+                    console.error('Lỗi: ' + error);
+                }
+            });
+        }
         </script>
     
     <!--/ Delete-->

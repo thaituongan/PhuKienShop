@@ -4,7 +4,7 @@
     <td>@Model.Order.OrderId</td>
     <td>@Model.Order.OrderDate</td>
     <td><a href="#" onclick="getOrderDetails(@Model.Order.OrderId)">Chi tiết đơn hàng</a></td>
-    <td>@Model.Order.TotalAmount</td>
+    <td>@Model.Order.TotalAmount.ToString("C")</td>
     <td>@PhuKienShop.Models.OrderViewModel.translateOrderStatus(Model.Order.Status)</td>
     <td>@Model.Order.CreatedAt</td>
 </tr>

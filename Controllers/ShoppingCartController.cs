@@ -36,10 +36,18 @@ namespace PhuKienShop.Controllers
         public IActionResult Index()
         {
 			var cart = GetCart();
-			var totalAmount = cart.Amount(_db);
-            var isSale = cart.IsSale(_db);
+            var productPrices = new Dictionary<int, decimal>();
+
+            foreach (var cartProduct in cart.CartProducts)
+            {
+                var price = cart.IsSale(_db, cartProduct.Product.ProductId);
+                productPrices[cartProduct.Product.ProductId] = price;
+            }
+
+            ViewBag.ProductPrices = productPrices;
+            var totalAmount = cart.Amount(_db);
+         
             ViewBag.TotalAmount = totalAmount;
-            ViewBag.IsSale = isSale;// Truyền giá trị xuống view
 
             return View(cart);
 		}

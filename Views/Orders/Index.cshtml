@@ -6,51 +6,51 @@
     <!-- Layout = "~/Views/Shared/_LayoutAdmin.cshtml"; -->
     Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
 
-            <style>
-                tr:nth-child(even) {
-                    background-color: aliceblue;
-                }
+                                <style>
+                                    tr:nth-child(even) {
+                                        background-color: aliceblue;
+                                    }
 
-                tr:nth-child(odd) {
-                    background-color: #ffffff;
-                }
+                                    tr:nth-child(odd) {
+                                        background-color: #ffffff;
+                                    }
 
-                .modal-dialog {
-                    width: 80%;
-                    max-width: 100%;
-                }
+                                    .modal-dialog {
+                                        width: 80%;
+                                        max-width: 100%;
+                                    }
 
-                .search-form {
-                    display: flex;
-                    align-items: center;
-                    border: 1px solid #fd1111;
-                    border-radius: 50px;
-                    overflow: hidden;
-                    width: 180px;
-                    justify-content: space-between;
-                }
+                                    .search-form {
+                                        display: flex;
+                                        align-items: center;
+                                        border: 1px solid #fd1111;
+                                        border-radius: 50px;
+                                        overflow: hidden;
+                                        width: 180px;
+                                        justify-content: space-between;
+                                    }
 
-                   
-                .search-form input {
-                        border: none ;
-                        outline: white;
-                        margin-left: 10px;
-                }
+                                       
+                                    .search-form input {
+                                            border: none ;
+                                            outline: white;
+                                            margin-left: 10px;
+                                    }
 
 
-                .search-form input:focus {
-                    border: none !important;
-                   outline: none !important;
-                }
+                                    .search-form input:focus {
+                                        border: none !important;
+                                       outline: none !important;
+                                    }
 
-                .search-form i {
-                    padding: 10px;
-                }
+                                    .search-form i {
+                                        padding: 10px;
+                                    }
 
-                .search-form i:hover {
-                    cursor: pointer;
-                }
-                </style>
+                                    .search-form i:hover {
+                                        cursor: pointer;
+                                    }
+                                    </style>
 
 }
    
@@ -90,14 +90,27 @@
                         </h4>
                     </div>
                     <div style="display:flex; justify-content: right;">
-                        <div class="form-group">
-                            <div class="search-form">
-                                <input type="text" name="orderID" class="form-control orderID" placeholder="Mã đơn hàng"><i class="fa-solid fa-magnifying-glass searchBtn" onclick="searchOrder(this)"></i>
-                                <input type="text" name="action" class="form-control" value="SEARCH" hidden>
+                        <div style="display:flex; flex-direction:column; align-items:end;">
+                            <div class="form-group">
+                                <div class="search-form">
+                                    <input type="text" name="orderID" class="form-control orderID" placeholder="Mã đơn hàng"><i class="fa-solid fa-magnifying-glass searchBtn" onclick="searchOrder(this)"></i>
+                                    <input type="text" name="action" class="form-control" value="SEARCH" hidden>
 
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Trạng thái</label>
+                                <select id="searchByStatus" class="form-select">
+                                    <option value="ALL">Tất cả</option>
+                                    <option value="WAITING">Chờ xác nhận</option>
+                                    <option value="CONFIRMED">Đã xác nhận</option>
+                                    <option value="PACKAGEED">Đã đóng gói</option>
+                                    <option value="DELIVERYED">Đang vận chuyển</option>
+                                    <option value="COMPLETEED">Đã hoàn thành</option>
+                                    <option value="CANCELED">Đã hủy</option>
+                                </select>
                             </div>
                         </div>
-                            
                     </div>
                     <table class="order-content">
                         <thead>
@@ -135,13 +148,12 @@
     -->
     
     @section Scripts {
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
     <script>
 
             function getOrderDetails(idin) {
                 var action = `Chi tiết đơn hàng ${idin}`;
-            var modalID = "DETAIL";
+                var modalID = "DETAIL";
            
             var html = `
                     <div id="${modalID}" class="modal fade">
@@ -221,7 +233,7 @@
                                         </div>
                                     </div>
                                     <div class="modal-footer">
-                                        <input type="button" class="btn btn-info" onclick="callUpdateOrder(this)" value="Xác nhận">
+                                        <input type="button" class="btn btn-info" onclick="callUpdateOrder(this)" value="Thực hiện">
                                     </div>
                                 </form>
 
@@ -259,15 +271,12 @@
  
 
         function callUpdateOrder(button) {
-            
-            console.log("goi update tu button");
             var form = button.closest('form');
-            console.log("form: ");
-            console.log(form);
-                var formdata = new FormData(form);
+            var formdata = new FormData(form);
             var id = formdata.get("orderID");
             var action = formdata.get("action");
             updateOrder(id, action,form);
+            
         }
 
             function searchOrder(element) {
@@ -305,6 +314,22 @@
                     }
                 });
             }
+
+        function refreshOrderTable() {
+                $.ajax({
+                    url: '@Url.Action("getAllOrder", "Orders")',
+                    type: 'POST',
+                    data: {},
+                    success: function (response) {
+                        console.log(response);
+                        $('.order-content tbody').html(response);
+                        console.log($('.order-content tbody'));
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Lỗi: ' + error);
+                    }
+                });
+        }
          
         $(document).ready(function () {
 
@@ -332,6 +357,8 @@
                 showErrorToast2(message);
         }
 
+
+
         function renderToast2Success() {
             var curToast2 = document.querySelector('#toast-2');
             if (curToast2) curToast2.remove();
@@ -351,7 +378,30 @@
                 trElement.classList.remove('modal-row');
             }
         }
-            
+        document.addEventListener("DOMContentLoaded", function () {
+                document.getElementById("searchByStatus").addEventListener("change", function () {
+                    var status = this.value;
+                    searchByStatus(status);
+
+                });
+        });
+        
+            function searchByStatus(status) {
+                console.log("search by status");
+            $.ajax({
+                url: '@Url.Action("searchByStatus", "Orders")',
+                type: 'POST',
+                data: { status: status },
+                success: function (response) {
+                    console.log(response);
+                    $('.order-content tbody').html(response);
+                    console.log($('.order-content tbody'));
+                },
+                error: function (xhr, status, error) {
+                    console.error('Lỗi: ' + error);
+                }
+            });
+        }
     </script>
    }
 
