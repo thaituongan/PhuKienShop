@@ -79,21 +79,18 @@ public partial class Product
         ImageUrl = img;
         CreatedAt = createat;
         UpdatedAt = updateat;
-
-
     }
-
-
-
+    //kiem tra xem san phẩm có đang sale hay không
     public bool isProductSale()
     {
         var listProSale = ProductSales.Where(pd => pd.StartDate <= DateTime.Now &&  pd.EndDate >= DateTime.Now).ToList();
         return listProSale.Any();
     }
+    //lấy giá của sản phẩm nếu nó đang sale
     public decimal GetPrice()
     {
        //xem sản phẩm có trong danh sách của sản phẩm đang sale hay không
-       var productSale = ProductSales.Where(pd => pd.StartDate <= DateTime.Now && pd.EndDate >= DateTime.Now).FirstOrDefault();
+        var productSale = ProductSales.Where(pd => pd.StartDate <= DateTime.Now && pd.EndDate >= DateTime.Now).FirstOrDefault();
         //neu san pham giam gia thi lay gia khuyen mai, khong thi lay gia goc
         return productSale != null ? productSale.SalePrice : Price;
     }
