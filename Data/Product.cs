@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Conventions;
+using Microsoft.SqlServer.Server;
+using System;
 using System.Collections.Generic;
 
 namespace PhuKienShop.Data;
@@ -40,6 +42,48 @@ public partial class Product
         string str = url.Substring(1);
         return str;
     }
+
+    public Product() { }
+
+    public Product(string name, double price, int quantity, int category, string branch, string img) 
+    {
+        ProductName = name;
+        Price = (decimal) price;
+        StockQuantity = quantity;
+        CategoryId = category;
+        Branch = branch;
+        ImageUrl = img;
+
+    }   
+    public Product(int id,string name, double price, int quantity, int category, string branch, string img,string des) 
+    {
+        ProductId = id;
+        ProductName = name;
+        Price = (decimal) price;
+        StockQuantity = quantity;
+        CategoryId = category;
+        Branch = branch;
+        ImageUrl = img;
+        Description = des;
+
+    }  
+    public Product(int id,string name, string des,double price, int quantity, int category, string branch, string img,DateTime createat, DateTime updateat) 
+    {
+        ProductId = id;
+        ProductName = name;
+        Description = des;
+        Price = (decimal) price;
+        StockQuantity = quantity;
+        CategoryId = category;
+        Branch = branch;
+        ImageUrl = img;
+        CreatedAt = createat;
+        UpdatedAt = updateat;
+
+
+    }
+
+
 
     public bool isProductSale()
     {
