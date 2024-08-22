@@ -5,7 +5,7 @@
     ViewData["Title"] = "Quản lý đơn hàng";
     <!-- Layout = "~/Views/Shared/_LayoutAdmin.cshtml"; -->
     Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
-
+}
             <style>
                 tr:nth-child(even) {
                     background-color: aliceblue;
@@ -52,7 +52,7 @@
                 }
                 </style>
 
-}
+
    
 
 <!-- main content -->
@@ -129,17 +129,13 @@
     <div id="update-container">
         
     </div>
-    <!-- <p>
-        <a asp-action="Create">Create New</a>
-    </p>
-    -->
     
     @section Scripts {
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
     <script>
 
             function getOrderDetails(idin) {
+               
                 var action = `Chi tiết đơn hàng ${idin}`;
             var modalID = "DETAIL";
            
