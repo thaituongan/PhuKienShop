@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -12,7 +13,9 @@ using PhuKienShop.Data;
 using PhuKienShop.Models;
 namespace PhuKienShop.Controllers
 {
-	public class ProductsController : Controller
+    [AllowAnonymous]
+
+    public class ProductsController : Controller
 	{
 		private readonly PkShopContext _context;
 
@@ -20,8 +23,6 @@ namespace PhuKienShop.Controllers
 		{
 			_context = context;
 		}
-
-		
 
 		// GET: Products
 		public async Task<IActionResult> Index()

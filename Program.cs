@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.EntityFrameworkCore;
 using PhuKienShop.Data;
 using PhuKienShop.Services;
 namespace PhuKienShop
@@ -17,7 +19,15 @@ namespace PhuKienShop
                 options.SlidingExpiration = true;
             });
 
-            builder.Services.AddAuthentication("PhuKienShopAuth")
+			// Add services to the container.
+			builder.Services.AddControllersWithViews(options =>
+			{
+				var policy = new AuthorizationPolicyBuilder()
+								.RequireAuthenticatedUser()
+								.Build();
+				options.Filters.Add(new AuthorizeFilter(policy));
+			});
+			builder.Services.AddAuthentication("PhuKienShopAuth")
                  .AddCookie("PhuKienShopAuth", options =>
                  {
                      options.LoginPath = "/Account/Login"; // Redirect here if not authenticated
@@ -28,7 +38,15 @@ namespace PhuKienShop
                      options.ClientId = "890059595195-nls0ig1u9ccgvlc1u4q73bmkn9ljikqg.apps.googleusercontent.com";
                      options.ClientSecret = "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";
                  });
-            builder.Services.AddSignalR();
+
+			// Configure Authorization
+			builder.Services.AddAuthorization(options =>
+			{
+				options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
+				options.AddPolicy("UserOnly", policy => policy.RequireRole("User"));
+				// Add more policies as needed
+			});
+			builder.Services.AddSignalR();
 
             builder.Services.AddControllersWithViews();
             builder.Services.AddDbContext<PkShopContext>(options =>

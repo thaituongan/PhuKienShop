@@ -7,9 +7,11 @@ using System.Text.Json;
 using System.Linq;
 using System.Threading.Tasks;
 using static PhuKienShop.Models.CheckoutViewModel;
+using Microsoft.AspNetCore.Authorization;
 
 namespace PhuKienShop.Controllers
 {
+    [Authorize(Policy = "UserOnly")]
     public class CheckOutController : Controller
     {
         private readonly PkShopContext _context;

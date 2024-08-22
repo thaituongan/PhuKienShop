@@ -7,9 +7,11 @@ using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
+using Microsoft.AspNetCore.Authorization;
 
 namespace PhuKienShop.Controllers
 {
+    [AllowAnonymous]
     public class AccountController : Controller
     {
         private readonly PkShopContext _context;
@@ -18,6 +20,11 @@ namespace PhuKienShop.Controllers
         {
             _context = context;
             _logger = logger;
+        }
+        [AllowAnonymous]
+        public IActionResult AccessDenied()
+        {
+            return View();
         }
         public IActionResult MyAccount()
         {
