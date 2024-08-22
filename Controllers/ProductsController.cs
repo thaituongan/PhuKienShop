@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -12,45 +13,15 @@ using PhuKienShop.Data;
 using PhuKienShop.Models;
 namespace PhuKienShop.Controllers
 {
-	public class ProductsController : Controller
+    [AllowAnonymous]
+
+    public class ProductsController : Controller
 	{
 		private readonly PkShopContext _context;
 
 		public ProductsController(PkShopContext context)
 		{
 			_context = context;
-		}
-
-		public IActionResult DetailsPage(int id, int page = 1)
-		{
-			var product = _context.Products
-				.Include(p => p.Reviews)
-				.FirstOrDefault(p => p.ProductId == id);
-
-			if (product == null)
-			{
-				return NotFound();
-			}
-
-			var pageSize = 2; // số bình luận mỗi trang
-			var reviews = product.Reviews
-				.OrderByDescending(r => r.CreatedAt)
-				.Skip((page - 1) * pageSize)
-				.Take(pageSize)
-				.ToList();
-
-			var totalReviews = product.Reviews.Count();
-			var totalPages = (int)Math.Ceiling(totalReviews / (double)pageSize);
-
-			var model = new ProductDetailModel
-			{
-				CurrentProduct = product,
-				Reviews = reviews,
-				TotalPages = totalPages,
-				CurrentPage = page
-			};
-
-			return View(model);
 		}
 
 		// GET: Products
@@ -277,6 +248,7 @@ namespace PhuKienShop.Controllers
 		{
 			return _context.Products.Any(e => e.ProductId == id);
 		}
+
 		[HttpPost]
 		public async Task<IActionResult> AddReview(int productId, string comment, int rating)
 		{
@@ -292,7 +264,7 @@ namespace PhuKienShop.Controllers
 					UserId = userId,
 					Rating = rating,
 					Comment = comment,
-					CreatedAt = DateTime.UtcNow
+					CreatedAt = DateTime.Now
 				};
 
 				_context.Reviews.Add(review);
@@ -303,5 +275,6 @@ namespace PhuKienShop.Controllers
 
 			return RedirectToAction("Login", "Account");
 		}
+
 	}
 }

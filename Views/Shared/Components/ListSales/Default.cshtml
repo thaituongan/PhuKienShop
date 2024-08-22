@@ -1,67 +1,105 @@
-﻿﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿
 @model IEnumerable<PhuKienShop.Data.ProductSale>
-@{
-	<div class="products-tabs">
-		<!-- tab -->
-		<div id="tab1" class="tab-pane active">
-			<div class="products-slick" data-nav="#slick-nav-2">
-				<!-- product -->
-				@foreach (var item in Model)
-				{
-					<div class="product" >
-						<a asp-controller="Products" asp-action="Details" asp-route-id="@item.Product.ProductId" asp-route-categoryId="@item.Product.CategoryId">
-						<div class="product-img">
-							<img height="150px" src="@item.Product.ImageUrl" alt="@item.Product.ImageUrl>">
-							<div class="product-label">
-								<span class="sale">@item.DiscountPercentage.ToString("N0")%</span>
-							</div>
-						</div>
-						<div class="product-body">
-							<p class="product-category">@item.Product.Category.CategoryName</p>
-								<h3 class="product-name"><a asp-controller="Products" asp-action="Details" asp-route-id="@item.Product.ProductId">@item.Product.ProductName</a></h3>
-
-							<h4 class="product-price">@item.SalePrice.ToString("N0") VND</h4>
-
-							<del class="product-old-price">@item.Product.Price.ToString("N0") VND</del>
-						</div>
-							<div class="add-to-cart">
-								@if (User.Identity.IsAuthenticated)
-								{
-									<form asp-controller="ShoppingCart" asp-action="AddToCart" method="post">
-										<input type="hidden" name="productId" value="@item.Product.ProductId" />
-										<input type="hidden" name="quantity" value="1" />
-										<button type="submit" class="add-to-cart-btn">
-											<i class="fa fa-shopping-cart"></i> add to cart
-										</button>
-									</form>
-								}
-								else
-								{
-									<form asp-controller="Account" asp-action="Login" method="get">
-										<button type="submit" class="add-to-cart-btn">
-											<i class="fa fa-shopping-cart"></i> add to cart
-										</button>
-									</form>
-								}
-							</div>
-
-					</a>
-					</div>
-					
-
-				}
-				<!-- /product -->
-			</div>
-			<div id="slick-nav-2" class="products-slick-nav"></div>
-		</div>
-		<!-- /tab -->
-
-		<!-- tab2 -->
-		<div id="tab-2" class="tab-pane">
-		San pham
-		</div>
-	</div>
-	
-}
+<div class="products-tabs">
+    <!-- tab -->
+    <div id="tab6" class="tab-pane active">
+        <div class="products-slick" data-nav="#slick-nav-6">
+            <!-- product -->
+            @foreach (var item in Model)
+            {
+                <div class="product">
+                    <a asp-controller="Products" asp-action="Details" asp-route-id="@item.Product.ProductId" asp-route-categoryId="@item.Product.CategoryId">
+                        <div class="product-img">
+                            <img height="150px" src="@item.Product.ImageUrl" alt="@item.Product.ImageUrl">
+                            <div class="product-label">
+                                <span class="sale">@item.DiscountPercentage.ToString("N0")%</span>
+                            </div>
+                        </div>
+                        <div class="product-body">
+                            <p class="product-category">@item.Product.Category.CategoryName</p>
+                            <h3 class="product-name"><a asp-controller="Products" asp-action="Details" asp-route-id="@item.Product.ProductId">@item.Product.ProductName</a></h3>
+                            <h4 class="product-price">@item.SalePrice.ToString("N0") VND</h4>
+                            <del class="product-old-price">@item.Product.Price.ToString("N0") VND</del>
+                        </div>
+                        <div class="add-to-cart">
+                            @if (User.Identity.IsAuthenticated)
+                            {
+                                <form asp-controller="ShoppingCart" asp-action="AddToCart" method="post">
+                                    <input type="hidden" name="productId" value="@item.Product.ProductId" />
+                                    <input type="hidden" name="quantity" value="1" />
+                                    <button type="submit" class="add-to-cart-btn">
+                                        <i class="fa fa-shopping-cart"></i> Thêm vào giỏ hàng
+                                    </button>
+                                </form>
+                            }
+                            else
+                            {
+                                <form asp-controller="Account" asp-action="Login" method="get">
+                                    <button type="submit" class="add-to-cart-btn">
+                                        <i class="fa fa-shopping-cart"></i> Thêm vào giỏ hàng
+                                    </button>
+                                </form>
+                            }
+                        </div>
+                    </a>
+                </div>
+            } 
+            
+            
+            <!-- /product -->
+        </div>
+        <div id="slick-nav-6" class="products-slick-nav"></div>
+    </div> 
+    @{
+        var categories = Model.Select(p => p.Product.CategoryId).Distinct().ToList();
+        int tabListSale= 7;
+    }
+    @foreach (var categoryId in categories)
+    {
+        <div id="tab-@tabListSale" class="tab-pane">
+            <div class="products-slick" data-nav="#slick-nav-@tabListSale">
+                @foreach (var item in Model.Where(p => p.Product.CategoryId == categoryId))
+                {
+                    <div class="product">
+                        <a asp-controller="Products" asp-action="Details" asp-route-id="@item.Product.ProductId" asp-route-categoryId="@item.Product.CategoryId">
+                            <div class="product-img">
+                                <img height="150px" src="@item.Product.ImageUrl" alt="@item.Product.ImageUrl">
+                                <div class="product-label">
+                                    <span class="sale">@item.DiscountPercentage.ToString("N0")%</span>
+                                </div>
+                            </div>
+                            <div class="product-body">
+                                <p class="product-category">@item.Product.Category.CategoryName</p>
+                                <h3 class="product-name"><a asp-controller="Products" asp-action="Details" asp-route-id="@item.Product.ProductId">@item.Product.ProductName</a></h3>
+                                <h4 class="product-price">@item.SalePrice.ToString("N0") VND</h4>
+                                <del class="product-old-price">@item.Product.Price.ToString("N0") VND</del>
+                            </div>
+                            <div class="add-to-cart">
+                                @if (User.Identity.IsAuthenticated)
+                                {
+                                    <form asp-controller="ShoppingCart" asp-action="AddToCart" method="post">
+                                        <input type="hidden" name="productId" value="@item.Product.ProductId" />
+                                        <input type="hidden" name="quantity" value="1" />
+                                        <button type="submit" class="add-to-cart-btn">
+                                            <i class="fa fa-shopping-cart"></i> Thêm vào giỏ hàng
+                                        </button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <form asp-controller="Account" asp-action="Login" method="get">
+                                        <button type="submit" class="add-to-cart-btn">
+                                            <i class="fa fa-shopping-cart"></i> Thêm vào giỏ hàng
+                                        </button>
+                                    </form>
+                                }
+                            </div>
+                        </a>
+                    </div>
+                }
+            </div>
+            <div id="slick-nav-@tabListSale" class="products-slick-nav"></div>
+        </div>
+        tabListSale++;
+    }
+</div>

@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using PhuKienShop.Data;
 using System.Security.Claims;
 [ApiController]
 [Route("api/[controller]")]
+[Authorize(Policy = "AdminOnly")]
 public class MessagesController : ControllerBase
 {
     private readonly PkShopContext _context;
@@ -40,7 +42,7 @@ public class MessagesController : ControllerBase
         // Create the message and save it to the database
         var msg = new PhuKienShop.Data.Message
         {
-            SenderId = 1,
+            SenderId = GetAdminId(),
             ReceiverId = sender.UserId,
             Content = message.Content,
             SentAt = DateTime.UtcNow
@@ -60,5 +62,10 @@ public class MessagesController : ControllerBase
         }
 
         return Ok();
+    }
+    private int? GetAdminId()
+    {
+        var admin = _context.Users.Take(1).SingleOrDefault(u => u.Role == "Admin");
+        return admin?.UserId;
     }
 }

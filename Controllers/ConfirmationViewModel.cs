@@ -1,7 +1,9 @@
-﻿using PhuKienShop.Data;
+﻿using Microsoft.AspNetCore.Authorization;
+using PhuKienShop.Data;
 
 namespace PhuKienShop.Controllers
 {
+    [Authorize(Policy = "UserOnly")]
     public class ConfirmationViewModel
     {
         public int OrderId { get; set; }

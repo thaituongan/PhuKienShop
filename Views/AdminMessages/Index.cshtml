@@ -1,25 +1,30 @@
 ﻿@model AdminMessagesViewModel
 @{
     Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+
+    // Automatically select the first user in the list if no user is selected
+    var firstUserId = Model.UserList?.FirstOrDefault()?.UserId;
+    var selectedUserId = Model.SelectedUser?.UserId ?? firstUserId;
 }
-<div id="chat">
+
+<div id="chat-component">
     <div class="row">
         <div class="col-md-4">
-            <h4> Tin Nhắn</h4>
-
-            <ul class="list-group">
+            <h4 class="chat-header">Danh Sách Khách Hàng</h4>
+            <ul class="list-group user-list">
                 @if (Model.UserList != null && Model.UserList.Any())
                 {
-                    <ul class="list-group">
-                        @foreach (var user in Model.UserList)
-                        {
-                            <li class="list-group-item @((Model.SelectedUser != null && Model.SelectedUser.UserId == user.UserId) ? "active-user" : "")">
-                                <a href="@Url.Action("Index", new { userId = user.UserId })" class="user-link">
-                                    @user.Username
-                                </a>
-                            </li>
-                        }
-                    </ul>
+                    @foreach (var user in Model.UserList)
+                    {
+                        <li class="list-group-item @((selectedUserId == user.UserId) ? "active-user" : "")">
+                            <a href="@Url.Action("Index", new { userId = user.UserId })" class="user-link">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="username"><i class="fa-solid fa-circle-user p-2"></i>@user.Username</span>
+                                    @*  <span class="badge badge-primary">@user.MessageCount</span> *@
+                                </div>
+                            </a>
+                        </li>
+                    }
                 }
                 else
                 {
@@ -29,17 +34,19 @@
         </div>
 
         <div class="col-md-8">
-            @if (Model.SelectedUser != null)
+            @if (Model.UserList != null && Model.UserList.Any())
             {
-                <h4>Chat with @Model.SelectedUser.Username</h4>
+                <h4 class="chat-header">Nhắn tin với @Model.SelectedUser?.Username</h4>
 
-                <div class="chat-history" style="border: 1px solid #ccc; padding: 10px; height: 400px; overflow-y: auto;">
+                <div class="chat-history">
                     @await Html.PartialAsync("_MessagesPartial", Model.Messages)
                 </div>
 
-                <form asp-action="Reply" asp-route-userId="@Model.SelectedUser.UserId" method="post" id="chat-form">
-                    <textarea id="messageContent" name="messageContent" placeholder="Type your message..." class="form-control" style="margin-top: 10px;"></textarea>
-                    <button type="submit" class="btn btn-primary" style="margin-top: 10px;">Send</button>
+                <form asp-action="Reply" asp-route-userId="@selectedUserId" method="post" id="chat-form">
+                    <div class="input-group mt-3">
+                        <input type="text" id="messageContent" name="messageContent" placeholder="Type your message..." class="form-control">
+                        <button type="submit" class="btn btn-primary">Send</button>
+                    </div>
                 </form>
             }
             else
@@ -49,45 +56,160 @@
         </div>
     </div>
 </div>
-<style>
-/*     #chat {
-        margin: 20px 50px;
-        padding: 50px;
-    } */
 
-    .admin-message .message-content {
-        background-color: #d1e7dd;
-        text-align: right;
-    }
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            function fetchMessages() {
+                var userId = '@selectedUserId';
+                if (userId) {
+                    $.ajax({
+                        url: '@Url.Action("GetMessages", "AdminMessages", new { userId = "__USER_ID__" })'.replace('__USER_ID__', userId),
+                        type: 'GET',
+                        success: function (data) {
+                            $('.chat-history').html(data);
+                            $('.chat-history').scrollTop($('.chat-history')[0].scrollHeight);
+                        },
+                        error: function () {
+                            console.error('Failed to load messages');
+                        }
+                    });
+                }
+            }
 
-    .user-message .message-content {
-        background-color: #f8d7da;
-        text-align: left;
-    }
+            setInterval(fetchMessages, 1000);
 
-    .active-user {
-        background-color: #0d6efd;
-        color: white;
-    }
+            $("#chat-form").submit(function (e) {
+                e.preventDefault();
+                $.ajax({
+                    url: $(this).attr('action'),
+                    type: 'POST',
+                    data: $(this).serialize(),
+                    success: function () {
+                        fetchMessages();
+                        $('#messageContent').val('');
+                    },
+                    error: function () {
+                        alert('Failed to send message. Please try again.');
+                    }
+                });
+            });
 
-    .message {
-        margin-bottom: 10px;
-        display: flex;
-    }
+            $('#messageContent').on('keypress', function (e) {
+                if (e.which === 13 && !e.shiftKey) {
+                    e.preventDefault();
+                    $('#chat-form').submit();
+                }
+            });
+        });
+    </script>
+}
+@section Styles {
+    <style>
+        #chat-component .user-list {
+            max-height: 400px;
+            overflow-y: auto;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
 
-    .admin-message {
-        justify-content: flex-end;
-    }
+        #chat-component .list-group-item {
+            border: none;
+            padding: 15px;
+            transition: background-color 0.3s ease;
+            cursor: pointer;
+        }
 
-    .user-message {
-        justify-content: flex-start;
-    }
+        #chat-component .list-group-item:hover {
+            background-color: #f0f0f0;
+        }
 
-    .chat-history {
-        padding: 10px;
-        height: 400px;
-        overflow-y: auto;
-        border: 1px solid #ccc;
-    }
-</style>
+        #chat-component .active-user {
+            background-color: #ebebeb !important;
+            color: white;
+        }
 
+        #chat-component .username {
+            font-weight: bold;
+        }
+
+        #chat-component .badge {
+            background-color: #ffc107;
+        }
+
+        #chat-component .chat-history {
+            padding: 10px;
+            height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        #chat-component .message {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        #chat-component .admin-message {
+            justify-content: flex-end;
+            text-align: right;
+        }
+
+        #chat-component .admin-message .message-content {
+            background-color: #d1e7dd;
+            padding: 8px 12px;
+            border-radius: 15px;
+            max-width: 60%;
+            text-align: left;
+        }
+
+        #chat-component .user-message {
+            justify-content: flex-start;
+            text-align: left;
+        }
+
+        #chat-component .user-message .message-content {
+            background-color: #f8d7da;
+            padding: 8px 12px;
+            border-radius: 15px;
+            max-width: 60%;
+            text-align: left;
+        }
+
+        #chat-component .input-group {
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #chat-component .input-group input {
+            border: none;
+            outline: none;
+            padding: 12px 15px;
+            font-size: 14px;
+        }
+
+        #chat-component .input-group button {
+            background-color: #007bff;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        #chat-component .input-group button:hover {
+            background-color: #0056b3;
+
+        }
+
+        #chat-component .chat-header {
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+    </style>
+}

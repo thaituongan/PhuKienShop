@@ -113,3 +113,4 @@ var lineChart = new Chart(ctx, {
 		bezierCurve: false,
 	}
 })
+

@@ -59,6 +59,15 @@ public class CartModel
             CartProducts.Add(new CartProduct { Product = product, Quantity = quantity });
         }
     }
+
+    public void UpdateProduct(int productId, int quantity)
+    {
+        var existingProduct = CartProducts.FirstOrDefault(cp => cp.Product.ProductId == productId);
+        if (existingProduct != null)
+        {
+            existingProduct.Quantity = quantity;
+        }
+    }
 }
 public class CartProduct
 {

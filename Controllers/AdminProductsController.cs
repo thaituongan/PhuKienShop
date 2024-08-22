@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -12,7 +13,8 @@ using PhuKienShop.Models;
 using PhuKienShop.Services;
 namespace PhuKienShop.Controllers
 {
-	public class AdminProductsController : Controller
+    [Authorize(Policy = "AdminOnly")]
+    public class AdminProductsController : Controller
 	{
 		private readonly PkShopContext _context;
 		private readonly ICategoryService _categoryService;

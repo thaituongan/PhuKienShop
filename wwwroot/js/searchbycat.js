@@ -5,14 +5,13 @@ document.getElementById('categorySelect').addEventListener('change', function ()
     // Đợi một chút trước khi gửi form để đảm bảo giá trị đã được lưu
     setTimeout(function () {
         document.getElementById('searchForm').submit(); // Gửi form ngay lập tức
-    }); // Thời gian chờ có thể điều chỉnh tùy theo nhu cầu
+    }, 100); // Thời gian chờ có thể điều chỉnh tùy theo nhu cầu
 });
 
 // Khi trang load lại, thiết lập lại giá trị đã chọn dựa trên giá trị lưu trong sessionStorage
 window.onload = function () {
     var savedCategory = sessionStorage.getItem('selectedCategory');
     if (savedCategory) {
-        document.write('<style>#categorySelect option[value="' + savedCategory + '"] { selected: true; }</style>');
-        //document.getElementById('categorySelect').value = savedCategory;
+        document.getElementById('categorySelect').value = savedCategory;
     }
 };

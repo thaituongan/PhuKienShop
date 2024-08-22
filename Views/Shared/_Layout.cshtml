@@ -8,8 +8,8 @@
 	@*     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
 	<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 	<link rel="stylesheet" href="~/ElectronicsShop.styles.css" asp-append-version="true" /> *@
-		<!-- Other head content -->
-		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+	<!-- Other head content -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 	<link rel="stylesheet" href="https://cdn.datatables.net/1.13.1/css/jquery.dataTables.min.css">
 	<link rel="stylesheet" href="https://cdn.datatables.net/1.13.1/css/dataTables.bootstrap5.min.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -32,7 +32,7 @@
 	<!-- Custom stlylesheet -->
 	<link type="text/css" rel="stylesheet" href="~/css/style.css" />
 	<!-- js-->
-	
+
 	<script src="~/js/searchpartial.js" defer></script>
 
 	<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -41,9 +41,38 @@
 	  <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 	  <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 	<![endif]-->
+
+	<style>
+		#searchResults {
+			position: absolute;
+			top: 150pxpx;
+			left: 0;
+			right: 0;
+			z-index: 100;
+			padding: 20px;
+			background-color: white; /* Nền trắng cho phần tử chính */
+		}
+
+			#searchResults .result-item {
+				background-color: white; /* Nền trắng cho từng phần tử con */
+				margin-bottom: 20px; /* Khoảng cách giữa các phần tử */
+				padding: 10px; /* Khoảng cách bên trong mỗi phần tử */
+				box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1); /* Đổ bóng cho mỗi phần tử */
+			}
+
+				#searchResults .result-item:last-child {
+					margin-bottom: 0; /* Xóa khoảng cách dưới cùng cho phần tử cuối */
+				}
+
+
+		#main {
+			position: relative;
+			z-index: 1; /* Đảm bảo rằng nội dung chính nằm phía sau kết quả tìm kiếm */
+		}
+	</style>
 </head>
 <body>
-	
+
 	<!-- HEADER -->
 	<header>
 		<!-- TOP HEADER -->
@@ -55,18 +84,23 @@
 					<li><a href="#"><i class="fa fa-map-marker"></i> Đại Học Nông Lâm</a></li>
 				</ul>
 				<ul class="header-links pull-right">
-					<li><a href="#"><i></i> VND</a></li>
-					<li><a href="@Url.Action("MyAccount", "Account")"><i class="fa fa-user-o"></i>
-							@{if(User.Identity.Name != null)
+					<li>
+						<a href="@Url.Action("MyAccount", "Account")">
+							<i class="fa fa-user-o"></i>
+							@{
+								if (User.Identity.Name != null)
 								{
 									@User.Identity.Name
-								}else
-									{
-										<span>Login</span>
-									}
-								
-							}</a></li>
-					<li><a href="@Url.Action("Logout", "Account")"> <i class="fas fa-sign-out-alt"></i></i> Logout</a></li>
+								}
+								else
+								{
+									<span>Đăng Nhập</span>
+								}
+
+							}
+						</a>
+					</li>
+					<li><a href="@Url.Action("Logout", "Account")"> <i class="fas fa-sign-out-alt"></i></i> Đăng Xuất</a></li>
 
 				</ul>
 
@@ -92,9 +126,9 @@
 					<div class="col-md-6">
 						<div class="header-search">
 							<form action="/Products/Search" method="get" id="searchForm">
-								
+
 								<input id="searchInput" name="searchTerm" class="input-select" placeholder="Tìm kiếm sản phẩm">
-								<button class="search-btn">Search</button>
+								<button class="search-btn">Tìm kiếm</button>
 							</form>
 						</div>
 					</div>
@@ -102,10 +136,10 @@
 					<!-- ACCOUNT -->
 					<div class="col-md-3 clearfix">
 						<div class="header-ctn">
-								<div class="dropdown">
-									<a class="dropdown-toggle" asp-controller="ShoppingCart" asp-action="Index">
-										<i class="fa fa-shopping-cart"></i>
-										<span>Giỏ Hàng</span>
+							<div class="dropdown">
+								<a class="dropdown-toggle" asp-controller="ShoppingCart" asp-action="Index">
+									<i class="fa fa-shopping-cart"></i>
+									<span>Giỏ Hàng</span>
 									<div class="qty">
 										<div class="qty">
 											@{
@@ -121,9 +155,9 @@
 										</div>
 
 									</div>  <!-- Hiển thị số lượng sản phẩm trong giỏ hàng -->
-									</a>
-								</div>
-						
+								</a>
+							</div>
+
 							<!-- Menu Toogle -->
 							<div class="menu-toggle">
 								<a href="#">
@@ -152,8 +186,7 @@
 				<!-- NAV -->
 				<ul class="main-nav nav navbar-nav">
 					<li class="active"><a href="@Url.Action("Index", "Home")">Trang Chủ</a></li>
-					<li><a href="#">Danh Mục</a></li>
-					<li><a href="#">Khuyến mãi</a></li>
+					<li><a href="@Url.Action("Index","ListProduct")">Danh Mục</a></li>
 					<li><a href="@Url.Action("Introduction", "Home")">Giới Thiệu</a></li>
 					<li><a href="@Url.Action("Contact", "Home")">Liên Hệ</a></li>
 					<li><a href="@Url.Action("Privacy", "Home")">Chính Sách Bảo Mật</a></li>
@@ -169,8 +202,7 @@
 	<div id="searchResults"></div>
 
 	</header>
-
-	<div id="main" style="min-height: 600px" >
+	<div id="main" style="min-height: 600px">
 		@RenderBody()
 	</div>
 	@Html.Partial("_Chat")
@@ -184,25 +216,26 @@
 				<div class="row">
 					<div class="col-md-3 col-xs-6">
 						<div class="footer">
-							<h3 class="footer-title">About Us</h3>
-							<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut.</p>
+							<h3 class="footer-title">Về Chúng Tôi</h3>
+							<p>
+								Được thành lập từ năm 2004, Có thị phần số 1 Việt Nam với hơn 3.200 điểm bán thiết bị di động.
+							</p>
 							<ul class="footer-links">
-								<li><a href="#"><i class="fa fa-map-marker"></i>1734 Stonecoal Road</a></li>
-								<li><a href="#"><i class="fa fa-phone"></i>+021-95-51-84</a></li>
-								<li><a href="#"><i class="fa fa-envelope-o"></i>email@email.com</a></li>
+								<li><a href="#"><i class="fa fa-map-marker"></i>Đại Học Nông Lâm</a></li>
+								<li><a href="#"><i class="fa fa-phone"></i>0949497383</a></li>
+								<li><a href="#"><i class="fa fa-envelope-o"></i>dhnl@email.com</a></li>
 							</ul>
 						</div>
 					</div>
 
 					<div class="col-md-3 col-xs-6">
 						<div class="footer">
-							<h3 class="footer-title">Categories</h3>
+							<h3 class="footer-title">Danh Mục</h3>
 							<ul class="footer-links">
-								<li><a href="#">Hot deals</a></li>
-								<li><a href="#">Laptops</a></li>
-								<li><a href="#">Smartphones</a></li>
-								<li><a href="#">Cameras</a></li>
-								<li><a href="#">Accessories</a></li>
+								<li><a href=" @Url.Action("Index", "ListProduct")" class="cta-btn">Cáp Sạc</a></li>
+								<li><a href=" @Url.Action("Index", "ListProduct")" class="cta-btn">Tai Nghe</a></li>
+								<li><a href=" @Url.Action("Index", "ListProduct")" class="cta-btn">Loa</a></li>
+								<li><a href=" @Url.Action("Index", "ListProduct")" class="cta-btn">Ốp Lưng</a></li>
 							</ul>
 						</div>
 					</div>
@@ -211,26 +244,23 @@
 
 					<div class="col-md-3 col-xs-6">
 						<div class="footer">
-							<h3 class="footer-title">Information</h3>
+							<h3 class="footer-title">Thông Tin</h3>
 							<ul class="footer-links">
-								<li><a href="#">About Us</a></li>
-								<li><a href="#">Contact Us</a></li>
-								<li><a href="#">Privacy Policy</a></li>
-								<li><a href="#">Orders and Returns</a></li>
-								<li><a href="#">Terms & Conditions</a></li>
+								<li><a href="@Url.Action("Introduction", "Home")">Về Chúng Tôi</a></li>
+								<li><a href="@Url.Action("Contact", "Home")">Liên Hệ</a></li>
+								<li><a href="@Url.Action("Privacy", "Home")">Chính Sách Bảo Mật</a></li>
 							</ul>
 						</div>
 					</div>
 
 					<div class="col-md-3 col-xs-6">
 						<div class="footer">
-							<h3 class="footer-title">Service</h3>
+							<h3 class="footer-title">Dịch Vụ</h3>
 							<ul class="footer-links">
-								<li><a href="#">My Account</a></li>
-								<li><a href="#">View Cart</a></li>
-								<li><a href="#">Wishlist</a></li>
-								<li><a href="#">Track My Order</a></li>
-								<li><a href="#">Help</a></li>
+								<li><a href="@Url.Action("MyAccount", "Account")">Tài Khoản Của Tôi</a></li>
+								<li><a href="#">Xem Giỏ Hàng</a></li>
+								<li><a href="#">Theo Dõi Đơn Hàng</a></li>
+								<li><a href="#">Hỗ Trợ</a></li>
 							</ul>
 						</div>
 					</div>
@@ -256,7 +286,7 @@
 						</ul>
 						<span class="copyright">
 							<!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-							Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with <i class="fa fa-heart-o" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>
+							Bản quyền &copy;<script>document.write(new Date().getFullYear());</script> Đã đăng ký Bản quyền | Mẫu này được tạo với <i class="fa fa-heart-o" aria-hidden="true"></i> bởi <a href="https://colorlib.com" target="_blank">Colorlib</a>
 							<!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
 						</span>
 					</div>
@@ -269,6 +299,8 @@
 	</footer>
 	<!-- /FOOTER -->
 	<!-- jQuery Plugins -->
+	<!-- SignalR Script and Chat Widget Logic -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
 	<script src="~/js/jquery.min.js"></script>
 	<script src="~/js/bootstrap.min.js"></script>
 	<script src="~/js/slick.min.js"></script>
