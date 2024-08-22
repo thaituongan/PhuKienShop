@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PhuKienShop.Data;
 using PhuKienShop.Models;
 
 namespace PhuKienShop.Controllers
 {
+    [Authorize(Policy = "AdminOnly")]
     public class StatisticsController : Controller
     {
         private readonly PkShopContext _db;

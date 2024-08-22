@@ -4,7 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using System.Linq;
 using Microsoft.AspNetCore.SignalR;
-
+using Microsoft.AspNetCore.Authorization;
+[Authorize(Policy = "AdminOnly")]
 [Route("admin/messages")]
 public class AdminMessagesController : Controller
 {
@@ -43,7 +44,7 @@ public class AdminMessagesController : Controller
     public async Task<IActionResult> Index(int? userId)
     {
         var users = await _context.Messages
-                                  .Where(m => m.ReceiverId == 1) // Messages to admin
+                                  .Where(m => m.ReceiverId == GetAdminId()) // Messages to admin
                                   .Select(m => m.Sender)
                                   .Distinct()
                                   .ToListAsync();
@@ -81,7 +82,7 @@ public class AdminMessagesController : Controller
 
         var message = new PhuKienShop.Data.Message
         {
-            SenderId = 1,
+            SenderId = GetAdminId(),
             ReceiverId = userId,
             Content = messageContent,
             SentAt = DateTime.UtcNow
@@ -90,9 +91,12 @@ public class AdminMessagesController : Controller
         _context.Messages.Add(message);
         await _context.SaveChangesAsync();
         await _hubContext.Clients.User(userId.ToString()).SendAsync("ReceiveMessage", "Admin", message.Content);
-        // You can also send a separate notification to alert the admin
-        //await _hubContext.Clients.User(userId.ToString()).SendAsync("NewMessageNotification", "Admin", message.Content);
-        //await _hubContext.Clients.All.SendAsync("ReceiveMessage", "Admin", message.Content);
+     
         return RedirectToAction("Index", new { userId });
+    }
+    private int? GetAdminId()
+    {
+        var admin = _context.Users.Take(1).SingleOrDefault(u => u.Role == "Admin");
+        return admin?.UserId;
     }
 }

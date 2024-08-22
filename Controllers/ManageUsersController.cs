@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PhuKienShop.Data;
 
 namespace PhuKienShop.Controllers
 {
+    [Authorize(Policy = "AdminOnly")]
     public class ManageUsersController : Controller
     {
         private readonly PkShopContext _context;

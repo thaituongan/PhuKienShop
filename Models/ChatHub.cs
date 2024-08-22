@@ -18,7 +18,7 @@ public class ChatHub : Hub
 			Content = message,
 			SentAt = DateTime.Now.AddHours(-7.0),
 			SenderId = GetUserIdByUsername(user),
-			ReceiverId = 1,
+			ReceiverId = GetAdminId(),
 
 		};
 
@@ -38,7 +38,7 @@ public class ChatHub : Hub
 
 	private int? GetAdminId()
 	{
-		var admin = _context.Users.SingleOrDefault(u => u.Role == "Admin");
+		var admin = _context.Users.Take(1).SingleOrDefault(u => u.Role == "Admin");
 		return admin?.UserId;
 	}
 
