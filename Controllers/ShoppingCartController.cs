@@ -63,6 +63,15 @@ namespace PhuKienShop.Controllers
             return RedirectToAction("Index");
         }
 
+        [HttpPost]
+        public IActionResult Update(int productId, int quantity)
+        {
+            var cart = GetCart();
+            cart.UpdateProduct(productId, quantity);
+            SaveCart(cart);
+            return RedirectToAction("Index");
+        }
+
         public IActionResult AddToCart(int productId, int quantity)
         {
             var product = _db.Products.Find(productId);
@@ -73,6 +82,6 @@ namespace PhuKienShop.Controllers
                 SaveCart(cart);
             }
             return RedirectToAction("Index");
-        }
+        } 
     }
 }
