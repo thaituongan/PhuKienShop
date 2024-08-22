@@ -1,0 +1,45 @@
+﻿@model PhuKienShop.Models.ProductDetailModel
+
+<ul class="reviews">
+    @if (Model.Reviews != null && Model.Reviews.Any())
+    {
+        @foreach (var review in Model.Reviews)
+        {
+            <li style="border-bottom: 1px solid #e0e0e0; padding: 15px 0;">
+                <div class="review-heading">
+                    <h5 class="name" style="margin: 0;">@review.User?.Username</h5>
+                </div>
+                <div class="review-body" style="margin-top: 5px;">
+                    <p>@review.Comment</p>
+                </div>
+                <div class="review-rating" style="display: flex; align-items: center; margin-top: 5px;">
+                    @for (int i = 0; i < review.Rating; i++)
+                    {
+                        <i class="fa fa-star" style="color: #ffd700;"></i>
+                    }
+                    @for (int i = review.Rating; i < 5; i++)
+                    {
+                        <i class="fa fa-star-o empty" style="color: #ddd;"></i>
+                    }
+                </div>
+                <div class="review-date" style="margin-top: 5px; color: #757575;">
+                    <p>@review.CreatedAt.ToString()</p>
+                </div>
+            </li>
+        }
+    }
+    else
+    {
+        <p>Không có đánh giá nào.</p>
+    }
+</ul>
+
+<!-- Reviews Pagination -->
+<ul class="reviews-pagination">
+    @for (int i = 1; i <= Model.TotalPages; i++)
+    {
+        <li class="@(i == Model.CurrentPage ? "active" : "")">
+            <a href="@Url.Action("Details", new { id = Model.CurrentProduct.ProductId, categoryId = Model.CurrentProduct.CategoryId, page = i })">@i</a>
+        </li>
+    }
+</ul>
