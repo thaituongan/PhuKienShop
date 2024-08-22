@@ -49,10 +49,26 @@
                                     </div>
                                 </td>
                                 <td><strong>@string.Format("{0:N0}", @price) VND</strong></td>
-                                <td data-th="Quantity"><b>@cartProduct.Quantity</b></td>
+                                <td data-th="Quantity">
+                                    <form asp-action="Update" method="post" class="form-inline">
+                                        <div class="input-group">
+                                            <input type="hidden" name="productId" value="@productId" />
+                                            <input type="number" name="quantity" class="form-control form-control-sm"
+                                                   value="@(cartProduct.Quantity > 0 ? cartProduct.Quantity : 1)"
+                                                   min="1" max="@cartProduct.Product.StockQuantity"
+                                                   style="width: 60px;" />
+                                            <div class="input-group-append" >
+                                                <button type="submit" class="btn btn-outline-secondary btn-sm"
+                                                        style="background-color: #28a745; color: white; width: 60px">
+                                                    <b>Lưu</b>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </td>
                                 <td><strong>@string.Format("{0:N0}", (price * cartProduct.Quantity)) VND</strong></td>
                                 <td class="actions" data-th="" style="width:10%;">
-                                    <button data-toggle="modal" data-target="#deleteEmployeeModal_@cartProduct.Product.ProductId" class="btn btn-danger btn-sm delete-btn" data-backdrop="false">
+                                    <button data-toggle="modal" data-target="#updateEmployeeModal_@cartProduct.Product.ProductId" class="btn btn-danger btn-sm delete-btn" data-backdrop="false">
                                         <i class="fa fa-trash-o"></i>
                                     </button>
                                 </td>
@@ -76,7 +92,9 @@
                                         }
                                     </div>
                                 </div>
+                                
                             </div>
+
 
                         }
                     </tbody>
@@ -106,7 +124,3 @@
         </div>
     </div>
 </div>
-
-<script>
-    
-</script>

@@ -14,7 +14,7 @@
 			<div class="col-md-12">
 				<ul class="breadcrumb-tree">
 					<li><a href="@Url.Action("Index", "Home")">Trang chủ</a></li>
-					<li><a href="#">@Model.CurrentProduct.Category.CategoryName</a></li>
+					<li><a href="@Url.Action("Index", "ListProduct", Model.CurrentProduct.Category.CategoryId)">@Model.CurrentProduct.Category.CategoryName</a></li>
 					<li class="active">@Model.CurrentProduct.ProductName</li>
 				</ul>
 			</div>
