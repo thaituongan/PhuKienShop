@@ -1,20 +1,15 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@model IEnumerable<PhuKienShop.Data.Category>
+﻿@model IEnumerable<PhuKienShop.Data.Category>
 @{
-	//bắt đầu từ tab2
-	int tabCounter = 2;
-	<div class="section-nav">
-		<ul class="section-tab-nav tab-nav">
-			<li class="active"><a data-toggle="tab" href="#tab1">Tất cả</a></li>
-			@foreach (var item in Model)
-			{
-				<li><a data-toggle="tab" href="#tab-@tabCounter">@item.CategoryName</a></li>
-				tabCounter++; //tăng biến đếm
-			}
-		</ul>
-	</div>
-
-
+    // Bắt đầu từ tab-2 cho các tab sau của ListProduct
+    int tabListProduct = 2;
+    <div class="section-nav">
+        <ul class="section-tab-nav tab-nav">
+            <li class="active"><a data-toggle="tab" href="#tab1">Tất cả</a></li>
+            @foreach (var item in Model)
+            {
+                <li><a data-toggle="tab" href="#tab-@tabListProduct">@item.CategoryName</a></li>
+                tabListProduct++; // Tăng biến đếm
+            }
+        </ul>
+    </div>
 }

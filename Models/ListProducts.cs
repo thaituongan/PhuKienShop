@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using PhuKienShop.Models;
 using System.Linq;
 
 namespace PhuKienShop.Data
@@ -15,7 +16,9 @@ namespace PhuKienShop.Data
 
         public IViewComponentResult Invoke()
         {
+            // Lấy danh sách sản phẩm từ cơ sở dữ liệu, bao gồm cả thông tin danh mục và giảm giá.
             var products = _context.Products
+                .Include(p => p.Category)
                 .Include(p => p.ProductSales)
                 .Select(p => new ProductViewModel
                 {
@@ -28,11 +31,12 @@ namespace PhuKienShop.Data
                 })
                 .ToList();
 
+            // Trả về view với viewModel đã tạo.
             return View(products);
         }
     }
 
-    public class ProductViewModel
+        public class ProductViewModel
     {
         public Product Product { get; set; }
         public bool IsOnSale { get; set; }

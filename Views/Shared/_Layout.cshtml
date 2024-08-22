@@ -50,12 +50,12 @@
 		<div id="top-header">
 			<div class="container">
 				<ul class="header-links pull-left">
-					<li><a href="#"><i class="fa fa-phone"></i> +021-95-51-84</a></li>
-					<li><a href="#"><i class="fa fa-envelope-o"></i> email@email.com</a></li>
-					<li><a href="#"><i class="fa fa-map-marker"></i> 1734 Stonecoal Road</a></li>
+					<li><a href="#"><i class="fa fa-phone"></i> 0949497383</a></li>
+					<li><a href="#"><i class="fa fa-envelope-o"></i> dhnl@email.com</a></li>
+					<li><a href="#"><i class="fa fa-map-marker"></i> Đại Học Nông Lâm</a></li>
 				</ul>
 				<ul class="header-links pull-right">
-					<li><a href="#"><i class="fa fa-dollar"></i> VND</a></li>
+					<li><a href="#"><i></i> VND</a></li>
 					<li><a href="@Url.Action("MyAccount", "Account")"><i class="fa fa-user-o"></i>
 							@{if(User.Identity.Name != null)
 								{
@@ -154,9 +154,9 @@
 					<li class="active"><a href="#">Trang Chủ</a></li>
 					<li><a href="#">Danh Mục</a></li>
 					<li><a href="#">Khuyến mãi</a></li>
-					<li><a href="#">Giới Thiệu</a></li>
+					<li><a href="@Url.Action("Introduction", "Home")">Giới Thiệu</a></li>
 					<li><a href="#">Liên Hệ</a></li>
-					<li><a href="#">Chính Sách Bảo Mật</a></li>
+					<li><a href="@Url.Action("Privacy", "Home")">Chính Sách Bảo Mật</a></li>
 				</ul>
 				<!-- /NAV -->
 			</div>
