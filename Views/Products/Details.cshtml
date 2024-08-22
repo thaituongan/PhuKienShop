@@ -1,8 +1,7 @@
-
 @model PhuKienShop.Models.ProductDetailModel
 @{
-    ViewData["Title"] = "Details";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+	ViewData["Title"] = "Details";
+	Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <!--liên kết script để cuộn xuống màn hình-->
 <script src="~/js/scroll.js" defer></script>
@@ -251,15 +250,15 @@
 										</ul>
 										<!-- Reviews Pagination -->
 
-											<ul class="reviews-pagination">
-												@for (int i = 1; i <= Model.TotalPages; i++)
-												{
-													<li class="@(i == Model.CurrentPage ? "active" : "")">
-														<a href="@Url.Action("Details", new { id = Model.CurrentProduct.ProductId, categoryId = Model.CurrentProduct.CategoryId, page = i })">@i</a>
-													</li>
-												}
-											</ul>
-									
+										<ul class="reviews-pagination">
+											@for (int i = 1; i <= Model.TotalPages; i++)
+											{
+												<li class="@(i == Model.CurrentPage ? "active" : "")">
+													<a href="@Url.Action("Details", new { id = Model.CurrentProduct.ProductId, categoryId = Model.CurrentProduct.CategoryId, page = i })">@i</a>
+												</li>
+											}
+										</ul>
+
 									</div>
 								</div>
 								<!-- /Reviews -->
@@ -311,7 +310,8 @@
 				</div>
 			</div>
 			<h3>Các loại @Model.CurrentProduct.Category.CategoryName.ToLower() khác</h3>
-			@if(!@Model.RelatedProducts.Any()){
+			@if (!@Model.RelatedProducts.Any())
+			{
 				<h2>Không có sản phẩm liên quan nào được hiển thị</h2>
 			} else{
 			<!-- product: hiển thị lên các sẩn phẩm liên quan -->
@@ -339,18 +339,18 @@
 										}
 									</div>
 
-									<div class="add-to-cart">
-										<button class="add-to-cart-btn"><i class="fa fa-shopping-cart"></i>Thêm vào giỏ hàng</button>
-									</div>
-								</a>
-							</div>
-						}
+										<div class="add-to-cart">
+											<button class="add-to-cart-btn"><i class="fa fa-shopping-cart"></i>Thêm vào giỏ hàng</button>
+										</div>
+									</a>
+								</div>
+							}
+						</div>
+						<div id="slick-nav-1" class="products-slick-nav"></div>
 					</div>
-					<div id="slick-nav-1" class="products-slick-nav"></div>
 				</div>
-			</div>
-			<!-- /product -->
-			<!-- product -->
+				<!-- /product -->
+				<!-- product -->
 			}
 		</div>
 		<!-- /row -->
@@ -370,4 +370,3 @@
 		});
 	}
 </script>
-
