@@ -74,6 +74,7 @@
 
   <ItemGroup>
     <Folder Include="Data\" />
+    <Folder Include="UserImg\" />
   </ItemGroup>
 
   <ItemGroup>
