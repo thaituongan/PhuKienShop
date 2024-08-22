@@ -121,43 +121,43 @@
     </div>
     <!-- /container -->
 </div>
-	<!-- /HOT DEAL SECTION -->
-	<div class="section">
-		<!-- container -->
-		<div class="container">
+<!-- /HOT DEAL SECTION -->
+<div class="section">
+    <!-- container -->
+    <div class="container">
 
-			<!-- SECTION -->
-			<div class="section">
-				<!-- container -->
-				<div class="container">
+        <!-- SECTION -->
+        <div class="section">
+            <!-- container -->
+            <div class="container">
 
-					<!-- /row -->
-				</div>
-				<!-- /container -->
-			</div>
-			<!-- /SECTION -->
-			<!-- row -->
-			<div class="row">
-				<!-- section title -->
-				<div class="col-md-12">
-					<div class="section-title">
-						<h3 class="title">Sản Phẩm Khuyến Mãi</h3>
-						@await Component.InvokeAsync("CategoryTab")
-					</div>
-				</div>
+                <!-- /row -->
+            </div>
+            <!-- /container -->
+        </div>
+        <!-- /SECTION -->
+        <!-- row -->
+        <div class="row">
+            <!-- section title -->
+            <div class="col-md-12">
+                <div class="section-title">
+                    <h3 class="title">Sản Phẩm Khuyến Mãi</h3>
+                    @await Component.InvokeAsync("CategoryTab")
+                </div>
+            </div>
 
-				<!-- Products tab & slick-->
-				<div class="col-md-12">
-					<div class="row">
-						@await Component.InvokeAsync("ListSales")
-					</div>
-				</div>
-				<!--	Products tab & slick -->
-			</div>
-			<!-- /row -->
-		</div>
-		<!-- /container -->
-	</div>
+            <!-- Products tab & slick-->
+            <div class="col-md-12">
+                <div class="row">
+                    @await Component.InvokeAsync("ListSales")
+                </div>
+            </div>
+            <!--	Products tab & slick -->
+        </div>
+        <!-- /row -->
+    </div>
+    <!-- /container -->
+</div>
 @section Scripts {
     <script>
         document.addEventListener("DOMContentLoaded", function () {
