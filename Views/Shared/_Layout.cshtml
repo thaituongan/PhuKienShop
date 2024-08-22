@@ -44,13 +44,26 @@
 
 	<style>
 		#searchResults {
-			position: absolute; /* Đặt phần tử đè lên vị trí của layout chính */
-			top: 100px; /* Điều chỉnh khoảng cách từ đỉnh của trang */
+			position: absolute;
+			top: 150pxpx;
 			left: 0;
 			right: 0;
-			z-index: 1000; /* Đảm bảo rằng nó nằm trên các phần tử khác */
+			z-index: 100;
 			padding: 20px;
+			background-color: white; /* Nền trắng cho phần tử chính */
 		}
+
+			#searchResults .result-item {
+				background-color: white; /* Nền trắng cho từng phần tử con */
+				margin-bottom: 20px; /* Khoảng cách giữa các phần tử */
+				padding: 10px; /* Khoảng cách bên trong mỗi phần tử */
+				box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1); /* Đổ bóng cho mỗi phần tử */
+			}
+
+				#searchResults .result-item:last-child {
+					margin-bottom: 0; /* Xóa khoảng cách dưới cùng cho phần tử cuối */
+				}
+
 
 		#main {
 			position: relative;
